@@ -15,6 +15,7 @@ export class CsvImporter extends Base {
 		super(info);
 
 		this.csvParser = require('csv-parse/lib/sync');
+		this.csvParserOpts = { max_limit_on_data_read: 1e6 };
 		this.messages = new Map();
 	}
 
@@ -46,7 +47,7 @@ export class CsvImporter extends Base {
 			// Parse the channels
 			if (entry.entryName.toLowerCase() === 'channels.csv') {
 				super.updateProgress(ProgressStep.PREPARING_CHANNELS);
-				const parsedChannels = this.csvParser(entry.getData().toString());
+				const parsedChannels = this.csvParser(entry.getData().toString(), this.csvParserOpts);
 				tempChannels = parsedChannels.map((c) => ({
 					id: c[0].trim().replace('.', '_'),
 					name: c[0].trim(),
