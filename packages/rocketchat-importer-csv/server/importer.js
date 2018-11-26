@@ -49,11 +49,12 @@ export class CsvImporter extends Base {
 				super.updateProgress(ProgressStep.PREPARING_CHANNELS);
 				const parsedChannels = this.csvParser(entry.getData().toString(), this.csvParserOpts);
 				tempChannels = parsedChannels.map((c) => ({
-					id: c[0].trim().replace('.', '_'),
-					name: c[0].trim(),
-					creator: c[1].trim(),
-					isPrivate: c[2].trim().toLowerCase() === 'private',
-					members: c[3].trim().split(';').map((m) => m.trim()),
+					id: c[0].trim(),
+					name: c[1].trim(),
+					creator: c[2].trim(),
+					isPrivate: c[3].trim().toLowerCase() !== 'public',
+					type: c[3].trim().toLowerCase(),
+					members: c[4].trim().split(';').map((m) => m.trim()),
 				}));
 				continue;
 			}
@@ -62,7 +63,16 @@ export class CsvImporter extends Base {
 			if (entry.entryName.toLowerCase() === 'users.csv') {
 				super.updateProgress(ProgressStep.PREPARING_USERS);
 				const parsedUsers = this.csvParser(entry.getData().toString());
-				tempUsers = parsedUsers.map((u) => ({ id: u[0].trim().replace('.', '_'), username: u[0].trim(), email: u[1].trim(), name: u[2].trim() }));
+				tempUsers = parsedUsers.map((u) => ({
+					id: u[0].trim(),
+					username: u[1].trim(),
+					email: u[2].trim(),
+					name: u[3].trim(),
+					customFields: {
+						id: u[4].trim(),
+						registeredAt: u[5].trim()
+					}
+				}));
 				continue;
 			}
 
@@ -198,6 +208,8 @@ export class CsvImporter extends Base {
 								Meteor.call('setUsername', u.username, { joinDefaultChannelsSilenced: true });
 								RocketChat.models.Users.setName(userId, u.name);
 								RocketChat.models.Users.update({ _id: userId }, { $addToSet: { importIds: u.id } });
+								RocketChat.validateCustomFields(u.customFields);
+								RocketChat.saveCustomFieldsWithoutValidation(userId, u.customFields);
 								u.rocketId = userId;
 							});
 						}
