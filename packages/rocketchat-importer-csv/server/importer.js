@@ -252,13 +252,13 @@ export class CsvImporter extends Base {
 							if (c.type === 'direct') {
 								// Create the direct
 								Meteor.runAsUser(creatorId, () => {
-									const roomInfo = Meteor.call('createDirectMessage', c.directreceiver);
+									const roomInfo = Meteor.call('createDirectMessage', c.members[0]);
 									c.rocketId = roomInfo.rid;
 								});
 							} else {
 								// Create the channel
 								Meteor.runAsUser(creatorId, () => {
-									const roomInfo = Meteor.call(c.isPrivate ? 'createPrivateGroup' : 'createChannel', c.name, c.members);
+									const roomInfo = Meteor.call(c.isPrivate ? 'createPrivateGroup' : 'createChannel', c.name, c.members, false, c.customFields);
 									c.rocketId = roomInfo.rid;
 								});
 							}
