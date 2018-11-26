@@ -234,18 +234,34 @@ export class CsvImporter extends Base {
 							RocketChat.models.Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
 						} else {
 							// Find the rocketchatId of the user who created this channel
-							let creatorId = startedByUserId;
+							let creatorId = null;
 							for (const u of this.users.users) {
 								if (u.username === c.creator && u.do_import) {
 									creatorId = u.rocketId;
 								}
 							}
+							if (!creatorId) {
+								creatorId = RocketChat.models.Users.findOneByUsername(c.creator);
+							}
 
-							// Create the channel
-							Meteor.runAsUser(creatorId, () => {
-								const roomInfo = Meteor.call(c.isPrivate ? 'createPrivateGroup' : 'createChannel', c.name, c.members);
-								c.rocketId = roomInfo.rid;
-							});
+							if (!creatorId) {
+								this.logger.error('CHANNELS: Not found user=' + c.creator);
+								continue;
+							}
+
+							if (c.type === 'direct') {
+								// Create the direct
+								Meteor.runAsUser(creatorId, () => {
+									const roomInfo = Meteor.call('createDirectMessage', c.directreceiver);
+									c.rocketId = roomInfo.rid;
+								});
+							} else {
+								// Create the channel
+								Meteor.runAsUser(creatorId, () => {
+									const roomInfo = Meteor.call(c.isPrivate ? 'createPrivateGroup' : 'createChannel', c.name, c.members);
+									c.rocketId = roomInfo.rid;
+								});
+							}
 
 							RocketChat.models.Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
 						}
