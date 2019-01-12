@@ -70,8 +70,8 @@ export class CsvImporter extends Base {
 					name: u[3].trim(),
 					customFields: {
 						id: u[4].trim(),
-						registeredAt: u[5].trim()
-					}
+						registeredAt: u[5].trim(),
+					},
 				}));
 				continue;
 			}
@@ -203,7 +203,7 @@ export class CsvImporter extends Base {
 							u.rocketId = existantUser._id;
 							RocketChat.models.Users.update({ _id: u.rocketId }, { $addToSet: { importIds: u.id } });
 						} else {
-							const userId = Accounts.createUser({ email: u.email, password: "p" + u.customFields.id });
+							const userId = Accounts.createUser({ email: u.email, password: `p${u.customFields.id}` });
 							Meteor.runAsUser(userId, () => {
 								Meteor.call('setUsername', u.username, { joinDefaultChannelsSilenced: true });
 								RocketChat.models.Users.setName(userId, u.name);
@@ -245,13 +245,13 @@ export class CsvImporter extends Base {
 							}
 
 							if (!creatorId) {
-								this.logger.error('CHANNELS: Not found user=' + c.creator);
+								this.logger.error(`CHANNELS: Not found user=${c.creator}`);
 								return;
 							}
 
 							if (c.type === 'direct') {
 								// Create the direct
-								this.logger.info('DIRECT: ' + JSON.stringify(c));
+								this.logger.info(`DIRECT: ${JSON.stringify(c)}`);
 								Meteor.runAsUser(creatorId, () => {
 									const roomInfo = Meteor.call('createDirectMessage', c.members[0]);
 									c.rocketId = roomInfo.rid;
