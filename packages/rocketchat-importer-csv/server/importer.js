@@ -8,7 +8,8 @@ import {
 	SelectionUser,
 } from 'meteor/rocketchat:importer';
 import { RocketChatFile } from 'meteor/rocketchat:file';
-import { RocketChat } from 'meteor/rocketchat:lib';
+import { Users, Rooms } from 'meteor/rocketchat:models';
+import { sendMessage } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
 	constructor(info) {
@@ -191,23 +192,23 @@ export class CsvImporter extends Base {
 					}
 
 					Meteor.runAsUser(startedByUserId, () => {
-						let existantUser = RocketChat.models.Users.findOneByEmailAddress(u.email);
+						let existantUser = Users.findOneByEmailAddress(u.email);
 
 						// If we couldn't find one by their email address, try to find an existing user by their username
 						if (!existantUser) {
-							existantUser = RocketChat.models.Users.findOneByUsername(u.username);
+							existantUser = Users.findOneByUsername(u.username);
 						}
 
 						if (existantUser) {
 							// since we have an existing user, let's try a few things
 							u.rocketId = existantUser._id;
-							RocketChat.models.Users.update({ _id: u.rocketId }, { $addToSet: { importIds: u.id } });
+							Users.update({ _id: u.rocketId }, { $addToSet: { importIds: u.id } });
 						} else {
 							const userId = Accounts.createUser({ email: u.email, password: `p${ u.customFields.id }` });
 							Meteor.runAsUser(userId, () => {
 								Meteor.call('setUsername', u.username, { joinDefaultChannelsSilenced: true });
-								RocketChat.models.Users.setName(userId, u.name);
-								RocketChat.models.Users.update({ _id: userId }, { $addToSet: { importIds: u.id } });
+								Users.setName(userId, u.name);
+								Users.update({ _id: userId }, { $addToSet: { importIds: u.id } });
 								RocketChat.validateCustomFields(u.customFields);
 								RocketChat.saveCustomFieldsWithoutValidation(userId, u.customFields);
 								u.rocketId = userId;
@@ -227,11 +228,11 @@ export class CsvImporter extends Base {
 					}
 
 					Meteor.runAsUser(startedByUserId, () => {
-						const existantRoom = RocketChat.models.Rooms.findOneByName(c.name);
+						const existantRoom = Rooms.findOneByName(c.name);
 						// If the room exists or the name of it is 'general', then we don't need to create it again
 						if (existantRoom || c.name.toUpperCase() === 'GENERAL') {
 							c.rocketId = c.name.toUpperCase() === 'GENERAL' ? 'GENERAL' : existantRoom._id;
-							RocketChat.models.Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
+							Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
 						} else {
 							// Find the rocketchatId of the user who created this channel
 							let creatorId = null;
@@ -241,7 +242,7 @@ export class CsvImporter extends Base {
 								}
 							}
 							if (!creatorId) {
-								creatorId = RocketChat.models.Users.findOneByUsername(c.creator)._id;
+								creatorId = Users.findOneByUsername(c.creator)._id;
 							}
 
 							if (!creatorId) {
@@ -264,7 +265,7 @@ export class CsvImporter extends Base {
 								});
 							}
 
-							RocketChat.models.Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
+							Rooms.update({ _id: c.rocketId }, { $addToSet: { importIds: c.id } });
 						}
 
 						super.addCountCompleted(1);
@@ -276,7 +277,7 @@ export class CsvImporter extends Base {
 				if (this.channels.channels.length === 0) {
 					for (const cname of this.messages.keys()) {
 						Meteor.runAsUser(startedByUserId, () => {
-							const existantRoom = RocketChat.models.Rooms.findOneByName(cname);
+							const existantRoom = Rooms.findOneByName(cname);
 							if (existantRoom || cname.toUpperCase() === 'GENERAL') {
 								this.channels.channels.push({
 									id: cname.replace('.', '_'),
@@ -300,7 +301,7 @@ export class CsvImporter extends Base {
 							for (const msgs of messagesMap.values()) {
 								for (const msg of msgs.messages) {
 									if (!this.getUserFromUsername(msg.username)) {
-										const user = RocketChat.models.Users.findOneByUsername(msg.username);
+										const user = Users.findOneByUsername(msg.username);
 										if (user) {
 											this.users.users.push({
 												rocketId: user._id,
@@ -322,13 +323,13 @@ export class CsvImporter extends Base {
 						continue;
 					}
 
-					const room = RocketChat.models.Rooms.findOneById(csvChannel.rocketId, { fields: { usernames: 1, t: 1, name: 1 } });
+					const room = Rooms.findOneById(csvChannel.rocketId, { fields: { usernames: 1, t: 1, name: 1 } });
 					Meteor.runAsUser(startedByUserId, () => {
 						const timestamps = {};
 						for (const [msgGroupData, msgs] of messagesMap.entries()) {
 							super.updateRecord({ messagesstatus: `${ ch }/${ msgGroupData }.${ msgs.messages.length }` });
 							for (const msg of msgs.messages) {
-								if (isNaN(new Date(parseInt(msg.ts)))) {
+								if (isNaN(new Date(parseInt(msg.ts, 10)))) {
 									this.logger.warn(`Timestamp on a message in ${ ch }/${ msgGroupData } is invalid`);
 									super.addCountCompleted(1);
 									continue;
@@ -345,7 +346,7 @@ export class CsvImporter extends Base {
 									}
 									const msgObj = {
 										_id: `csv-${ csvChannel.id }-${ msg.ts }${ suffix }`,
-										ts: new Date(parseInt(msg.ts)),
+										ts: new Date(parseInt(msg.ts, 10)),
 										msg: msg.text,
 										rid: room._id,
 										u: {
@@ -354,7 +355,7 @@ export class CsvImporter extends Base {
 										},
 									};
 
-									RocketChat.sendMessage(creator, msgObj, room, true);
+									sendMessage(creator, msgObj, room, true);
 								}
 
 								super.addCountCompleted(1);
@@ -396,7 +397,7 @@ export class CsvImporter extends Base {
 	getUserFromUsername(username) {
 		for (const u of this.users.users) {
 			if (u.username === username) {
-				return RocketChat.models.Users.findOneById(u.rocketId, { fields: { username: 1 } });
+				return Users.findOneById(u.rocketId, { fields: { username: 1 } });
 			}
 		}
 	}
