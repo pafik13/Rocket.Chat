@@ -9,7 +9,11 @@ import {
 } from 'meteor/rocketchat:importer';
 import { RocketChatFile } from 'meteor/rocketchat:file';
 import { Users, Rooms } from 'meteor/rocketchat:models';
-import { sendMessage } from 'meteor/rocketchat:lib';
+import {
+	validateCustomFields,
+	saveCustomFieldsWithoutValidation,
+	sendMessage,
+} from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
 	constructor(info) {
@@ -209,8 +213,8 @@ export class CsvImporter extends Base {
 								Meteor.call('setUsername', u.username, { joinDefaultChannelsSilenced: true });
 								Users.setName(userId, u.name);
 								Users.update({ _id: userId }, { $addToSet: { importIds: u.id } });
-								RocketChat.validateCustomFields(u.customFields);
-								RocketChat.saveCustomFieldsWithoutValidation(userId, u.customFields);
+								validateCustomFields(u.customFields);
+								saveCustomFieldsWithoutValidation(userId, u.customFields);
 								u.rocketId = userId;
 							});
 						}
