@@ -15,13 +15,13 @@ variables:
   DOCKER_DRIVER: overlay2
 
 before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.apianon.ru:5555
+  #- docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.apianon.ru:5555
   #https://medium.com/@Empanado/simple-continuous-deployment-with-docker-compose-docker-machine-and-gitlab-ci-9047765322e1
   - apk add --update py-pip
   - pip install docker-compose
   - apk add curl
   - apk add bash
-  - apk add nodejs-current
+  - apk add docker
   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
   - meteor npm install
