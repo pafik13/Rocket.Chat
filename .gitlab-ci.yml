@@ -1,4 +1,4 @@
-image: circleci/node:8.11
+image: docker:latest
 services:
 - docker:dind
 
@@ -21,6 +21,7 @@ before_script:
   - pip install docker-compose
   - apk add curl
   - apk add bash
+  - apk add nodejs-current
   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
   - meteor npm install
