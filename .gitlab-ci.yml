@@ -19,6 +19,7 @@ before_script:
   #https://medium.com/@Empanado/simple-continuous-deployment-with-docker-compose-docker-machine-and-gitlab-ci-9047765322e1
   - apk add --update py-pip
   - pip install docker-compose
+  - apk add curl
   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
   - meteor npm install
