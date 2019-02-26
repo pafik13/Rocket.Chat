@@ -20,6 +20,7 @@ before_script:
   - apk add --update py-pip
   - pip install docker-compose
   - apk add curl
+  - apk add bash
   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
   - meteor npm install
