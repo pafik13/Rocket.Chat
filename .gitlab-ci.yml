@@ -22,26 +22,35 @@ before_script:
   #- apk add curl
   #- apk add bash
   #- apk add 
-  - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
-  - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
-  - meteor npm install
-  - set +e
-  - meteor add rocketchat:lib
-  - set -e
-  - meteor build --server-only --directory /tmp/build
+#   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
+#   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
+#   - meteor npm install
+#   - set +e
+#   - meteor add rocketchat:lib
+#   - set -e
+#   - meteor build --server-only --directory /tmp/build
 
 
 build:
   stage: build
   script:
+    - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
+    - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
+    - meteor npm install
+    - set +e
+    - meteor add rocketchat:lib
+    - set -e
+    - meteor build --server-only --directory /tmp/build
     - docker build --pull -t $TEST_IMAGE .
     - docker push $TEST_IMAGE
+  when: manual
 
 test:
   stage: test
   script:
     - docker pull $TEST_IMAGE
     - docker run $TEST_IMAGE npm test
+  when: manual
 
 release:
   stage: release
@@ -51,6 +60,7 @@ release:
     - docker push $RELEASE_IMAGE
   only:
     - develop
+  when: manual
 
 stage deploy:
   stage: deploy
@@ -67,6 +77,7 @@ stage deploy:
     - docker-compose up -d
   only:
     - develop
+  when: manual
 
 prod deploy:
   stage: deploy
