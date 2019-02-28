@@ -41,8 +41,8 @@ build:
     - meteor add rocketchat:lib
     - set -e
     - meteor build --server-only --directory /tmp/build
-    - docker build --pull -t $TEST_IMAGE .
-    - docker push $TEST_IMAGE
+    - sudo docker build --pull -t $TEST_IMAGE .
+    - sudo docker push $TEST_IMAGE
   when: manual
 
 test:
