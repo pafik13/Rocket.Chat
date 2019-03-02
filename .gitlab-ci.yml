@@ -24,7 +24,7 @@ before_script:
   - apk add bash
   - apk add gnupg
 #   - curl -sL https://deb.nodesource.com/setup_8.x  | bash -
-  - apk add nodejs=8.11
+  - apk add nodejs=10.14.2-r0
 #   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
 #   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
 #   - meteor npm install
