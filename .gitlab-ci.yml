@@ -1,4 +1,5 @@
-image: circleci/node:8.11
+#image: circleci/node:8.11
+image: docker:latest
 services:
 - docker:dind
 
@@ -15,13 +16,15 @@ variables:
   DOCKER_DRIVER: overlay2
 
 before_script:
-  #- docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.apianon.ru:5555
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.apianon.ru:5555
   #https://medium.com/@Empanado/simple-continuous-deployment-with-docker-compose-docker-machine-and-gitlab-ci-9047765322e1
-  #- apk add --update py-pip
-  #- pip install docker-compose
-  #- apk add curl
-  #- apk add bash
-  #- apk add 
+  - apk add --update py-pip
+  - pip install docker-compose
+  - apk add curl
+  - apk add bash
+  - apk add gnupg
+  - curl -sL https://deb.nodesource.com/setup_8.x  | bash -
+  - apk add nodejs
 #   - curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
 #   - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
 #   - meteor npm install
@@ -41,8 +44,8 @@ build:
     - meteor add rocketchat:lib
     - set -e
     - meteor build --server-only --directory /tmp/build
-    - sudo docker build --pull -t $TEST_IMAGE .
-    - sudo docker push $TEST_IMAGE
+    - docker build --pull -t $TEST_IMAGE .
+    - docker push $TEST_IMAGE
   when: manual
 
 test:
