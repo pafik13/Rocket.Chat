@@ -322,15 +322,19 @@ export class CsvImporter extends Base {
 				// Import the Messages
 				super.updateProgress(ProgressStep.IMPORTING_MESSAGES);
 				for (const [ch, messagesMap] of this.messages.entries()) {
-					const csvChannel = this.getChannelFromName(ch);
-					if (!csvChannel || !csvChannel.do_import) {
-						continue;
+					const isDialog = ch === 'dialog';
+					if (!isDialog) {
+						const csvChannel = this.getChannelFromName(ch);
+						if (!csvChannel || !csvChannel.do_import) {
+							continue;
+						}
 					}
-
-					const room = Rooms.findOneById(csvChannel.rocketId, { fields: { usernames: 1, t: 1, name: 1 } });
+					
 					Meteor.runAsUser(startedByUserId, () => {
 						const timestamps = {};
 						for (const [msgGroupData, msgs] of messagesMap.entries()) {
+							const room = Rooms.findOneById(isDialog ? msgGroupData : csvChannel.rocketId, { fields: { usernames: 1, t: 1, name: 1 } });
+
 							super.updateRecord({ messagesstatus: `${ ch }/${ msgGroupData }.${ msgs.messages.length }` });
 							for (const msg of msgs.messages) {
 								if (isNaN(new Date(parseInt(msg.ts, 10)))) {
@@ -349,7 +353,7 @@ export class CsvImporter extends Base {
 										timestamps[msg.ts] += 1;
 									}
 									const msgObj = {
-										_id: `csv-${ csvChannel.id }-${ msg.ts }${ suffix }`,
+										_id: `csv-${ isDialog ? msgGroupData : csvChannel.id }-${ msg.ts }${ suffix }`,
 										ts: new Date(parseInt(msg.ts, 10)),
 										msg: msg.text,
 										rid: room._id,
