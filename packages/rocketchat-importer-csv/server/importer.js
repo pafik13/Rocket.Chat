@@ -363,7 +363,8 @@ export class CsvImporter extends Base {
 										},
 									};
 
-									sendMessage(creator, msgObj, room, true);
+									const res = sendMessage(creator, msgObj, room, true);
+									this.logger.info(`'sendMessage' result: ${ JSON.stringify(res) }`);
 								}
 
 								super.addCountCompleted(1);
