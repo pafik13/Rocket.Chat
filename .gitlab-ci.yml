@@ -1,8 +1,7 @@
-#image: circleci/node:8.11
-image: docker:latest
+image: circleci/node:8.11
+# image: docker:latest
 services:
 - docker:dind
-- node:8.11
 
 stages:
 - build
@@ -21,9 +20,9 @@ before_script:
   #https://medium.com/@Empanado/simple-continuous-deployment-with-docker-compose-docker-machine-and-gitlab-ci-9047765322e1
   - apk add --update py-pip
   - pip install docker-compose
-  - apk add curl
-  - apk add bash
-  - apk add gnupg
+#   - apk add curl
+#   - apk add bash
+#   - apk add gnupg
   - node -v
 #   - curl -sL https://deb.nodesource.com/setup_8.x  | bash -
   # - apk add nodejs=10.14.2-r0
