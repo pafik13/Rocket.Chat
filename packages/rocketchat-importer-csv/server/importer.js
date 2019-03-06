@@ -297,9 +297,14 @@ export class CsvImporter extends Base {
 				// If no users file, collect user map from DB for message-only import
 				if (this.users.users.length === 0) {
 					for (const [ch, messagesMap] of this.messages.entries()) {
-						const csvChannel = this.getChannelFromName(ch);
-						if (!csvChannel || !csvChannel.do_import) {
-							continue;
+						const isDialog = ch === 'dialog';
+						
+						this.logger.info(`'Messages prepare:' ch,isDialog: ${ ch }, ${ isDialog}`);
+						if (!isDialog) {
+							const csvChannel = this.getChannelFromName(ch);
+							if (!csvChannel || !csvChannel.do_import) {
+								continue;
+							}
 						}
 						Meteor.runAsUser(startedByUserId, () => {
 							for (const msgs of messagesMap.values()) {
@@ -311,6 +316,7 @@ export class CsvImporter extends Base {
 												rocketId: user._id,
 												username: user.username,
 											});
+											this.logger.info(`'Messages prepare:' user: ${ JSON.stringify(user) }`);
 										}
 									}
 								}
@@ -344,6 +350,7 @@ export class CsvImporter extends Base {
 								}
 
 								const creator = this.getUserFromUsername(msg.username);
+								this.logger.info(`'sendMessage' creator: ${ JSON.stringify(creator) }`);
 								if (creator) {
 									let suffix = '';
 									if (timestamps[msg.ts] === undefined) {
