@@ -298,8 +298,7 @@ export class CsvImporter extends Base {
 				if (this.users.users.length === 0) {
 					for (const [ch, messagesMap] of this.messages.entries()) {
 						const isDialog = ch === 'dialog';
-						
-						this.logger.info(`'Messages prepare:' ch,isDialog: ${ ch }, ${ isDialog}`);
+						this.logger.info(`'Messages prepare:' ch,isDialog: ${ ch }, ${ isDialog }`);
 						if (!isDialog) {
 							const csvChannel = this.getChannelFromName(ch);
 							if (!csvChannel || !csvChannel.do_import) {
@@ -328,14 +327,15 @@ export class CsvImporter extends Base {
 				// Import the Messages
 				super.updateProgress(ProgressStep.IMPORTING_MESSAGES);
 				for (const [ch, messagesMap] of this.messages.entries()) {
+					let csvChannel;
 					const isDialog = ch === 'dialog';
 					if (!isDialog) {
-						const csvChannel = this.getChannelFromName(ch);
+						csvChannel = this.getChannelFromName(ch);
 						if (!csvChannel || !csvChannel.do_import) {
 							continue;
 						}
 					}
-					
+
 					Meteor.runAsUser(startedByUserId, () => {
 						const timestamps = {};
 						for (const [msgGroupData, msgs] of messagesMap.entries()) {
