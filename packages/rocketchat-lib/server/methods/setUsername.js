@@ -26,20 +26,20 @@ Meteor.methods({
 			return username;
 		}
 
-		let nameValidation;
-		try {
-			nameValidation = new RegExp(`^${ settings.get('UTF8_Names_Validation') }$`);
-		} catch (error) {
-			nameValidation = new RegExp('^[0-9a-zA-Z-_.]+$');
-		}
+		// let nameValidation;
+		// try {
+		// 	nameValidation = new RegExp(`^${ settings.get('UTF8_Names_Validation') }$`);
+		// } catch (error) {
+		// 	nameValidation = new RegExp('^[0-9a-zA-Z-_.]+$');
+		// }
 
-		if (!nameValidation.test(username)) {
-			throw new Meteor.Error('username-invalid', `${ _.escape(username) } is not a valid username, use only letters, numbers, dots, hyphens and underscores`);
-		}
+		// if (!nameValidation.test(username)) {
+		// 	throw new Meteor.Error('username-invalid', `${ _.escape(username) } is not a valid username, use only letters, numbers, dots, hyphens and underscores`);
+		// }
 
-		if (!checkUsernameAvailability(username)) {
-			throw new Meteor.Error('error-field-unavailable', `<strong>${ _.escape(username) }</strong> is already in use :(`, { method: 'setUsername', field: username });
-		}
+		// if (!checkUsernameAvailability(username)) {
+		// 	throw new Meteor.Error('error-field-unavailable', `<strong>${ _.escape(username) }</strong> is already in use :(`, { method: 'setUsername', field: username });
+		// }
 
 		if (!setUsername(user._id, username)) {
 			throw new Meteor.Error('error-could-not-change-username', 'Could not change username', { method: 'setUsername' });
@@ -47,9 +47,9 @@ Meteor.methods({
 
 		if (!user.username) {
 			Meteor.runAsUser(user._id, () => Meteor.call('joinDefaultChannels', joinDefaultChannelsSilenced));
-			Meteor.defer(function() {
-				return callbacks.run('afterCreateUser', Users.findOneById(user._id));
-			});
+			// Meteor.defer(function() {
+			// 	return callbacks.run('afterCreateUser', Users.findOneById(user._id));
+			// });
 		}
 
 		return username;
