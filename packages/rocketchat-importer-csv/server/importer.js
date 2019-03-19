@@ -13,6 +13,7 @@ import {
 	validateCustomFields,
 	saveCustomFieldsWithoutValidation,
 	sendMessage,
+	setUserAvatar
 } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
@@ -34,6 +35,7 @@ export class CsvImporter extends Base {
 		let tempChannels = [];
 		let tempUsers = [];
 		const tempMessages = new Map();
+		let tempAvatars = [];
 		for (const entry of zipEntries) {
 			this.logger.debug(`Entry: ${ entry.entryName }`);
 
@@ -103,6 +105,18 @@ export class CsvImporter extends Base {
 				tempMessages.get(channelName).set(msgGroupData, msgs.map((m) => ({ username: m[0], ts: m[1], text: m[2] })));
 				continue;
 			}
+			
+			// Parse the avatars
+			if (entry.entryName.toLowerCase() === 'avatars.csv') {
+				super.updateProgress(ProgressStep.PREPARING_AVATARS);
+				const parsedAvatars = this.csvParser(entry.getData().toString(), this.csvParserOpts);
+				tempAvatars = parsedAvatars.map((a) => ({
+					id: a[0].trim(),
+					username: a[1].trim(),
+					avatarUrl: a[2].trim(),
+				}));
+				continue;
+			}
 		}
 
 		// Insert the users record, eventually this might have to be split into several ones as well
@@ -144,9 +158,15 @@ export class CsvImporter extends Base {
 
 		super.updateRecord({ 'count.messages': messagesCount, messagesstatus: null });
 		super.addCountToTotal(messagesCount);
-
+		
+		// Insert the avatars records.
+		const avatarsId = this.collection.insert({ import: this.importRecord._id, importer: this.name, type: 'avatars', avatars: tempAvatars });
+		this.avatars = this.collection.findOne(avatarsId);
+		super.updateRecord({ 'count.avatars': tempAvatars.length });
+		super.addCountToTotal(tempAvatars.length);
+		
 		// Ensure we have at least a single user, channel, or message
-		if (tempUsers.length === 0 && tempChannels.length === 0 && messagesCount === 0) {
+		if (tempUsers.length === 0 && tempChannels.length === 0 && messagesCount === 0 && tempAvatars.length === 0) {
 			this.logger.error('No users, channels, or messages found in the import file.');
 			super.updateProgress(ProgressStep.ERROR);
 			return super.getProgress();
@@ -155,9 +175,10 @@ export class CsvImporter extends Base {
 		const selectionUsers = tempUsers.map((u) => new SelectionUser(u.id, u.username, u.email, false, false, true));
 		const selectionChannels = tempChannels.map((c) => new SelectionChannel(c.id, c.name, false, true, c.isPrivate));
 		const selectionMessages = this.importRecord.count.messages;
-
+		const selectionAvatars = this.importRecord.count.avatars;
+		
 		super.updateProgress(ProgressStep.USER_SELECTION);
-		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages);
+		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars);
 	}
 
 	startImport(importSelection) {
@@ -380,6 +401,37 @@ export class CsvImporter extends Base {
 					});
 				}
 
+
+				// If no users file, collect user map from DB for message-only import
+				const usersCache = new Map();
+				for (const a of this.avatars.avatars) {
+					this.logger.info(`'Avatars prepare:' username: ${ a.username }`);
+					Meteor.runAsUser(startedByUserId, () => {
+						if (!usersCache.get(a.username)) {
+							const user = Users.findOneByUsername(a.username);
+							if (user) {
+								usersCache.set(user.username, user)
+								this.logger.info(`'Avatars prepare:' user: ${ JSON.stringify(user) }`);
+							}
+						}
+					});
+				}
+				this.logger.info(`'Avatars prepare:' usersCache size: ${ usersCache.length }`);
+
+
+				// Import the avatars
+				for (const a of this.avatars.avatars) {
+					Meteor.runAsUser(startedByUserId, () => {
+						let user = usersCache.get(a.username);
+						
+						Meteor.runAsUser(user._id, () => {
+							setUserAvatar(user, a.avatarUrl, '', 'url');
+						});
+
+						super.addCountCompleted(1);
+					});
+				}
+
 				super.updateProgress(ProgressStep.FINISHING);
 				super.updateProgress(ProgressStep.DONE);
 			} catch (e) {
@@ -398,8 +450,9 @@ export class CsvImporter extends Base {
 		const selectionUsers = this.users.users.map((u) => new SelectionUser(u.id, u.username, u.email, false, false, true));
 		const selectionChannels = this.channels.channels.map((c) => new SelectionChannel(c.id, c.name, false, true, c.isPrivate));
 		const selectionMessages = this.importRecord.count.messages;
+		const selectionAvatars = this.importRecord.count.avatars;
 
-		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages);
+		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars);
 	}
 
 	getChannelFromName(channelName) {

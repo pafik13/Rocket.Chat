@@ -33,6 +33,9 @@ Template.adminImportPrepare.helpers({
 	message_count() {
 		return Template.instance().message_count.get();
 	},
+	avatars_count() {
+		return Template.instance().avatars_count.get();
+	},
 	fileSizeLimitMessage() {
 		const maxFileSize = settings.get('FileUpload_MaxFileSize');
 		let message;
@@ -121,6 +124,7 @@ function getImportFileData(importer, template) {
 		template.users.set(data.users);
 		template.channels.set(data.channels);
 		template.message_count.set(data.message_count);
+		template.avatars_count.set(data.avatars_count);
 		template.loaded.set(true);
 		template.preparing.set(false);
 	}).catch((error) => {
@@ -246,6 +250,7 @@ Template.adminImportPrepare.onCreated(function() {
 	this.users = new ReactiveVar([]);
 	this.channels = new ReactiveVar([]);
 	this.message_count = new ReactiveVar(0);
+	this.avatars_count = new ReactiveVar(0);
 
 	function loadSelection(progress) {
 		if ((progress != null ? progress.step : undefined)) {
@@ -255,6 +260,7 @@ Template.adminImportPrepare.onCreated(function() {
 				case 'importer_importing_users':
 				case 'importer_importing_channels':
 				case 'importer_importing_messages':
+				case 'importer_importing_avatars':
 				case 'importer_finishing':
 					return FlowRouter.go(`/admin/import/progress/${ FlowRouter.getParam('importer') }`);
 				case 'importer_user_selection':
@@ -265,6 +271,7 @@ Template.adminImportPrepare.onCreated(function() {
 						instance.users.set(data.users);
 						instance.channels.set(data.channels);
 						instance.message_count.set(data.message_count);
+						instance.avatars_count.set(data.avatars_count);
 						instance.loaded.set(true);
 						return instance.preparing.set(false);
 					});
