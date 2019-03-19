@@ -13,7 +13,7 @@ import {
 	validateCustomFields,
 	saveCustomFieldsWithoutValidation,
 	sendMessage,
-	setUserAvatar
+	setUserAvatar,
 } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
@@ -105,7 +105,7 @@ export class CsvImporter extends Base {
 				tempMessages.get(channelName).set(msgGroupData, msgs.map((m) => ({ username: m[0], ts: m[1], text: m[2] })));
 				continue;
 			}
-			
+
 			// Parse the avatars
 			if (entry.entryName.toLowerCase() === 'avatars.csv') {
 				super.updateProgress(ProgressStep.PREPARING_AVATARS);
@@ -158,13 +158,13 @@ export class CsvImporter extends Base {
 
 		super.updateRecord({ 'count.messages': messagesCount, messagesstatus: null });
 		super.addCountToTotal(messagesCount);
-		
+
 		// Insert the avatars records.
 		const avatarsId = this.collection.insert({ import: this.importRecord._id, importer: this.name, type: 'avatars', avatars: tempAvatars });
 		this.avatars = this.collection.findOne(avatarsId);
 		super.updateRecord({ 'count.avatars': tempAvatars.length });
 		super.addCountToTotal(tempAvatars.length);
-		
+
 		// Ensure we have at least a single user, channel, or message
 		if (tempUsers.length === 0 && tempChannels.length === 0 && messagesCount === 0 && tempAvatars.length === 0) {
 			this.logger.error('No users, channels, or messages found in the import file.');
@@ -176,7 +176,7 @@ export class CsvImporter extends Base {
 		const selectionChannels = tempChannels.map((c) => new SelectionChannel(c.id, c.name, false, true, c.isPrivate));
 		const selectionMessages = this.importRecord.count.messages;
 		const selectionAvatars = this.importRecord.count.avatars;
-		
+
 		super.updateProgress(ProgressStep.USER_SELECTION);
 		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars);
 	}
@@ -410,7 +410,7 @@ export class CsvImporter extends Base {
 						if (!usersCache.get(a.username)) {
 							const user = Users.findOneByUsername(a.username);
 							if (user) {
-								usersCache.set(user.username, user)
+								usersCache.set(user.username, user);
 								this.logger.info(`'Avatars prepare:' user: ${ JSON.stringify(user) }`);
 							}
 						}
@@ -422,8 +422,8 @@ export class CsvImporter extends Base {
 				// Import the avatars
 				for (const a of this.avatars.avatars) {
 					Meteor.runAsUser(startedByUserId, () => {
-						let user = usersCache.get(a.username);
-						
+						const user = usersCache.get(a.username);
+
 						Meteor.runAsUser(user._id, () => {
 							setUserAvatar(user, a.avatarUrl, '', 'url');
 						});
