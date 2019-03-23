@@ -342,22 +342,27 @@ API.v1.addRoute('users.update', { authRequired: true }, {
 				customFields: Match.Maybe(Object),
 			}),
 		});
-
-		const userData = _.extend({ _id: this.bodyParams.userId }, this.bodyParams.data);
+		const { userId } = this.bodyParams;
+		const userData = _.extend({ _id: userId }, this.bodyParams.data);
 
 		Meteor.runAsUser(this.userId, () => saveUser(this.userId, userData));
 
 		if (this.bodyParams.data.customFields) {
-			saveCustomFields(this.bodyParams.userId, this.bodyParams.data.customFields);
+			const user = Users.findOneById(userId, { fields: { customFields: 1 } });
+			const newCustomFields = {
+				...user.customFields,
+				...this.bodyParams.data.customFields,
+			};
+			saveCustomFields(userId, newCustomFields);
 		}
 
 		if (typeof this.bodyParams.data.active !== 'undefined') {
 			Meteor.runAsUser(this.userId, () => {
-				Meteor.call('setUserActiveStatus', this.bodyParams.userId, this.bodyParams.data.active);
+				Meteor.call('setUserActiveStatus', userId, this.bodyParams.data.active);
 			});
 		}
 
-		return API.v1.success({ user: Users.findOneById(this.bodyParams.userId, { fields: API.v1.defaultFieldsToExclude }) });
+		return API.v1.success({ user: Users.findOneById(userId, { fields: API.v1.defaultFieldsToExclude }) });
 	},
 });
 
