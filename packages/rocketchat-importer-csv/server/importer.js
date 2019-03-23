@@ -13,7 +13,7 @@ import {
 	validateCustomFields,
 	saveCustomFieldsWithoutValidation,
 	sendMessage,
-	setUserAvatar,
+	saveCustomFields,
 } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
@@ -76,8 +76,9 @@ export class CsvImporter extends Base {
 					email: u[2].trim(),
 					name: u[3].trim(),
 					customFields: {
-						id: u[4].trim(),
+						anonym_id: u[4].trim(),
 						registeredAt: u[5].trim(),
+						photoUrl: u[6].trim(),
 					},
 				}));
 				continue;
@@ -403,30 +404,31 @@ export class CsvImporter extends Base {
 
 
 				// If no users file, collect user map from DB for message-only import
-				const usersCache = new Map();
-				for (const a of this.avatars.avatars) {
-					this.logger.info(`'Avatars prepare:' username: ${ a.username }`);
-					Meteor.runAsUser(startedByUserId, () => {
-						if (!usersCache.get(a.username)) {
-							const user = Users.findOneByUsername(a.username);
-							if (user) {
-								usersCache.set(user.username, user);
-								this.logger.info(`'Avatars prepare:' user: ${ JSON.stringify(user) }`);
-							}
-						}
-					});
-				}
-				this.logger.info(`'Avatars prepare:' usersCache size: ${ usersCache.length }`);
+				// const usersCache = new Map();
+				// for (const a of this.avatars.avatars) {
+				// 	this.logger.info(`'Avatars prepare:' username: ${ a.username }`);
+				// 	Meteor.runAsUser(startedByUserId, () => {
+				// 		if (!usersCache.get(a.username)) {
+				// 			const user = Users.findOneByUsername(a.username);
+				// 			if (user) {
+				// 				usersCache.set(user.username, user);
+				// 				this.logger.info(`'Avatars prepare:' user: ${ JSON.stringify(user) }`);
+				// 			}
+				// 		}
+				// 	});
+				// }
+				// this.logger.info(`'Avatars prepare:' usersCache size: ${ usersCache.length }`);
 
 
 				// Import the avatars
 				for (const a of this.avatars.avatars) {
 					Meteor.runAsUser(startedByUserId, () => {
-						const user = usersCache.get(a.username);
+						// const user = usersCache.get(a.username);
 
-						Meteor.runAsUser(user._id, () => {
-							setUserAvatar(user, a.avatarUrl, '', 'url');
-						});
+						const user = Users.findOneByUsername(a.username, { fields: { customFields: 1 } });
+						// this.logger.error(user);
+						user.customFields.photoUrl = a.avatarUrl;
+						saveCustomFields(user._id, user.customFields);
 
 						super.addCountCompleted(1);
 					});
