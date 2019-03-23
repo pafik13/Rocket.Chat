@@ -3,7 +3,7 @@ import { Match, check } from 'meteor/check';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Messages } from 'meteor/rocketchat:models';
-import { Apps } from 'meteor/rocketchat:apps';
+// import { Apps } from 'meteor/rocketchat:apps';
 import { Markdown } from 'meteor/rocketchat:markdown';
 
 const objectMaybeIncluding = (types) => Match.Where((value) => {
@@ -110,11 +110,12 @@ export const sendMessage = function(user, message, room, upsert = false) {
 	if (!message.ts) {
 		message.ts = new Date();
 	}
-	const { _id, username, name } = user;
+	const { _id, username, name, customFields } = user;
 	message.u = {
 		_id,
 		username,
 		name,
+		...customFields,
 	};
 	message.rid = room._id;
 
@@ -131,20 +132,20 @@ export const sendMessage = function(user, message, room, upsert = false) {
 	}
 
 	// For the Rocket.Chat Apps :)
-	if (message && Apps && Apps.isLoaded()) {
-		const prevent = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentPrevent', message));
-		if (prevent) {
-			throw new Meteor.Error('error-app-prevented-sending', 'A Rocket.Chat App prevented the message sending.');
-		}
+	// if (message && Apps && Apps.isLoaded()) {
+	// 	const prevent = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentPrevent', message));
+	// 	if (prevent) {
+	// 		throw new Meteor.Error('error-app-prevented-sending', 'A Rocket.Chat App prevented the message sending.');
+	// 	}
 
-		let result;
-		result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentExtend', message));
-		result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentModify', result));
+	// 	let result;
+	// 	result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentExtend', message));
+	// 	result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentModify', result));
 
-		if (typeof result === 'object') {
-			message = Object.assign(message, result);
-		}
-	}
+	// 	if (typeof result === 'object') {
+	// 		message = Object.assign(message, result);
+	// 	}
+	// }
 
 	if (message.parseUrls !== false) {
 		message.html = message.msg;
@@ -182,11 +183,11 @@ export const sendMessage = function(user, message, room, upsert = false) {
 			message._id = Messages.insert(message);
 		}
 
-		if (Apps && Apps.isLoaded()) {
-			// This returns a promise, but it won't mutate anything about the message
-			// so, we don't really care if it is successful or fails
-			Apps.getBridges().getListenerBridge().messageEvent('IPostMessageSent', message);
-		}
+		// if (Apps && Apps.isLoaded()) {
+		// 	// This returns a promise, but it won't mutate anything about the message
+		// 	// so, we don't really care if it is successful or fails
+		// 	Apps.getBridges().getListenerBridge().messageEvent('IPostMessageSent', message);
+		// }
 
 		/*
 		Defer other updates as their return is not interesting to the user
