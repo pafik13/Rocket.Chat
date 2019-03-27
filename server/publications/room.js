@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { roomTypes } from 'meteor/rocketchat:utils';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
+import { Rooms, Subscriptions, Users } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
 import _ from 'underscore';
@@ -58,9 +58,10 @@ const roomMap = (record) => {
 
 Meteor.methods({
 	'rooms/get'(updatedAt) {
+		const userId = Meteor.userId();
 		let options = { fields };
 
-		if (!Meteor.userId()) {
+		if (!userId) {
 			if (settings.get('Accounts_AllowAnonymousRead') === true) {
 				return Rooms.findByDefaultAndTypes(true, ['c'], options).fetch();
 			}
@@ -73,14 +74,25 @@ Meteor.methods({
 			fields,
 		};
 
+		const user = Users.findOneByIdWithCustomFields(userId);
+
 		if (updatedAt instanceof Date) {
+			const records = Rooms.findBySubscriptionUserIdUpdatedAfter(userId, updatedAt, options).fetch();
+
+			records.forEach(function(record) {
+				record.u = user;
+			});
 			return {
-				update: Rooms.findBySubscriptionUserIdUpdatedAfter(Meteor.userId(), updatedAt, options).fetch(),
+				update: records,
 				remove: Rooms.trashFindDeletedAfter(updatedAt, {}, { fields: { _id: 1, _deletedAt: 1 } }).fetch(),
 			};
 		}
 
-		return Rooms.findBySubscriptionUserId(Meteor.userId(), options).fetch();
+		const records = Rooms.findBySubscriptionUserId(userId, options).fetch();
+		records.forEach(function(record) {
+			record.u = user;
+		});
+		return records;
 	},
 
 	getRoomByTypeAndName(type, name) {

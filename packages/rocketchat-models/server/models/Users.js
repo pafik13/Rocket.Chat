@@ -413,6 +413,18 @@ export class Users extends Base {
 		return this.findOne(query, options);
 	}
 
+	findOneByIdWithCustomFields(userId) {
+		const query = { _id: userId };
+		const options = {
+			fields: {
+				username: 1,
+				name: 1,
+				customFields: 1,
+			},
+		};
+		return this.findOne(query, options);
+	}
+
 	// FIND
 	findById(userId) {
 		const query = { _id: userId };

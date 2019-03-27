@@ -55,7 +55,6 @@ Meteor.methods({
 			fields: {
 				username: 1,
 				name: 1,
-				customFields: 1,
 			},
 		});
 

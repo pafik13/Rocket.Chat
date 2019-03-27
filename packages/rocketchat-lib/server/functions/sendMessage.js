@@ -110,12 +110,11 @@ export const sendMessage = function(user, message, room, upsert = false) {
 	if (!message.ts) {
 		message.ts = new Date();
 	}
-	const { _id, username, name, customFields } = user;
+	const { _id, username, name } = user;
 	message.u = {
 		_id,
 		username,
 		name,
-		...customFields,
 	};
 	message.rid = room._id;
 

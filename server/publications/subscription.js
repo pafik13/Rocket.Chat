@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { Subscriptions, Users } from 'meteor/rocketchat:models';
 import { Notifications } from 'meteor/rocketchat:notifications';
 
 const fields = {
@@ -40,7 +40,8 @@ const fields = {
 
 Meteor.methods({
 	'subscriptions/get'(updatedAt) {
-		if (!Meteor.userId()) {
+		const userId = Meteor.userId();
+		if (!userId) {
 			return [];
 		}
 
@@ -48,7 +49,13 @@ Meteor.methods({
 
 		const options = { fields };
 
-		const records = Subscriptions.findByUserId(Meteor.userId(), options).fetch();
+		const records = Subscriptions.findByUserId(userId, options).fetch();
+
+		const user = Users.findOneByIdWithCustomFields(userId);
+
+		records.forEach(function(record) {
+			record.u = user;
+		});
 
 		if (updatedAt instanceof Date) {
 			return {
