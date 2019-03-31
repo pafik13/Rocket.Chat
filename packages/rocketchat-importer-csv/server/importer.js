@@ -14,6 +14,8 @@ import {
 	saveCustomFieldsWithoutValidation,
 	sendMessage,
 	saveCustomFields,
+	setName,
+	setActiveStatus
 } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
@@ -36,6 +38,8 @@ export class CsvImporter extends Base {
 		let tempUsers = [];
 		const tempMessages = new Map();
 		let tempAvatars = [];
+		let tempNames = [];
+		let tempStatuses = [];
 		for (const entry of zipEntries) {
 			this.logger.debug(`Entry: ${ entry.entryName }`);
 
@@ -118,6 +122,30 @@ export class CsvImporter extends Base {
 				}));
 				continue;
 			}
+
+			// Parse the names
+			if (entry.entryName.toLowerCase() === 'names.csv') {
+				super.updateProgress(ProgressStep.PREPARING_NAMES);
+				const parsedNames = this.csvParser(entry.getData().toString(), this.csvParserOpts);
+				tempNames = parsedNames.map((a) => ({
+					id: a[0].trim(),
+					rocketId: a[1].trim(),
+					name: a[2].trim(),
+				}));
+				continue;
+			}
+			
+			// Parse the statuses
+			if (entry.entryName.toLowerCase() === 'statuses.csv') {
+				super.updateProgress(ProgressStep.PREPARING_STATUSES);
+				const parsedStatuses = this.csvParser(entry.getData().toString(), this.csvParserOpts);
+				tempStatuses = parsedStatuses.map((a) => ({
+					id: a[0].trim(),
+					rocketId: a[1].trim(),
+					status: a[2].trim() === 'true',
+				}));
+				continue;
+			}
 		}
 
 		// Insert the users record, eventually this might have to be split into several ones as well
@@ -166,8 +194,20 @@ export class CsvImporter extends Base {
 		super.updateRecord({ 'count.avatars': tempAvatars.length });
 		super.addCountToTotal(tempAvatars.length);
 
+		// Insert the names records.
+		const namesId = this.collection.insert({ import: this.importRecord._id, importer: this.name, type: 'names', names: tempNames });
+		this.names = this.collection.findOne(namesId);
+		super.updateRecord({ 'count.names': tempNames.length });
+		super.addCountToTotal(tempNames.length);
+
+		// Insert the statuses records.
+		const statusesId = this.collection.insert({ import: this.importRecord._id, importer: this.name, type: 'statuses', statuses: tempStatuses });
+		this.statuses = this.collection.findOne(statusesId);
+		super.updateRecord({ 'count.statuses': tempStatuses.length });
+		super.addCountToTotal(tempStatuses.length);
+
 		// Ensure we have at least a single user, channel, or message
-		if (tempUsers.length === 0 && tempChannels.length === 0 && messagesCount === 0 && tempAvatars.length === 0) {
+		if (tempUsers.length === 0 && tempChannels.length === 0 && messagesCount === 0 && tempAvatars.length === 0 && tempNames.length === 0 && tempStatuses.length === 0) {
 			this.logger.error('No users, channels, or messages found in the import file.');
 			super.updateProgress(ProgressStep.ERROR);
 			return super.getProgress();
@@ -177,9 +217,11 @@ export class CsvImporter extends Base {
 		const selectionChannels = tempChannels.map((c) => new SelectionChannel(c.id, c.name, false, true, c.isPrivate));
 		const selectionMessages = this.importRecord.count.messages;
 		const selectionAvatars = this.importRecord.count.avatars;
+		const selectionNames = this.importRecord.count.names;
+		const selectionStatuses = this.importRecord.count.statuses;
 
 		super.updateProgress(ProgressStep.USER_SELECTION);
-		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars);
+		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars, selectionNames, selectionStatuses);
 	}
 
 	startImport(importSelection) {
@@ -421,6 +463,7 @@ export class CsvImporter extends Base {
 
 
 				// Import the avatars
+				super.updateProgress(ProgressStep.IMPORTING_AVATARS);
 				for (const a of this.avatars.avatars) {
 					Meteor.runAsUser(startedByUserId, () => {
 						// const user = usersCache.get(a.username);
@@ -429,6 +472,28 @@ export class CsvImporter extends Base {
 						// this.logger.error(user);
 						user.customFields.photoUrl = a.avatarUrl;
 						saveCustomFields(user._id, user.customFields);
+
+						super.addCountCompleted(1);
+					});
+				}
+
+				// Import the names
+				super.updateProgress(ProgressStep.IMPORTING_NAMES);
+				for (const n of this.names.names) {
+					Meteor.runAsUser(startedByUserId, () => {
+
+						setName(n.rocketId, n.name);
+
+						super.addCountCompleted(1);
+					});
+				}
+
+				// Import the statuses
+				super.updateProgress(ProgressStep.IMPORTING_STATUSES);
+				for (const s of this.statuses.statuses) {
+					Meteor.runAsUser(startedByUserId, () => {
+
+						setActiveStatus(s.rocketId, s.status);
 
 						super.addCountCompleted(1);
 					});
@@ -453,8 +518,10 @@ export class CsvImporter extends Base {
 		const selectionChannels = this.channels.channels.map((c) => new SelectionChannel(c.id, c.name, false, true, c.isPrivate));
 		const selectionMessages = this.importRecord.count.messages;
 		const selectionAvatars = this.importRecord.count.avatars;
+		const selectionNames = this.importRecord.count.names;
+		const selectionStatuses = this.importRecord.count.statuses;
 
-		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars);
+		return new Selection(this.name, selectionUsers, selectionChannels, selectionMessages, selectionAvatars, selectionNames, selectionStatuses);
 	}
 
 	getChannelFromName(channelName) {

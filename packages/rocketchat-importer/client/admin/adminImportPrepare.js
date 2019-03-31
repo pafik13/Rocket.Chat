@@ -36,6 +36,12 @@ Template.adminImportPrepare.helpers({
 	avatars_count() {
 		return Template.instance().avatars_count.get();
 	},
+	names_count() {
+		return Template.instance().names_count.get();
+	},
+	statuses_count() {
+		return Template.instance().statuses_count.get();
+	},
 	fileSizeLimitMessage() {
 		const maxFileSize = settings.get('FileUpload_MaxFileSize');
 		let message;
@@ -125,6 +131,8 @@ function getImportFileData(importer, template) {
 		template.channels.set(data.channels);
 		template.message_count.set(data.message_count);
 		template.avatars_count.set(data.avatars_count);
+		template.names_count.set(data.names_count);
+		template.statuses_count.set(data.statuses_count);
 		template.loaded.set(true);
 		template.preparing.set(false);
 	}).catch((error) => {
@@ -251,6 +259,8 @@ Template.adminImportPrepare.onCreated(function() {
 	this.channels = new ReactiveVar([]);
 	this.message_count = new ReactiveVar(0);
 	this.avatars_count = new ReactiveVar(0);
+	this.names_count = new ReactiveVar(0);
+	this.statuses_count = new ReactiveVar(0);
 
 	function loadSelection(progress) {
 		if ((progress != null ? progress.step : undefined)) {
@@ -272,6 +282,8 @@ Template.adminImportPrepare.onCreated(function() {
 						instance.channels.set(data.channels);
 						instance.message_count.set(data.message_count);
 						instance.avatars_count.set(data.avatars_count);
+						instance.names_count.set(data.names_count);
+						instance.statuses_count.set(data.statuses_count);
 						instance.loaded.set(true);
 						return instance.preparing.set(false);
 					});
