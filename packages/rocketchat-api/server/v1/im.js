@@ -157,12 +157,12 @@ API.v1.addRoute(['dm.history', 'im.history'], { authRequired: true }, {
 
 		let count = 20;
 		if (this.queryParams.count) {
-			count = parseInt(this.queryParams.count);
+			count = parseInt(this.queryParams.count, 10);
 		}
 
 		let offset = 0;
 		if (this.queryParams.offset) {
-			offset = parseInt(this.queryParams.offset);
+			offset = parseInt(this.queryParams.offset, 10);
 		}
 
 		const unreads = this.queryParams.unreads || false;
@@ -364,5 +364,57 @@ API.v1.addRoute(['dm.setTopic', 'im.setTopic'], { authRequired: true }, {
 		return API.v1.success({
 			topic: this.bodyParams.topic,
 		});
+	},
+});
+
+API.v1.addRoute(['dm.blockUser', 'im.blockUser'], { authRequired: true }, {
+	post() {
+		const params = this.requestParams();
+
+		const findResult = findDirectMessageRoom(params, this.user);
+
+		const { room, subscription } = findResult;
+
+		let companion;
+		if (params.username) {
+			companion = params.username;
+		} else {
+			const index = room.usernames.indexOf(subscription.u.username);
+			companion = index === 0 ? room.usernames[1] : room.usernames[0];
+		}
+
+		companion = Users.findOneByUsername(companion, { fields: { username: 1 } });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('blockUser', { rid: room._id, blocked: companion._id });
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute(['dm.unblockUser', 'im.unblockUser'], { authRequired: true }, {
+	post() {
+		const params = this.requestParams();
+
+		const findResult = findDirectMessageRoom(params, this.user);
+
+		const { room, subscription } = findResult;
+
+		let companion;
+		if (params.username) {
+			companion = params.username;
+		} else {
+			const index = room.usernames.indexOf(subscription.u.username);
+			companion = index === 0 ? room.usernames[1] : room.usernames[0];
+		}
+
+		companion = Users.findOneByUsername(companion, { fields: { username: 1 } });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('unblockUser', { rid: room._id, blocked: companion._id });
+		});
+
+		return API.v1.success();
 	},
 });
