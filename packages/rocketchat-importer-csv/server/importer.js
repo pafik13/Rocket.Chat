@@ -14,8 +14,6 @@ import {
 	saveCustomFieldsWithoutValidation,
 	sendMessage,
 	saveCustomFields,
-	setName,
-	setActiveStatus
 } from 'meteor/rocketchat:lib';
 
 export class CsvImporter extends Base {
@@ -134,7 +132,7 @@ export class CsvImporter extends Base {
 				}));
 				continue;
 			}
-			
+
 			// Parse the statuses
 			if (entry.entryName.toLowerCase() === 'statuses.csv') {
 				super.updateProgress(ProgressStep.PREPARING_STATUSES);
@@ -482,7 +480,7 @@ export class CsvImporter extends Base {
 				for (const n of this.names.names) {
 					Meteor.runAsUser(startedByUserId, () => {
 
-						setName(n.rocketId, n.name);
+						Users.setName(n.rocketId, n.name);
 
 						super.addCountCompleted(1);
 					});
@@ -493,7 +491,7 @@ export class CsvImporter extends Base {
 				for (const s of this.statuses.statuses) {
 					Meteor.runAsUser(startedByUserId, () => {
 
-						setActiveStatus(s.rocketId, s.status);
+						Meteor.call('setUserActiveStatus', s.rocketId, s.status);
 
 						super.addCountCompleted(1);
 					});
