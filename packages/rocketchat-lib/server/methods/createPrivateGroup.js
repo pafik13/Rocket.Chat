@@ -27,6 +27,13 @@ Meteor.methods({
 			}),
 		}));
 
+		customFields = {
+			anonym_id: -1,
+			photoUrl: '',
+			registeredAt: new Date().toISOString(),
+			...customFields,
+		};
+
 		return createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
 	},
 });

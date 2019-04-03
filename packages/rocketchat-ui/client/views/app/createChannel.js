@@ -37,6 +37,16 @@ const acEvents = {
 	},
 };
 
+const validateAvatarUrl = (url) => {
+	const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+		'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+		'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+		'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+		'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+		'(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+	return !!pattern.test(url);
+};
+
 const validateChannelName = (name) => {
 	if (settings.get('UI_Allow_room_names_with_special_chars')) {
 		return true;
@@ -80,6 +90,9 @@ Template.createChannel.helpers({
 	selectedUsers() {
 		return Template.instance().selectedUsers.get();
 	},
+	invalidAvatarUrl() {
+		return Template.instance().invalidAvatarUrl.get();
+	},
 	inUse() {
 		return Template.instance().inUse.get();
 	},
@@ -122,11 +135,12 @@ Template.createChannel.helpers({
 	createIsDisabled() {
 		const instance = Template.instance();
 		const invalid = instance.invalid.get();
+		const invalidAvatarUrl = instance.invalid.get();
 		const extensions_invalid = instance.extensions_invalid.get();
 		const inUse = instance.inUse.get();
 		const name = instance.name.get();
 
-		if (name.length === 0 || invalid || inUse === true || inUse === undefined || extensions_invalid) {
+		if (name.length === 0 || invalid || inUse === true || inUse === undefined || extensions_invalid || invalidAvatarUrl) {
 			return 'disabled';
 		}
 		return '';
@@ -219,10 +233,26 @@ Template.createChannel.events({
 			t.name.set(modified);
 		}
 	},
+	'input [name="avatar"]'(e, t) {
+		const input = e.target;
+		const { value } = input;
+		const position = input.selectionEnd || input.selectionStart;
+		const { length } = value;
+
+		document.activeElement === input && e && /input/i.test(e.type) && (input.selectionEnd = position + input.value.length - length);
+
+		if (value !== '') {
+			t.invalidAvatarUrl.set(!validateAvatarUrl(value));
+		} else {
+			t.invalidAvatarUrl.set(false);
+		}
+		t.avatarUrl.set(value);
+	},
 	'submit .create-channel__content'(e, instance) {
 		e.preventDefault();
 		e.stopPropagation();
 		const name = e.target.name.value;
+		const photoUrl = e.target.avatar.value;
 		const type = instance.type.get();
 		const readOnly = instance.readOnly.get();
 		const broadcast = instance.broadcast.get();
@@ -232,6 +262,9 @@ Template.createChannel.events({
 		if (instance.invalid.get() || instance.inUse.get()) {
 			return e.target.name.focus();
 		}
+		if (instance.invalidAvatarUrl.get()) {
+			return e.target.avatar.focus();
+		}
 		if (!Object.keys(instance.extensions_validations).map((key) => instance.extensions_validations[key]).reduce((valid, fn) => fn(instance) && valid, true)) {
 			return instance.extensions_invalid.set(true);
 		}
@@ -239,7 +272,7 @@ Template.createChannel.events({
 		const extraData = Object.keys(instance.extensions_submits)
 			.reduce((result, key) => ({ ...result, ...instance.extensions_submits[key](instance) }), { broadcast, encrypted });
 
-		Meteor.call(isPrivate ? 'createPrivateGroup' : 'createChannel', name, instance.selectedUsers.get().map((user) => user.username), readOnly, {}, extraData, function(err, result) {
+		Meteor.call(isPrivate ? 'createPrivateGroup' : 'createChannel', name, instance.selectedUsers.get().map((user) => user.username), readOnly, { photoUrl }, extraData, function(err, result) {
 			if (err) {
 				if (err.error === 'error-invalid-name') {
 					instance.invalid.set(true);
@@ -291,6 +324,8 @@ Template.createChannel.onCreated(function() {
 	this.extensions_validations = {};
 	this.extensions_submits = {};
 	this.name = new ReactiveVar('');
+	this.avatarUrl = new ReactiveVar('');
+	this.invalidAvatarUrl = new ReactiveVar(false);
 	this.type = new ReactiveVar(hasAllPermission(['create-p']) ? 'p' : 'c');
 	this.readOnly = new ReactiveVar(false);
 	this.broadcast = new ReactiveVar(false);

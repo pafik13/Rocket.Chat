@@ -88,6 +88,26 @@
 							</div>
 						{{/if}}
 					</div>
+					<div class="rc-input {{#if invalidAvatarUrl}}rc-input--error{{/if}}">
+						<label class="rc-input__label">
+							<div class="rc-input__title">{{_ "Channel_avatar_url"}}</div>
+							<div class="rc-input__wrapper">
+								<div class="rc-input__icon">
+									{{> icon block="rc-input__icon-svg" icon="permalink"}}
+								</div>
+								<input name="avatar" type="text" class="rc-input__element"
+									   placeholder="{{_ "Channel_AvatarUrl_Placeholder"}}">
+							</div>
+						</label>
+						{{#if invalidAvatarUrl}}
+							<div class="rc-input__error">
+								<div class="rc-input__error-icon">
+									{{> icon block="rc-input__error-icon" icon="warning" classes="rc-input__error-icon-svg"}}
+								</div>
+								<div class="rc-input__error-message">{{_ "Incorrect_url"}}</div>
+							</div>
+						{{/if}}
+					</div>
 					<div class="rc-input">
 						<label class="rc-input__label">
 							<div class="rc-input__title">{{_ "Invite_Users"}}</div>

@@ -56,18 +56,14 @@ Meteor.methods({
 
 		records.forEach(function(record) {
 			record.u = user;
-			
+
 			try {
-				const roomOptions = { 
-					fields: { 
-						lastMessage: 1 
-					}
-				};
+				const roomOptions = { fields: { lastMessage: 1 } };
 				const { lastMessage } = Rooms.findOneById(record.rid, roomOptions);
-				
+
 				record.lastMessage = lastMessage;
 			} catch (e) {
-				SystemLogger.error(`subscriptions/get::rid=${record.rid}`, e);
+				SystemLogger.error(`subscriptions/get::rid=${ record.rid }`, e);
 				record.lastMessage = null;
 			}
 		});
