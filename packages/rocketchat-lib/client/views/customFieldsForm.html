@@ -48,6 +48,24 @@
 						</label>
 					{{/unless}}
 				{{/if}}
+				{{#if $eq field.type 'number'}}
+					{{# unless ../new}}
+						<div class="input-line">
+							<label for="{{fieldName}}">{{_ fieldName}}</label>
+							<div>
+								<input type="number" name="{{fieldName}}" id="{{fieldName}}" data-customfield="true" value="{{fieldValue}}" />
+								<div class="input-error"></div>
+							</div>
+						</div>
+					{{else}}
+						<label class="rc-input__label">
+							<div class="rc-input__title">{{_ fieldName}}</div>
+							<div class="rc-input__wrapper">
+								<input type="number" class="rc-input__element"  name="{{fieldName}}" id="{{fieldName}}" data-customfield="true" value="{{fieldValue}}">
+							</div>
+						</label>
+					{{/unless}}
+				{{/if}}
 			</div>
 		{{/each}}
 	</div>
