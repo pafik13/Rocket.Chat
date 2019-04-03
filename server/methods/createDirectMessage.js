@@ -86,7 +86,11 @@ Meteor.methods({
 				unread: 0,
 				userMentions: 0,
 				groupMentions: 0,
-				customFields: me.customFields,
+				customFields: to.customFields,
+				i: {
+					_id: to._id,
+					username: to.username,
+				},
 				u: {
 					_id: me._id,
 					username: me.username,
@@ -120,7 +124,11 @@ Meteor.methods({
 				unread: 0,
 				userMentions: 0,
 				groupMentions: 0,
-				customFields: to.customFields,
+				customFields: me.customFields,
+				i: {
+					_id: me._id,
+					username: me.username,
+				},
 				u: {
 					_id: to._id,
 					username: to.username,

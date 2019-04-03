@@ -14,6 +14,9 @@ export class Subscriptions extends Base {
 		this.tryEnsureIndex({ rid: 1, alert: 1, 'u._id': 1 });
 		this.tryEnsureIndex({ rid: 1, roles: 1 });
 		this.tryEnsureIndex({ 'u._id': 1, name: 1, t: 1 });
+		this.tryEnsureIndex({ 'i._id': 1 });
+		this.tryEnsureIndex({ 'u._id': 1, 'i._id': 1 });
+
 		this.tryEnsureIndex({ open: 1 });
 		this.tryEnsureIndex({ alert: 1 });
 
@@ -745,8 +748,7 @@ export class Subscriptions extends Base {
 
 	setCustomFieldsDirectMessagesByUserId(userId, fields) {
 		const query = {
-			'u._id': userId,
-			t: 'd',
+			'i._id': userId,
 		};
 		const update = { $set: { customFields: fields } };
 		const options = { multi: true };

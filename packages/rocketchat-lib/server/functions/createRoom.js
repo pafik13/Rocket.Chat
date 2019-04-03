@@ -26,6 +26,11 @@ function createDirectRoom(source, target, extraData, options) {
 			open: true,
 			alert: true,
 			unread: 0,
+			customFields: source.customFields,
+			i: {
+				_id: source._id,
+				username: source.username,
+			},
 			u: {
 				_id: target._id,
 				username: target.username,
@@ -40,6 +45,11 @@ function createDirectRoom(source, target, extraData, options) {
 			open: true,
 			alert: true,
 			unread: 0,
+			customFields: target.customFields,
+			i: {
+				_id: target._id,
+				username: target.username,
+			},
 			u: {
 				_id: source._id,
 				username: source.username,
