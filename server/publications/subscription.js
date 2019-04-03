@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { Subscriptions, Users } from 'meteor/rocketchat:models';
+import { Subscriptions, Users, Rooms } from 'meteor/rocketchat:models';
 import { Notifications } from 'meteor/rocketchat:notifications';
+import { SystemLogger } from 'meteor/rocketchat:logger';
 
 const fields = {
 	t: 1,
@@ -55,6 +56,20 @@ Meteor.methods({
 
 		records.forEach(function(record) {
 			record.u = user;
+			
+			try {
+				const roomOptions = { 
+					fields: { 
+						lastMessage: 1 
+					}
+				};
+				const { lastMessage } = Rooms.findOneById(record.rid, roomOptions);
+				
+				record.lastMessage = lastMessage;
+			} catch (e) {
+				SystemLogger.error(`subscriptions/get::rid=${record.rid}`, e);
+				record.lastMessage = null;
+			}
 		});
 
 		if (updatedAt instanceof Date) {
