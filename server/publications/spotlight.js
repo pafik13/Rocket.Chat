@@ -41,6 +41,7 @@ Meteor.methods({
 				name: 1,
 				joinCodeRequired: 1,
 				lastMessage: 1,
+				customFields: 1,
 			},
 			sort: {
 				name: 1,
@@ -59,6 +60,7 @@ Meteor.methods({
 				username: 1,
 				name: 1,
 				status: 1,
+				customFields: 1,
 			},
 			sort: {},
 		};
