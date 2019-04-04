@@ -2,6 +2,7 @@ import { Push } from 'meteor/rocketchat:push';
 import { settings } from 'meteor/rocketchat:settings';
 import { metrics } from 'meteor/rocketchat:metrics';
 import { RocketChatAssets } from 'meteor/rocketchat:assets';
+import { SystemLogger } from 'meteor/rocketchat:logger';
 
 export class PushNotification {
 	getNotificationId(roomId) {
@@ -21,6 +22,10 @@ export class PushNotification {
 	}
 
 	send({ roomName, roomId, username, message, usersTo, payload, badge = 1, category }) {
+		SystemLogger.log('PushNotification:message_in', message);
+		message = message.replace(/^\[.+\) /g, '');
+		SystemLogger.log('PushNotification:message_re', message);
+
 		let title;
 		if (roomName && roomName !== '') {
 			title = `${ roomName }`;
@@ -28,6 +33,7 @@ export class PushNotification {
 		} else {
 			title = `${ username }`;
 		}
+
 		const config = {
 			from: 'push',
 			badge,
@@ -49,6 +55,8 @@ export class PushNotification {
 				category,
 			};
 		}
+
+		SystemLogger.log('PushNotification:config', config);
 
 		metrics.notificationsSent.inc({ notification_type: 'mobile' });
 		return Push.send(config);
