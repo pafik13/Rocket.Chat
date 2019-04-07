@@ -401,6 +401,27 @@ API.v1.addRoute('channels.invite', { authRequired: true }, {
 	},
 });
 
+
+API.v1.addRoute('channels.inviteMany', { authRequired: true }, {
+	post() {
+		const params = this.requestParams();
+		const channel = findChannelByIdOrName({ params });
+		
+		const { usernames } = params;
+		if (usernames) {
+			throw new Meteor.Error('error-invalid-param', 'The required "usernames" does not exists');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('addUsersToRoom', { rid: channel._id, users: usernames });
+		});
+		
+		return API.v1.success({
+			channel,
+		});
+	},
+});
+
 API.v1.addRoute('channels.join', { authRequired: true }, {
 	post() {
 		const findResult = findChannelByIdOrName({ params: this.requestParams() });
