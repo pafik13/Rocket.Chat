@@ -366,6 +366,35 @@ API.v1.addRoute('groups.invite', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('groups.inviteMany', { authRequired: true }, {
+	post() {
+		const { roomId = '', roomName = '', usernames } = this.requestParams();
+		const idOrName = roomId || roomName;
+		if (!idOrName.trim()) {
+			throw new Meteor.Error('error-room-param-not-provided', 'The parameter "roomId" or "roomName" is required');
+		}
+		
+		const group = Rooms.findOneByIdOrName(idOrName) || {};
+		const { _id: rid, t: type } = group;
+
+		if (!rid || type !== 'p') {
+			throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any group');
+		}
+		
+		if (usernames) {
+			throw new Meteor.Error('error-invalid-param', 'The required "usernames" does not exists');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('addUsersToRoom', { rid, users: usernames });
+		});
+
+		return API.v1.success({
+			group,
+		});
+	},
+});
+
 API.v1.addRoute('groups.kick', { authRequired: true }, {
 	post() {
 		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
