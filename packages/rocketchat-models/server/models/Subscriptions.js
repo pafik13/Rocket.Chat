@@ -655,13 +655,13 @@ export class Subscriptions extends Base {
 
 		const update = {
 			$unset: {
-				unaccepted: "",
+				unaccepted: '',
 			},
 		};
 
 		return this.update(query, update);
 	}
-	
+
 	archiveByRoomId(roomId) {
 		const query =
 			{ rid: roomId };

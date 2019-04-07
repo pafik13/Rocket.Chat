@@ -20,14 +20,14 @@ Meteor.methods({
 		if (!room) {
 			return false;
 		}
-		
+
 		const options = { fields: { _id: 1, unaccepted: 1 } };
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, fromId, options);
-		
+
 		if (room.t === 'd' && !subscription) {
 			return false;
 		}
-		
+
 		return Subscriptions.acceptDirect(subscription._id);
 	},
 });
