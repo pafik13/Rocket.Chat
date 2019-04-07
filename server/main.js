@@ -15,6 +15,7 @@ import './startup/presence';
 import './startup/serverRunning';
 import './configuration/accounts_meld';
 import './methods/OEmbedCacheCleanup';
+import './methods/acceptDirect';
 import './methods/addAllUserToRoom';
 import './methods/addRoomLeader';
 import './methods/addRoomModerator';

@@ -121,6 +121,7 @@ Meteor.methods({
 				t: 'd',
 				open: false,
 				alert: false,
+				unaccepted: true,
 				unread: 0,
 				userMentions: 0,
 				groupMentions: 0,

@@ -648,6 +648,20 @@ export class Subscriptions extends Base {
 	}
 
 	// UPDATE
+	acceptDirect(_id) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$unset: {
+				unaccepted: "",
+			},
+		};
+
+		return this.update(query, update);
+	}
+	
 	archiveByRoomId(roomId) {
 		const query =
 			{ rid: roomId };
