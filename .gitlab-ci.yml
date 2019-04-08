@@ -6,5 +6,16 @@ build:
   script:
     - pwd
     - ls -la
+    - meteor npm install
+    - meteor npm run lint
+    - meteor npm run testunit
+    - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
+    - set +e
+    - meteor add rocketchat:lib
+    - set -e
+    - meteor build --server-only --directory /opt/Rocket.Chat
+    - cd /opt/Rocket.Chat/programs/server/
+    - nmp install
+    - systemctl restart rocketchat.service
   tags:
     - chat-dev
