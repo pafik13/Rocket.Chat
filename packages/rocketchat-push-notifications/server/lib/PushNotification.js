@@ -23,7 +23,8 @@ export class PushNotification {
 
 	send({ roomName, roomId, username, message, usersTo, payload, badge = 1, category }) {
 		SystemLogger.log('PushNotification:message_in', message);
-		message = message.replace(/^\[.+\) /g, '');
+		// message = message.replace(/^\[.+\) /g, '');
+		message = message.replace(/\[ \]\(https:\/\/chat\.apianon\.ru\/(d|c|g|channel|direct|group)\/(.)+\)/gm, '');
 		SystemLogger.log('PushNotification:message_re', message);
 
 		let title;
