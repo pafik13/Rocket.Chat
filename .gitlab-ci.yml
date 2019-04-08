@@ -13,9 +13,9 @@ build:
     - set +e
     - meteor add rocketchat:lib
     - set -e
-    - meteor build --server-only --directory /opt/Rocket.Chat
-    - cd /opt/Rocket.Chat/programs/server/
+    - meteor build --server-only --directory /opt/rocket-build
+    - cd /opt/rocket-build
     - nmp install
-    - systemctl restart rocketchat.service
+ #   - systemctl restart rocketchat.service
   tags:
     - chat-dev
