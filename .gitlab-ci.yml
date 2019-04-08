@@ -6,4 +6,5 @@ build:
   script:
     - pwd
     - ls -la
-  tags: chat-dev
+  tags:
+    - chat-dev
