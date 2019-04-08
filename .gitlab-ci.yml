@@ -15,7 +15,8 @@ build:
     - set -e
     - meteor build --server-only --directory /opt/rocket-build
     - cd /opt/rocket-build
-    - nmp install
- #   - systemctl restart rocketchat.service
+    - npm install
+    - rsync -a --delete /opt/rocket-build/ /opt/Rocket.Chat/
+    - /bin/systemctl restart rocketchat.service
   tags:
     - chat-dev
