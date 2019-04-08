@@ -4,19 +4,17 @@ stages:
 build:
   stage: build
   script:
-    - pwd
-    - ls -la
-    - meteor npm install
-    - meteor npm run lint
-    - meteor npm run testunit
+    # - meteor npm install
+    # - meteor npm run lint
+    # - meteor npm run testunit
     - export TOOL_NODE_FLAGS="--max_old_space_size=4096"
     - set +e
     - meteor add rocketchat:lib
     - set -e
     - meteor build --server-only --directory /opt/rocket-build
-    - cd /opt/rocket-build
+    - cd /opt/rocket-build/bundle/programs/server/
     - npm install
-    - rsync -a --delete /opt/rocket-build/ /opt/Rocket.Chat/
+    - rsync -a --delete /opt/rocket-build/bundle/ /opt/Rocket.Chat/
     - /bin/systemctl restart rocketchat.service
   tags:
     - chat-dev
