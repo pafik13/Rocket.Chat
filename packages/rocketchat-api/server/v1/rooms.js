@@ -57,6 +57,23 @@ API.v1.addRoute('rooms.get', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('rooms.getMessageOffsetFromLast', { authRequired: true }, {
+	get() {
+		const { msgId } = this.queryParams;
+
+		if (!msgId) {
+			throw new Meteor.Error('error-query-param-invalid', 'The "msgId" query parameter is empty.');
+		}
+
+		let offset;
+		Meteor.runAsUser(this.userId, () => offset = Meteor.call('getMessageOffsetFromLast', msgId));
+
+		return API.v1.success({
+			offset,
+		});
+	},
+});
+
 API.v1.addRoute('rooms.upload/:rid', { authRequired: true }, {
 	post() {
 		const room = Meteor.call('canAccessRoom', this.urlParams.rid, this.userId);

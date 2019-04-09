@@ -908,6 +908,10 @@ export class Messages extends Base {
 		return this.findOne({ 'file._id': fileID });
 	}
 
+	getMessageById(messageId) {
+		return this.findOne({ _id: messageId });
+	}
+
 	setAsRead(rid, until) {
 		return this.update({
 			rid,

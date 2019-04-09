@@ -29,6 +29,7 @@ import './methods/deleteFileMessage';
 import './methods/deleteUser';
 import './methods/eraseRoom';
 import './methods/getAvatarSuggestion';
+import './methods/getMessageOffsetFromLast';
 import './methods/getRoomIdByNameOrId';
 import './methods/getRoomNameById';
 import './methods/getTotalChannels';
