@@ -30,6 +30,18 @@ function findDirectMessageRoom(params, user) {
 	};
 }
 
+API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('acceptDirect', findResult.room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute(['dm.create', 'im.create'], { authRequired: true }, {
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
