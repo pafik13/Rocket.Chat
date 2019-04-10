@@ -29,6 +29,7 @@ const fields = {
 	mobilePushNotifications: 1,
 	emailNotifications: 1,
 	unreadAlert: 1,
+	unaccepted: 1,
 	_updatedAt: 1,
 	blocked: 1,
 	blocker: 1,
