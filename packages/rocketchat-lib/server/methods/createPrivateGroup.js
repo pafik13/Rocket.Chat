@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { createRoom } from '../functions';
+import { validateUrl } from 'meteor/rocketchat:utils';
 
 Meteor.methods({
 	createPrivateGroup(name, members, readOnly = false, customFields = {}, extraData = {}) {
@@ -33,6 +34,10 @@ Meteor.methods({
 			registeredAt: new Date().toISOString(),
 			...customFields,
 		};
+
+		if (customFields.photoUrl && !validateUrl(customFields.photoUrl)) {
+			throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', { method: 'createChannel' });
+		}
 
 		return createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
 	},

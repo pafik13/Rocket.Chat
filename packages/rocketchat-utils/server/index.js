@@ -7,6 +7,7 @@ export { roomTypes } from './lib/roomTypes';
 export { RoomTypeRouteConfig, RoomTypeConfig, RoomSettingsEnum, UiTextContext } from '../lib/RoomTypeConfig';
 export { RoomTypesCommon } from '../lib/RoomTypesCommon';
 export { isDocker } from './functions/isDocker';
+export { validateUrl } from './functions/validateUrl';
 export { getAvatarUrlFromUsername } from '../lib/getAvatarUrlFromUsername';
 export { slashCommands } from '../lib/slashCommand';
 export { getUserNotificationPreference } from '../lib/getUserNotificationPreference';

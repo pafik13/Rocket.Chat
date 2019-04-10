@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
+import { validateUrl } from 'meteor/rocketchat:utils';
 
 export const saveRoomCustomFields = function(rid, roomCustomFields) {
 	if (!Match.test(rid, String)) {
@@ -13,6 +14,13 @@ export const saveRoomCustomFields = function(rid, roomCustomFields) {
 			function: 'RocketChat.saveRoomCustomFields',
 		});
 	}
+
+	if (roomCustomFields.photoUrl && !validateUrl(roomCustomFields.photoUrl)) {
+		throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', {
+			function: 'RocketChat.saveRoomCustomFields',
+		});
+	}
+
 	const ret = Rooms.setCustomFieldsById(rid, roomCustomFields);
 
 	// Update customFields of any user's Subscription related with this rid

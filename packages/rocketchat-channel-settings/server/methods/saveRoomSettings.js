@@ -3,6 +3,8 @@ import { Match, check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
+import { _ } from 'meteor/underscore';
+
 
 import { saveRoomName } from '../functions/saveRoomName';
 import { saveRoomTopic } from '../functions/saveRoomTopic';
@@ -145,8 +147,12 @@ Meteor.methods({
 					}
 					break;
 				case 'roomCustomFields':
-					if (value !== room.customFields) {
-						saveRoomCustomFields(rid, value);
+					if (!_.isEqual(value, room.customFields)) {
+						const newCustomFields = {
+							...room.customFields,
+							...value,
+						};
+						saveRoomCustomFields(rid, newCustomFields);
 					}
 					break;
 				case 'roomDescription':

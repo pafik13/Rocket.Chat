@@ -739,6 +739,28 @@ API.v1.addRoute('channels.rename', { authRequired: true }, {
 	},
 });
 
+
+API.v1.addRoute('channels.setAvatar', { authRequired: true }, {
+	post() {
+		const { photoUrl } = this.bodyParams;
+
+		if (!photoUrl || !photoUrl.trim()) {
+			return API.v1.failure('The bodyParam "photoUrl" is required');
+		}
+
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		const customFields = { photoUrl };
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult._id, 'roomCustomFields', customFields);
+		});
+
+		return API.v1.success({
+			channel: findChannelByIdOrName({ params: this.requestParams(), userId: this.userId }),
+		});
+	},
+});
+
 API.v1.addRoute('channels.setCustomFields', { authRequired: true }, {
 	post() {
 		if (!this.bodyParams.customFields || !(typeof this.bodyParams.customFields === 'object')) {
