@@ -436,6 +436,8 @@ workflows:
 #       - test-without-oplog-mongo-3-6: *test-mongo-no-pr
 #       - test-without-oplog-mongo-4-0: *test-mongo-no-pr
       - deploy:
+          requires:
+            - build
 #           requires:
 #             - test-with-oplog-mongo-3-2
 #             - test-with-oplog-mongo-3-4
