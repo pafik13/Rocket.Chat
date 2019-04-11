@@ -408,7 +408,7 @@ API.v1.addRoute('channels.inviteMany', { authRequired: true }, {
 		const channel = findChannelByIdOrName({ params });
 
 		const { usernames } = params;
-		if (usernames) {
+		if (!usernames) {
 			throw new Meteor.Error('error-invalid-param', 'The required "usernames" does not exists');
 		}
 
@@ -417,7 +417,7 @@ API.v1.addRoute('channels.inviteMany', { authRequired: true }, {
 		});
 
 		return API.v1.success({
-			channel,
+			channel: findChannelByIdOrName({ params: this.requestParams(), userId: this.userId }),
 		});
 	},
 });

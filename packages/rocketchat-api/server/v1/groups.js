@@ -381,7 +381,7 @@ API.v1.addRoute('groups.inviteMany', { authRequired: true }, {
 			throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any group');
 		}
 
-		if (usernames) {
+		if (!usernames) {
 			throw new Meteor.Error('error-invalid-param', 'The required "usernames" does not exists');
 		}
 
@@ -390,7 +390,7 @@ API.v1.addRoute('groups.inviteMany', { authRequired: true }, {
 		});
 
 		return API.v1.success({
-			group,
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
 		});
 	},
 });
