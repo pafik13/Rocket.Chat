@@ -4,7 +4,7 @@ stages:
 build:
   stage: build
   script:
-    - curl -H "X-Auth-Token: XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id: t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message": { "rid": "GENERAL", "msg": "@here ВНИМАНИЕ! Начата сборка новой версии Rocket-Chat. Через 10-15 минут сервер будет недоступен!" }}'
+    - curl -H "X-Auth-Token:XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id:t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message":{"rid": "GENERAL","msg":"@here ВНИМАНИЕ! Начата сборка новой версии Rocket-Chat. Через 10-15 минут сервер будет недоступен!"}}'
     - meteor npm install
     - meteor npm run lint
     - meteor npm run testunit
@@ -16,9 +16,9 @@ build:
     - meteor build --server-only --directory /opt/rocket-build
     - cd /opt/rocket-build/bundle/programs/server/
     - npm install
-    - curl -H "X-Auth-Token: XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id: t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message": { "rid": "GENERAL", "msg": "@here ВНИМАНИЕ! Обновление исходного кода. Осталось пару минут...!" }}'
+    - curl -H "X-Auth-Token:XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id:t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message": {"rid": "GENERAL", "msg": "@here ВНИМАНИЕ! Обновление исходного кода. Осталось пару минут...!"}}'
     - rsync -a --delete /opt/rocket-build/bundle/ /opt/Rocket.Chat/
     - sudo /bin/systemctl restart rocketchat.service
-    - curl -H "X-Auth-Token: XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id: t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message": { "rid": "GENERAL", "msg": "@here ВНИМАНИЕ! Обновление исходного кода ЗАВЕРШЕНО!" }}'
+    - curl -H "X-Auth-Token:XgmdN2J0fFC5UDdGFzRz9cGPsn9Sorfurya0dcoQlk5" -H "X-User-Id:t99TsHmSEPkf5cmF4" -H "Content-type:application/json" https://corp.anonchat.pro/api/v1/chat.sendMessage -d '{"message":{"rid":"GENERAL","msg":"@here ВНИМАНИЕ! Обновление исходного кода ЗАВЕРШЕНО!"}}'
   tags:
     - chat-dev
