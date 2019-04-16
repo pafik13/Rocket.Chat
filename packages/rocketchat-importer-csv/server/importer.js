@@ -270,7 +270,7 @@ export class CsvImporter extends Base {
 							u.rocketId = existantUser._id;
 							Users.update({ _id: u.rocketId }, { $addToSet: { importIds: u.id } });
 						} else {
-							const userId = Accounts.createUser({ email: u.email, password: `p${ u.customFields.id }` });
+							const userId = Accounts.createUser({ email: u.email, password: `p${ u.customFields.anonym_id }` });
 							Meteor.runAsUser(userId, () => {
 								Meteor.call('setUsername', u.username, { joinDefaultChannelsSilenced: true });
 								Users.setName(userId, u.name);
