@@ -4,6 +4,7 @@ stages:
 build:
   stage: build
   script:
+    - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Началась сборка новой версии Rocket-Chat! Через 10-15 минут сервер будет кратковременно недоступен!"}}'
     - meteor npm install
     - meteor npm run lint
     - meteor npm run testunit
@@ -15,7 +16,9 @@ build:
     - meteor build --server-only --directory /opt/rocket-build
     - cd /opt/rocket-build/bundle/programs/server/
     - npm install
+    - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Обновление исходного кода. Осталось пару минут...!"}}'
     - rsync -a --delete /opt/rocket-build/bundle/ /opt/Rocket.Chat/
     - sudo /bin/systemctl restart rocketchat.service
+    - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Обновление исходного кода ЗАВЕРШЕНО!"}}'
   tags:
     - chat-dev
