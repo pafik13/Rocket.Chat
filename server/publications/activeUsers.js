@@ -1,12 +1,18 @@
 import { Meteor } from 'meteor/meteor';
-import { Users } from 'meteor/rocketchat:models';
+import { Users, Subscriptions } from 'meteor/rocketchat:models';
 
 Meteor.publish('activeUsers', function() {
-	if (!this.userId) {
+	const userId = Meteor.userId();
+
+	if (!userId) {
 		return this.ready();
 	}
 
-	return Users.findUsersNotOffline({
+	const records = Subscriptions.findByUserIdAndType(userId, 'd', { fields: { i: 1 } }).fetch();
+
+	const userIds = records.map((record) => record.i._id);
+
+	return Users.findUsersWithUsernameByIdsNotOffline(userIds, {
 		fields: {
 			username: 1,
 			name: 1,
