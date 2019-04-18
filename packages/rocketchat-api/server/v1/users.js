@@ -33,21 +33,24 @@ API.v1.addRoute('users.create', { authRequired: true }, {
 			customFields: Match.Maybe(Object),
 		});
 
-		// New change made by pull request #5152
-		if (typeof this.bodyParams.joinDefaultChannels === 'undefined') {
-			this.bodyParams.joinDefaultChannels = true;
-		}
+		const originalJoinDefaultChannels = typeof this.bodyParams.joinDefaultChannels === 'undefined' ? true : this.bodyParams.joinDefaultChannels;
 
 		if (this.bodyParams.customFields) {
 			validateCustomFields(this.bodyParams.customFields);
 		}
 
+		// Fix messages WO customFields
+		this.bodyParams.joinDefaultChannels = false;
 		const newUserId = saveUser(this.userId, this.bodyParams);
 
 		if (this.bodyParams.customFields) {
 			saveCustomFieldsWithoutValidation(newUserId, this.bodyParams.customFields);
 		}
 
+		// Fix messages WO customFields
+		if (originalJoinDefaultChannels) {
+			Meteor.runAsUser(newUserId, () => Meteor.call('joinDefaultChannels', false));
+		}
 
 		if (typeof this.bodyParams.active !== 'undefined') {
 			Meteor.runAsUser(this.userId, () => {
