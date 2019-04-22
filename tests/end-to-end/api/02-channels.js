@@ -748,7 +748,7 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.nested.property('channel.customFields.field2', 'value2');
 					expect(res.body).to.have.nested.property('channel.customFields.field3', 'value3');
 					expect(res.body).to.have.nested.property('channel.customFields.field4', 'value4');
-					expect(res.body).to.have.not.nested.property('channel.customFields.field1', 'value1');
+					expect(res.body).to.have.nested.property('channel.customFields.field1', 'value1');
 				})
 				.end(done);
 		});
@@ -768,9 +768,9 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.nested.property('channel._id');
 					expect(res.body).to.have.nested.property('channel.name', cfchannel.name);
 					expect(res.body).to.have.nested.property('channel.t', 'c');
-					expect(res.body).to.have.not.nested.property('channel.customFields.field2', 'value2');
-					expect(res.body).to.have.not.nested.property('channel.customFields.field3', 'value3');
-					expect(res.body).to.have.not.nested.property('channel.customFields.field4', 'value4');
+					expect(res.body).to.have.nested.property('channel.customFields.field2', 'value2');
+					expect(res.body).to.have.nested.property('channel.customFields.field3', 'value3');
+					expect(res.body).to.have.nested.property('channel.customFields.field4', 'value4');
 				})
 				.end(done);
 		});
