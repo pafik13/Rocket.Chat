@@ -625,6 +625,9 @@ describe('[Groups]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.nested.property('group.customFields.field0', 'value0');
+					expect(res.body).to.have.nested.property('group.customFields.anonym_id', -1);
+					expect(res.body).to.have.nested.property('group.customFields.photoUrl', '');
+					expect(res.body).to.have.nested.property('group.customFields.registeredAt', cfchannel.customFields.registeredAt);
 				})
 				.end(done);
 		});
@@ -644,7 +647,7 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group.name', cfchannel.name);
 					expect(res.body).to.have.nested.property('group.t', 'p');
 					expect(res.body).to.have.nested.property('group.customFields.field9', 'value9');
-					expect(res.body).to.have.not.nested.property('group.customFields.field0', 'value0');
+					expect(res.body).to.have.nested.property('group.customFields.field0', 'value0');
 				})
 				.end(done);
 		});
@@ -724,7 +727,7 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group.customFields.field2', 'value2');
 					expect(res.body).to.have.nested.property('group.customFields.field3', 'value3');
 					expect(res.body).to.have.nested.property('group.customFields.field4', 'value4');
-					expect(res.body).to.have.not.nested.property('group.customFields.field1', 'value1');
+					expect(res.body).to.have.nested.property('group.customFields.field1', 'value1');
 				})
 				.end(done);
 		});
@@ -744,9 +747,9 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group._id');
 					expect(res.body).to.have.nested.property('group.name', cfchannel.name);
 					expect(res.body).to.have.nested.property('group.t', 'p');
-					expect(res.body).to.have.not.nested.property('group.customFields.field2', 'value2');
-					expect(res.body).to.have.not.nested.property('group.customFields.field3', 'value3');
-					expect(res.body).to.have.not.nested.property('group.customFields.field4', 'value4');
+					expect(res.body).to.have.nested.property('group.customFields.field2', 'value2');
+					expect(res.body).to.have.nested.property('group.customFields.field3', 'value3');
+					expect(res.body).to.have.nested.property('group.customFields.field4', 'value4');
 				})
 				.end(done);
 		});
