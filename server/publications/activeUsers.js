@@ -1,5 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Users, Subscriptions } from 'meteor/rocketchat:models';
+import { Logger } from 'meteor/rocketchat:logger';
+
+const logger = new Logger('activeUsers');
 
 Meteor.publish('activeUsers', function() {
 	const userId = Meteor.userId();
@@ -8,11 +11,18 @@ Meteor.publish('activeUsers', function() {
 		return this.ready();
 	}
 
-	const pub = this;
-
 	const records = Subscriptions.findByUserIdAndType(userId, 'd', { fields: { i: 1 } }).fetch();
 
-	const userIds = records.map((record) => record.i._id);
+	logger.info('records', records);
+
+	const userIds = [];
+	for (let r = 0, len = records.length; r < len; r++) {
+		const record = records[r];
+		if (record.i) {
+			userIds.push(record.i._id);
+		}
+	}
+	logger.info('userIds', userIds);
 
 	const options = {
 		fields: {
@@ -23,28 +33,5 @@ Meteor.publish('activeUsers', function() {
 		},
 	};
 
-	const cursorHandle = Users.findUsersWithUsernameByIdsNotOffline(userIds, options).observeChanges({
-		added(_id, record) {
-			record.realAction = 'added';
-			return pub.added('users', _id, record);
-		},
-		changed(_id, record) {
-			pub.removed('users', _id, record);
-			const user = Users.findOneById(_id, options);
-			user.realAction = 'changed';
-			return pub.added('users', _id, user);
-		},
-		removed(_id, record) {
-			pub.removed('users', _id, record);
-			const user = Users.findOneById(_id, options);
-			user.realAction = 'removed';
-			return pub.added('users', _id, user);
-		},
-	});
-
-	this.ready();
-
-	this.onStop(function() {
-		return cursorHandle.stop();
-	});
+	return Users.findUsersWithUsernameByIdsNotOffline(userIds, options);
 });
