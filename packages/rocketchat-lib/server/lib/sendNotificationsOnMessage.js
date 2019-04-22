@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Random } from 'meteor/random';
 import moment from 'moment';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
@@ -141,40 +142,40 @@ const sendNotification = async({
 	}
 };
 
-// const project = {
-// 	$project: {
-// 		audioNotifications: 1,
-// 		desktopNotificationDuration: 1,
-// 		desktopNotifications: 1,
-// 		emailNotifications: 1,
-// 		mobilePushNotifications: 1,
-// 		muteGroupMentions: 1,
-// 		name: 1,
-// 		userHighlights: 1,
-// 		'u._id': 1,
-// 		'receiver.active': 1,
-// 		'receiver.emails': 1,
-// 		'receiver.language': 1,
-// 		'receiver.status': 1,
-// 		'receiver.statusConnection': 1,
-// 		'receiver.username': 1,
-// 	},
-// };
+const project = {
+	$project: {
+		audioNotifications: 1,
+		desktopNotificationDuration: 1,
+		desktopNotifications: 1,
+		emailNotifications: 1,
+		mobilePushNotifications: 1,
+		muteGroupMentions: 1,
+		name: 1,
+		userHighlights: 1,
+		'u._id': 1,
+		'receiver.active': 1,
+		'receiver.emails': 1,
+		'receiver.language': 1,
+		'receiver.status': 1,
+		'receiver.statusConnection': 1,
+		'receiver.username': 1,
+	},
+};
 
-// const filter = {
-// 	$match: {
-// 		'receiver.active': true,
-// 	},
-// };
+const filter = {
+	$match: {
+		'receiver.active': true,
+	},
+};
 
-// const lookup = {
-// 	$lookup: {
-// 		from: 'users',
-// 		localField: 'u._id',
-// 		foreignField: '_id',
-// 		as: 'receiver',
-// 	},
-// };
+const lookup = {
+	$lookup: {
+		from: 'users',
+		localField: 'u._id',
+		foreignField: '_id',
+		as: 'receiver',
+	},
+};
 
 async function sendAllNotifications(message, room) {
 
@@ -258,25 +259,35 @@ async function sendAllNotifications(message, room) {
 
 	// the find bellow is crucial. all subscription records returned will receive at least one kind of notification.
 	// the query is defined by the server's default values and Notifications_Max_Room_Members setting.
+	const timeToken = `notification:: ${ Random.id() }`;
+	console.time(timeToken);
+	const cursor = Subscriptions.model.rawCollection().aggregate([
+		{ $match: query },
+		lookup,
+		filter,
+		project,
+	]);
 
-	// const subscriptions = await Subscriptions.model.rawCollection().aggregate([
-	// 	{ $match: query },
-	// 	lookup,
-	// 	filter,
-	// 	project,
-	// ]).toArray();
-
-	// subscriptions.forEach((subscription) => sendNotification({
-	// 	subscription,
-	// 	sender,
-	// 	hasMentionToAll,
-	// 	hasMentionToHere,
-	// 	message,
-	// 	notificationMessage,
-	// 	room,
-	// 	mentionIds,
-	// 	disableAllMessageNotifications,
-	// }));
+	let count = 0;
+	while (await cursor.hasNext()) {
+		// load   one document from the resultset into memory
+		const subscription = await cursor.next();
+		// console.log(subscription);
+		sendNotification({
+			subscription,
+			sender,
+			hasMentionToAll,
+			hasMentionToHere,
+			message,
+			notificationMessage,
+			room,
+			mentionIds,
+			disableAllMessageNotifications,
+		});
+		count++;
+	}
+	console.timeEnd(timeToken);
+	console.log(`notification::count=${ count }`);
 
 	// on public channels, if a mentioned user is not member of the channel yet, he will first join the channel and then be notified based on his preferences.
 	if (room.t === 'c') {
