@@ -141,40 +141,40 @@ const sendNotification = async({
 	}
 };
 
-const project = {
-	$project: {
-		audioNotifications: 1,
-		desktopNotificationDuration: 1,
-		desktopNotifications: 1,
-		emailNotifications: 1,
-		mobilePushNotifications: 1,
-		muteGroupMentions: 1,
-		name: 1,
-		userHighlights: 1,
-		'u._id': 1,
-		'receiver.active': 1,
-		'receiver.emails': 1,
-		'receiver.language': 1,
-		'receiver.status': 1,
-		'receiver.statusConnection': 1,
-		'receiver.username': 1,
-	},
-};
+// const project = {
+// 	$project: {
+// 		audioNotifications: 1,
+// 		desktopNotificationDuration: 1,
+// 		desktopNotifications: 1,
+// 		emailNotifications: 1,
+// 		mobilePushNotifications: 1,
+// 		muteGroupMentions: 1,
+// 		name: 1,
+// 		userHighlights: 1,
+// 		'u._id': 1,
+// 		'receiver.active': 1,
+// 		'receiver.emails': 1,
+// 		'receiver.language': 1,
+// 		'receiver.status': 1,
+// 		'receiver.statusConnection': 1,
+// 		'receiver.username': 1,
+// 	},
+// };
 
-const filter = {
-	$match: {
-		'receiver.active': true,
-	},
-};
+// const filter = {
+// 	$match: {
+// 		'receiver.active': true,
+// 	},
+// };
 
-const lookup = {
-	$lookup: {
-		from: 'users',
-		localField: 'u._id',
-		foreignField: '_id',
-		as: 'receiver',
-	},
-};
+// const lookup = {
+// 	$lookup: {
+// 		from: 'users',
+// 		localField: 'u._id',
+// 		foreignField: '_id',
+// 		as: 'receiver',
+// 	},
+// };
 
 async function sendAllNotifications(message, room) {
 
