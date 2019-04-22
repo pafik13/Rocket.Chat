@@ -259,24 +259,24 @@ async function sendAllNotifications(message, room) {
 	// the find bellow is crucial. all subscription records returned will receive at least one kind of notification.
 	// the query is defined by the server's default values and Notifications_Max_Room_Members setting.
 
-	const subscriptions = await Subscriptions.model.rawCollection().aggregate([
-		{ $match: query },
-		lookup,
-		filter,
-		project,
-	]).toArray();
+	// const subscriptions = await Subscriptions.model.rawCollection().aggregate([
+	// 	{ $match: query },
+	// 	lookup,
+	// 	filter,
+	// 	project,
+	// ]).toArray();
 
-	subscriptions.forEach((subscription) => sendNotification({
-		subscription,
-		sender,
-		hasMentionToAll,
-		hasMentionToHere,
-		message,
-		notificationMessage,
-		room,
-		mentionIds,
-		disableAllMessageNotifications,
-	}));
+	// subscriptions.forEach((subscription) => sendNotification({
+	// 	subscription,
+	// 	sender,
+	// 	hasMentionToAll,
+	// 	hasMentionToHere,
+	// 	message,
+	// 	notificationMessage,
+	// 	room,
+	// 	mentionIds,
+	// 	disableAllMessageNotifications,
+	// }));
 
 	// on public channels, if a mentioned user is not member of the channel yet, he will first join the channel and then be notified based on his preferences.
 	if (room.t === 'c') {
