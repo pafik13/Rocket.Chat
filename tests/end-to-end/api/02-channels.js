@@ -1,3 +1,5 @@
+/* global expect */
+
 import {
 	getCredentials,
 	api,
@@ -662,7 +664,7 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.nested.property('channel.name', cfchannel.name);
 					expect(res.body).to.have.nested.property('channel.t', 'c');
 					expect(res.body).to.have.nested.property('channel.customFields.field9', 'value9');
-					expect(res.body).to.have.not.nested.property('channel.customFields.field0', 'value0');
+					expect(res.body).to.have.nested.property('channel.customFields.field0', 'value0');
 				})
 				.end(done);
 		});
@@ -677,6 +679,7 @@ describe('[Channels]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.nested.property('channel.customFields.field9', 'value9');
+					expect(res.body).to.have.nested.property('channel.customFields.field0', 'value0');
 				})
 				.end(done);
 		});
