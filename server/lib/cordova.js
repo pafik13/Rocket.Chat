@@ -177,7 +177,7 @@ function configurePush() {
 			production: settings.get('Push_production'),
 			sendInterval: 5000,
 			sendBatchSize: 10,
-			debug: true,
+			// debug: true,
 		});
 
 		if (settings.get('Push_enable_gateway') === true) {
