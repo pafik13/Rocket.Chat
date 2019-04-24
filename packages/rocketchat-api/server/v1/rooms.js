@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Random } from 'meteor/random';
 import { FileUpload } from 'meteor/rocketchat:file-upload';
-import { Rooms } from 'meteor/rocketchat:models';
+import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import Busboy from 'busboy';
 import { API } from '../api';
 import S3 from 'aws-sdk/clients/s3';
@@ -302,7 +302,18 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		if (!Meteor.call('canAccessRoom', room._id, this.userId, {})) {
 			return API.v1.failure('not-allowed', 'Not Allowed');
 		}
-		return API.v1.success({ room: Rooms.findOneByIdOrName(room._id, { fields }) });
+		const options = {
+			fields: {
+				blocker: 1,
+				blocked: 1,
+			},
+		};
+		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
+		const result = Rooms.findOneByIdOrName(room._id, { fields });
+		result.blocker = subscription.blocker;
+		result.blocked = subscription.blocked;
+
+		return API.v1.success({ room: result });
 	},
 });
 
