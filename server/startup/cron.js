@@ -40,30 +40,30 @@ function generateStatistics() {
 	}
 }
 
-function cleanupOEmbedCache() {
-	return Meteor.call('OEmbedCacheCleanup');
-}
+// function cleanupOEmbedCache() {
+// 	return Meteor.call('OEmbedCacheCleanup');
+// }
 
 Meteor.startup(function() {
 	return Meteor.defer(function() {
 		generateStatistics();
 
-		// SyncedCron.add({
-		// 	name: 'Generate and save statistics',
-		// 	schedule(parser) {
-		// 		return parser.cron(`${ new Date().getMinutes() } * * * *`);
-		// 	},
-		// 	job: generateStatistics,
-		// });
-
 		SyncedCron.add({
-			name: 'Cleanup OEmbed cache',
+			name: 'Generate and save statistics',
 			schedule(parser) {
-				const now = new Date();
-				return parser.cron(`${ now.getMinutes() } ${ now.getHours() } * * *`);
+				return parser.cron(`${ new Date().getMinutes() } * * * *`);
 			},
-			job: cleanupOEmbedCache,
+			job: generateStatistics,
 		});
+
+		// SyncedCron.add({
+		// 	name: 'Cleanup OEmbed cache',
+		// 	schedule(parser) {
+		// 		const now = new Date();
+		// 		return parser.cron(`${ now.getMinutes() } ${ now.getHours() } * * *`);
+		// 	},
+		// 	job: cleanupOEmbedCache,
+		// });
 
 		return SyncedCron.start();
 	});
