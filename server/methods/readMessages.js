@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { callbacks } from 'meteor/rocketchat:callbacks';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
 
 Meteor.methods({
 	readMessages(rid) {
@@ -20,6 +20,7 @@ Meteor.methods({
 		// TODO: move this calls to an exported function
 		const userSubscription = Subscriptions.findOneByRoomIdAndUserId(rid, userId, { fields: { ls: 1 } });
 		Subscriptions.setAsReadByRoomIdAndUserId(rid, userId);
+		Rooms.setLastMessageRead(rid);
 
 		Meteor.defer(() => {
 			callbacks.run('afterReadMessages', rid, { userId, lastSeen: userSubscription.ls });
