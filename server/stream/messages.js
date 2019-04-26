@@ -55,9 +55,22 @@ Meteor.startup(function() {
 		if (record._hidden !== true && (record.imported == null)) {
 			// const UI_Use_Real_Name = settings.get('UI_Use_Real_Name') === true;
 
+			let user;
 			if (record.u && record.u._id) {
-				const user = Users.findOneByIdWithCustomFields(record.u._id);
+				user = Users.findOneByIdWithCustomFields(record.u._id);
 				record.u = user;
+			}
+
+			if (record.t) {
+				// console.log('publishMessage', record._id);
+				if (user && record.msg === user.username) {
+					record.msg = user.name;
+				} else {
+					const hero = Users.findOneByUsername(record.msg, { name: 1 });
+					if (hero && hero.name) {
+						record.msg = hero.name;
+					}
+				}
 			}
 
 			// if (record.mentions && record.mentions.length) {

@@ -8,10 +8,24 @@ export const composeMessageObjectWithUser = function(message, userId) {
 		if (message.starred && Array.isArray(message.starred)) {
 			message.starred = message.starred.filter((star) => star._id === userId);
 		}
+		let user;
 		if (message.u && message.u._id) {
-			const user = getUser(message.u._id);
+			user = getUser(message.u._id);
 			message.u = user;
 		}
+
+		if (message.t) {
+			// console.log('composeMessageObjectWithUser', message._id);
+			if (user && message.msg === user.username) {
+				message.msg = user.name;
+			} else {
+				const hero = Users.findOneByUsername(message.msg, { name: 1 });
+				if (hero && hero.name) {
+					message.msg = hero.name;
+				}
+			}
+		}
+
 		// if (message.mentions && message.mentions.length && settings.get('UI_Use_Real_Name')) {
 		// 	message.mentions.forEach((mention) => {
 		// 		const user = getUser(mention._id);
