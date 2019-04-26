@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { roomTypes } from 'meteor/rocketchat:utils';
+import { roomTypes, composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms, Subscriptions, Users } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
@@ -145,6 +145,9 @@ Rooms.on('change', ({ clientAction, id, data }) => {
 			getSubscriptions(clientAction, id).forEach(({ u }) => {
 				Notifications.notifyUserInThisInstance(u._id, 'rooms-changed', clientAction, data);
 			});
+		}
+		if (data.lastMessage) {
+			data.lastMessage = composeMessageObjectWithUser(data.lastMessage, null);
 		}
 		Notifications.streamUser.__emit(id, clientAction, data);
 	}
