@@ -82,23 +82,30 @@ function notifyUsersOnMessage(message, room) {
 				Subscriptions.incUserMentionsAndUnreadForRoomIdAndUserIds(room._id, _.compact(_.unique(mentionIds.concat(highlightsIds))), 1, 1);
 			}
 		} else {
-			const unreadCount = settings.get('Unread_Count');
+			// Don't fetch all users if room exceeds max members
+			const maxMembersForNotification = settings.get('Notifications_Max_Room_Members');
+			const roomMembersCount = Subscriptions.findByRoomId(room._id).count();
+			const disableIncUnread = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
 
-			if (toAll || toHere) {
-				let incUnread = 0;
-				if (['all_messages', 'group_mentions_only', 'user_and_group_mentions_only'].includes(unreadCount)) {
-					incUnread = 1;
-				}
-				Subscriptions.incGroupMentionsAndUnreadForRoomIdExcludingUserId(room._id, message.u._id, 1, incUnread);
+			if (!disableIncUnread) {
+				const unreadCount = settings.get('Unread_Count');
 
-			} else if ((mentionIds && mentionIds.length > 0) || (highlightsIds && highlightsIds.length > 0)) {
-				let incUnread = 0;
-				if (['all_messages', 'user_mentions_only', 'user_and_group_mentions_only'].includes(unreadCount)) {
-					incUnread = 1;
+				if (toAll || toHere) {
+					let incUnread = 0;
+					if (['all_messages', 'group_mentions_only', 'user_and_group_mentions_only'].includes(unreadCount)) {
+						incUnread = 1;
+					}
+					Subscriptions.incGroupMentionsAndUnreadForRoomIdExcludingUserId(room._id, message.u._id, 1, incUnread);
+
+				} else if ((mentionIds && mentionIds.length > 0) || (highlightsIds && highlightsIds.length > 0)) {
+					let incUnread = 0;
+					if (['all_messages', 'user_mentions_only', 'user_and_group_mentions_only'].includes(unreadCount)) {
+						incUnread = 1;
+					}
+					Subscriptions.incUserMentionsAndUnreadForRoomIdAndUserIds(room._id, _.compact(_.unique(mentionIds.concat(highlightsIds))), 1, incUnread);
+				} else if (unreadCount === 'all_messages') {
+					Subscriptions.incUnreadForRoomIdExcludingUserId(room._id, message.u._id);
 				}
-				Subscriptions.incUserMentionsAndUnreadForRoomIdAndUserIds(room._id, _.compact(_.unique(mentionIds.concat(highlightsIds))), 1, incUnread);
-			} else if (unreadCount === 'all_messages') {
-				Subscriptions.incUnreadForRoomIdExcludingUserId(room._id, message.u._id);
 			}
 		}
 	}
