@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Subscriptions, Users, Rooms } from 'meteor/rocketchat:models';
 import { Notifications } from 'meteor/rocketchat:notifications';
 import { SystemLogger } from 'meteor/rocketchat:logger';
+import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 
 const fields = {
 	t: 1,
@@ -64,7 +65,11 @@ Meteor.methods({
 				const roomOptions = { fields: { lastMessage: 1 } };
 				const { lastMessage } = Rooms.findOneById(record.rid, roomOptions);
 
-				record.lastMessage = lastMessage;
+				if (lastMessage && lastMessage.u) {
+					record.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
+				} else {
+					record.lastMessage = null;
+				}
 			} catch (e) {
 				SystemLogger.error(`subscriptions/get::rid=${ record.rid }`, e);
 				record.lastMessage = null;
