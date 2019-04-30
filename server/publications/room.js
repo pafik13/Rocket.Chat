@@ -81,6 +81,11 @@ Meteor.methods({
 
 			records.forEach(function(record) {
 				record.u = user;
+				if (record.lastMessage && record.lastMessage.u) {
+					record.lastMessage = composeMessageObjectWithUser(record.lastMessage, record.lastMessage.u._id);
+				} else {
+					record.lastMessage = null;
+				}
 			});
 			return {
 				update: records,
@@ -91,6 +96,11 @@ Meteor.methods({
 		const records = Rooms.findBySubscriptionUserId(userId, options).fetch();
 		records.forEach(function(record) {
 			record.u = user;
+			if (record.lastMessage && record.lastMessage.u) {
+				record.lastMessage = composeMessageObjectWithUser(record.lastMessage, record.lastMessage.u._id);
+			} else {
+				record.lastMessage = null;
+			}
 		});
 		return records;
 	},
