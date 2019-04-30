@@ -483,7 +483,7 @@ export class Rooms extends Base {
 	setLastMessageRead(roomId, userId) {
 		const query = {
 			_id: roomId,
-			'u.id': {
+			'lastMessage.u.id': {
 				$ne: userId,
 			},
 		};
