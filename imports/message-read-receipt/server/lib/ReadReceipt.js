@@ -14,10 +14,16 @@ const debounceByRoomId = function(fn) {
 	};
 };
 
-const updateMessages = debounceByRoomId(Meteor.bindEnvironment((roomId) => {
+// const updateMessages = debounceByRoomId(Meteor.bindEnvironment((roomId) => {
+// 	// @TODO maybe store firstSubscription in room object so we don't need to call the above update method
+// 	const firstSubscription = Subscriptions.getMinimumLastSeenByRoomId(roomId);
+// 	Messages.setAsRead(roomId, firstSubscription.ls);
+// }));
+
+const updateMessages2 = debounceByRoomId(Meteor.bindEnvironment((roomId, userId) => {
 	// @TODO maybe store firstSubscription in room object so we don't need to call the above update method
 	const firstSubscription = Subscriptions.getMinimumLastSeenByRoomId(roomId);
-	Messages.setAsRead(roomId, firstSubscription.ls);
+	Messages.setAsRead2(roomId, firstSubscription.ls, userId);
 }));
 
 export const ReadReceipt = {
@@ -37,7 +43,7 @@ export const ReadReceipt = {
 			this.storeReadReceipts(Messages.findUnreadMessagesByRoomAndDate(roomId, userLastSeen), roomId, userId);
 		}
 
-		updateMessages(roomId);
+		updateMessages2(roomId, userId);
 	},
 
 	markMessageAsReadBySender(message, roomId, userId) {

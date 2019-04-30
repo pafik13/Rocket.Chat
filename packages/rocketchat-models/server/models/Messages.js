@@ -926,6 +926,25 @@ export class Messages extends Base {
 		});
 	}
 
+
+	setAsRead2(rid, until, userId) {
+		console.log('setAsRead2', rid, until, userId);
+		return this.update({
+			rid,
+			unread: true,
+			ts: { $lt: until },
+			'u._id': {
+				$ne: userId,
+			},
+		}, {
+			$unset: {
+				unread: 1,
+			},
+		}, {
+			multi: true,
+		});
+	}
+
 	setAsReadById(_id) {
 		return this.update({
 			_id,
