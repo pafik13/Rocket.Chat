@@ -481,13 +481,15 @@ export class Rooms extends Base {
 
 
 	setLastMessageRead(roomId, userId) {
+		console.log('setLastMessageRead', roomId, userId);
 		const query = {
 			_id: roomId,
-			'lastMessage.u.id': {
+			'lastMessage.u._id': {
 				$ne: userId,
 			},
 		};
 
+		console.log('setLastMessageRead', query);
 		const update = {
 			$unset: {
 				'lastMessage.unread': 1,
