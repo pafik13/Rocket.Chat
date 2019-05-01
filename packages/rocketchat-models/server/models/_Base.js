@@ -135,6 +135,10 @@ export class Base {
 		return this._db.remove(...args);
 	}
 
+	removeSimple(...args/* query*/) {
+		return this._db.removeSimple(...args);
+	}
+
 	insertOrUpsert(...args) {
 		return this._db.insertOrUpsert(...args);
 	}

@@ -32,7 +32,7 @@ export class OEmbedCache extends Base {
 				$lte: date,
 			},
 		};
-		return this.remove(query);
+		return this.removeSimple(query);
 	}
 }
 

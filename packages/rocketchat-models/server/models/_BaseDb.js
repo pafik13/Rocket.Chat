@@ -314,6 +314,10 @@ export class BaseDb extends EventEmitter {
 		return result;
 	}
 
+	removeSimple(query) {
+		return this.originals.remove(query);
+	}
+
 	insertOrUpsert(...args) {
 		if (args[0] && args[0]._id) {
 			const { _id } = args[0];
