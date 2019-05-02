@@ -14,7 +14,12 @@ Meteor.methods({
 		const date = new Date();
 		const expirationDays = settings.get('API_EmbedCacheExpirationDays');
 		date.setDate(date.getDate() - expirationDays);
-		OEmbedCache.removeAfterDate(date);
+		const query = {
+			updatedAt: {
+				$lte: date,
+			},
+		};
+		OEmbedCache.model.rawCollection().remove(query);
 		return {
 			message: 'cache_cleared',
 		};
