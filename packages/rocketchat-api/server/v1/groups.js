@@ -4,6 +4,11 @@ import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
+import Busboy from 'busboy';
+import { Random } from 'meteor/random';
+import S3 from 'aws-sdk/clients/s3';
+import Path from 'path';
+import { settings } from 'meteor/rocketchat:settings';
 
 // Returns the private group subscription IF found otherwise it will return the failure of why it didn't. Check the `statusCode` property
 function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) {
@@ -209,6 +214,122 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		});
 	},
 });
+
+function validateGroup(params) {
+	if (!params.name) {
+		throw new Error('Field "name" is required');
+	}
+
+	if (params.members && !_.isArray(params.members)) {
+		throw new Error('Field "members" must be an array if provided');
+	}
+}
+
+function createGroup(userId, params) {
+	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
+	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields));
+
+	console.log('createGroup', id);
+	return {
+		group: findPrivateGroupByIdOrName({ params: { roomId: id.rid }, userId: this.userId }),
+	};
+}
+
+
+API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
+	post() {
+		const { userId } = this;
+		if (!hasPermission(userId, 'create-p')) {
+			return API.v1.unauthorized();
+		}
+
+		const busboy = new Busboy({ headers: this.request.headers });
+		const files = [];
+		const fields = {};
+
+		Meteor.wrapAsync((callback) => {
+			busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+				if (fieldname !== 'file') {
+					return files.push(new Meteor.Error('invalid-field'));
+				}
+
+				const fileDate = [];
+				file.on('data', (data) => fileDate.push(data));
+
+				file.on('end', () => {
+					files.push({ fieldname, file, filename, encoding, mimetype, fileBuffer: Buffer.concat(fileDate) });
+				});
+			});
+
+			busboy.on('field', (fieldname, value) => fields[fieldname] = value);
+
+			busboy.on('finish', Meteor.bindEnvironment(() => callback()));
+
+			this.request.pipe(busboy);
+		})();
+
+		if (files.length === 0) {
+			return API.v1.failure('File required');
+		}
+
+		if (files.length > 1) {
+			return API.v1.failure('Just 1 file is allowed');
+		}
+
+		let customFields = {};
+
+		try {
+			validateGroup(fields);
+			if (fields.customFields) {
+				customFields = JSON.parse(fields.customFields);
+				delete fields.customFields;
+			}
+		} catch (e) {
+			return API.v1.failure(e.message);
+		}
+
+		const { group } = createGroup(userId, fields);
+		const { rid } = group;
+
+		const file = files[0];
+
+		const options = {
+			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
+			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
+			region: settings.get('FileUpload_S3_Region'),
+			sslEnabled: true,
+		};
+
+		const s3 = new S3(options);
+		const { filename, mimetype } = file;
+		const prefix = 'images/rocket_room_avatars';
+		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
+		const params = {
+			Body: file.fileBuffer,
+			Bucket: 'fotoanon',
+			Key: key,
+			Tagging: `rid=${ rid }&userId=${ userId }&filename=${ filename }&mimetype=${ mimetype }`,
+			ACL: 'public-read',
+		};
+
+		customFields.photoUrl = `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`,
+
+		Meteor.runAsUser(userId, () => {
+			const result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
+
+			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
+			if (fields.topic) {
+				Meteor.call('saveRoomSettings', rid, 'roomTopic', fields.topic);
+			}
+			if (fields.description) {
+				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
+			}
+
+			return API.v1.success(result);
+		});
+	},
+});
+
 
 API.v1.addRoute('groups.delete', { authRequired: true }, {
 	post() {

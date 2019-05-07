@@ -4,6 +4,11 @@ import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
+import Busboy from 'busboy';
+import { Random } from 'meteor/random';
+import S3 from 'aws-sdk/clients/s3';
+import Path from 'path';
+import { settings } from 'meteor/rocketchat:settings';
 
 // Returns the channel IF found otherwise it will return the failure of why it didn't. Check the `statusCode` property
 function findChannelByIdOrName({ params, checkedArchived = true, userId }) {
@@ -231,6 +236,120 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 		return API.v1.success(API.channels.create.execute(userId, bodyParams));
 	},
 });
+
+
+API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
+	post() {
+		const { userId } = this;
+
+		const busboy = new Busboy({ headers: this.request.headers });
+		const files = [];
+		const fields = {};
+
+		Meteor.wrapAsync((callback) => {
+			busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+				if (fieldname !== 'file') {
+					return files.push(new Meteor.Error('invalid-field'));
+				}
+
+				const fileDate = [];
+				file.on('data', (data) => fileDate.push(data));
+
+				file.on('end', () => {
+					files.push({ fieldname, file, filename, encoding, mimetype, fileBuffer: Buffer.concat(fileDate) });
+				});
+			});
+
+			busboy.on('field', (fieldname, value) => fields[fieldname] = value);
+
+			busboy.on('finish', Meteor.bindEnvironment(() => callback()));
+
+			this.request.pipe(busboy);
+		})();
+
+		if (files.length === 0) {
+			return API.v1.failure('File required');
+		}
+
+		if (files.length > 1) {
+			return API.v1.failure('Just 1 file is allowed');
+		}
+
+		let customFields = {};
+		let errorResponse;
+		try {
+			API.channels.create.validate({
+				user: {
+					value: userId,
+				},
+				name: {
+					value: fields.name,
+					key: 'name',
+				},
+				members: {
+					value: fields.members,
+					key: 'members',
+				},
+			});
+
+			if (fields.customFields) {
+				customFields = JSON.parse(fields.customFields);
+				delete fields.customFields;
+			}
+		} catch (e) {
+			if (e.message === 'unauthorized') {
+				errorResponse = API.v1.unauthorized();
+			} else {
+				errorResponse = API.v1.failure(e.message);
+			}
+		}
+
+		if (errorResponse) {
+			return errorResponse;
+		}
+
+		const { channel } = API.channels.create.execute(userId, fields);
+		const rid = channel._id;
+
+		const file = files[0];
+
+		const options = {
+			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
+			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
+			region: settings.get('FileUpload_S3_Region'),
+			sslEnabled: true,
+		};
+
+		const s3 = new S3(options);
+		const { filename, mimetype } = file;
+		const prefix = 'images/rocket_room_avatars';
+		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
+		const params = {
+			Body: file.fileBuffer,
+			Bucket: 'fotoanon',
+			Key: key,
+			Tagging: `rid=${ rid }&userId=${ userId }&filename=${ filename }&mimetype=${ mimetype }`,
+			ACL: 'public-read',
+		};
+
+		customFields.photoUrl = `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`,
+
+		Meteor.runAsUser(userId, () => {
+			const result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
+
+			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
+			if (fields.topic) {
+				Meteor.call('saveRoomSettings', rid, 'roomTopic', fields.topic);
+			}
+			if (fields.description) {
+				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
+			}
+
+			return API.v1.success(result);
+		});
+	},
+});
+
 
 API.v1.addRoute('channels.delete', { authRequired: true }, {
 	post() {
