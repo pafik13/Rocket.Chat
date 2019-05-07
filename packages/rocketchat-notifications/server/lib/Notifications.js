@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { DDPCommon } from 'meteor/ddp-common';
 import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
-import { settings } from 'meteor/rocketchat:settings';
 
 const changedPayload = function(collection, id, fields) {
 	return DDPCommon.stringifyDDP({
@@ -190,7 +189,6 @@ notifications.streamRoom.allowWrite(function(eventName, username, typing, extraD
 		return true;
 	}
 	if (e === 'typing') {
-		const key = settings.get('UI_Use_Real_Name') ? 'name' : 'username';
 		// typing from livechat widget
 		if (extraData && extraData.token) {
 			const room = Rooms.findOneById(roomId);
@@ -199,17 +197,11 @@ notifications.streamRoom.allowWrite(function(eventName, username, typing, extraD
 			}
 		}
 
-		const user = Meteor.users.findOne(this.userId, {
-			fields: {
-				[key]: 1,
-			},
-		});
-
-		if (!user) {
+		if (!this.userId) {
 			return false;
 		}
 
-		return user[key] === username;
+		return true;
 	}
 	return false;
 });
