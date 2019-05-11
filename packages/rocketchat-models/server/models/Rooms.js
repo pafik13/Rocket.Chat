@@ -1170,6 +1170,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	findByAnonymId(anonymId) {
+		if (!_.isNumber(anonymId) || isNaN(anonymId)) {
+			throw new Error('findByAnonymId: anonymId must be a valid number!');
+		}
+
+		const query = {
+			'customFields.anonym_id': Number(anonymId),
+		};
+
+		return this.find(query);
+	}
+
 	muteUsernameByRoomId(_id, username) {
 		const query = { _id };
 

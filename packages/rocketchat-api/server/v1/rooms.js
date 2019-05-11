@@ -327,3 +327,23 @@ API.v1.addRoute('rooms.leave', { authRequired: true }, {
 		return API.v1.success();
 	},
 });
+
+API.v1.addRoute('rooms.getByAnonymId', { authRequired: true }, {
+	get() {
+		const { anonym_id } = this.queryParams;
+
+		const anonymId = parseInt(anonym_id, 10);
+
+		if (anonymId === -1) {
+			return API.v1.success({
+				rooms: [],
+			});
+		}
+
+		const result = Rooms.findByAnonymId(anonymId).fetch();
+
+		return API.v1.success({
+			rooms: result.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
+		});
+	},
+});
