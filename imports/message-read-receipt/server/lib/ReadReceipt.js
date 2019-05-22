@@ -22,8 +22,8 @@ const debounceByRoomId = function(fn) {
 
 const updateMessages2 = debounceByRoomId(Meteor.bindEnvironment((roomId, userId) => {
 	// @TODO maybe store firstSubscription in room object so we don't need to call the above update method
-	const firstSubscription = Subscriptions.getMinimumLastSeenByRoomId(roomId);
-	Messages.setAsRead2(roomId, firstSubscription.ls, userId);
+	// const firstSubscription = Subscriptions.getMinimumLastSeenByRoomId(roomId);
+	Messages.setAsRead2(roomId, userId);
 }));
 
 export const ReadReceipt = {

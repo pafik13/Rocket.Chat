@@ -927,12 +927,11 @@ export class Messages extends Base {
 	}
 
 
-	setAsRead2(rid, until, userId) {
-		console.log('setAsRead2', rid, until, userId);
+	setAsRead2(rid, userId) {
+		console.log('setAsRead2', rid, userId);
 		return this.update({
 			rid,
 			unread: true,
-			ts: { $lt: until },
 			'u._id': {
 				$ne: userId,
 			},
