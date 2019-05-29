@@ -279,6 +279,9 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		let customFields = {};
 
 		try {
+			if (fields.members) {
+				fields.members = JSON.parse(fields.members);
+			}
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);

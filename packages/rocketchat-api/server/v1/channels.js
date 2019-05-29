@@ -278,6 +278,10 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 		let customFields = {};
 		let errorResponse;
 		try {
+			if (fields.members) {
+				fields.members = JSON.parse(fields.members);
+			}
+
 			API.channels.create.validate({
 				user: {
 					value: userId,
