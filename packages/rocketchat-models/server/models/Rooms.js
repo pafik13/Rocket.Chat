@@ -774,6 +774,9 @@ export class Rooms extends Base {
 
 	findByNameAndTypeNotDefault(name, type, options) {
 		const query = {
+			_id: {
+				$ne: 'GENERAL',
+			},
 			t: type,
 			name,
 			default: {
@@ -786,6 +789,8 @@ export class Rooms extends Base {
 	}
 
 	findByNameAndTypesNotInIds(name, types, ids, options) {
+		ids.push('GENERAL');
+
 		const query = {
 			_id: {
 				$ne: ids,
@@ -795,6 +800,7 @@ export class Rooms extends Base {
 			},
 			name,
 		};
+		console.log('findByNameAndTypesNotInIds', query);
 
 		// do not use cache
 		return this._db.find(query, options);
