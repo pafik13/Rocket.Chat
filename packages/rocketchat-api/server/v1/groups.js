@@ -204,13 +204,26 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 
 		const readOnly = typeof this.bodyParams.readOnly !== 'undefined' ? this.bodyParams.readOnly : false;
 
-		let id;
+		let result;
+		let rid;
 		Meteor.runAsUser(this.userId, () => {
-			id = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields);
+			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields);
+			rid = result.rid;
+
+			const { customFields, description, topic } = this.bodyParams;
+			if (customFields) {
+				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
+			}
+			if (topic) {
+				Meteor.call('saveRoomSettings', rid, 'roomTopic', topic);
+			}
+			if (description) {
+				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
+			}
 		});
 
 		return API.v1.success({
-			group: this.composeRoomWithLastMessage(Rooms.findOneById(id.rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
 		});
 	},
 });
@@ -282,6 +295,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
+			fields.readOnly = Boolean(fields.readOnly);
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
@@ -328,7 +342,10 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
 			}
 
-			return API.v1.success(result);
+			return API.v1.success({
+				group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+				s3_result: result,
+			});
 		});
 	},
 });

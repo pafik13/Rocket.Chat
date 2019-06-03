@@ -190,9 +190,7 @@ function createChannel(userId, params) {
 	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
 	const id = Meteor.runAsUser(userId, () => Meteor.call('createChannel', params.name, params.members ? params.members : [], readOnly, params.customFields));
 
-	return {
-		channel: findChannelByIdOrName({ params: { roomId: id.rid }, userId: this.userId }),
-	};
+	return id.rid;
 }
 
 API.channels = {};
@@ -233,7 +231,25 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 			return error;
 		}
 
-		return API.v1.success(API.channels.create.execute(userId, bodyParams));
+		const rid = API.channels.create.execute(userId, bodyParams);
+
+		const { customFields, description, topic } = bodyParams;
+
+		Meteor.runAsUser(this.userId, () => {
+			if (customFields) {
+				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
+			}
+			if (topic) {
+				Meteor.call('saveRoomSettings', rid, 'roomTopic', topic);
+			}
+			if (description) {
+				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
+			}
+		});
+
+		return API.v1.success({
+			channel: this.composeRoomWithLastMessage(findChannelByIdOrName({ params: { roomId: rid }, userId: this.userId }), this.userId),
+		});
 	},
 });
 
@@ -281,6 +297,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
+			fields.readOnly = Boolean(fields.readOnly);
 
 			API.channels.create.validate({
 				user: {
@@ -349,7 +366,10 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
 			}
 
-			return API.v1.success(result);
+			return API.v1.success({
+				channel: this.composeRoomWithLastMessage(findChannelByIdOrName({ params: { roomId: rid }, userId: this.userId }), this.userId),
+				s3_result: result,
+			});
 		});
 	},
 });
