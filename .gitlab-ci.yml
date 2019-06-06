@@ -19,7 +19,13 @@ build:
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Обновление исходного кода. Осталось пару минут...!"}}'
     - rsync -a --delete /opt/rocket-build/bundle/ /opt/Rocket.Chat/
     - sudo /bin/systemctl restart rocketchat.service
-    - for i in {3001..3007}; do sudo /bin/systemctl restart rocketchat@$i; done
+    - sudo /bin/systemctl restart rocketchat.service@3001
+    - sudo /bin/systemctl restart rocketchat.service@3002
+    - sudo /bin/systemctl restart rocketchat.service@3003
+    - sudo /bin/systemctl restart rocketchat.service@3004
+    - sudo /bin/systemctl restart rocketchat.service@3005
+    - sudo /bin/systemctl restart rocketchat.service@3006
+    - sudo /bin/systemctl restart rocketchat.service@3007
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Обновление исходного кода ЗАВЕРШЕНО!"}}'
   tags:
     - chat-dev
