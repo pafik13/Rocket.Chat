@@ -19,6 +19,34 @@ function fetchRooms(userId, rooms) {
 
 Meteor.methods({
 	spotlight(text, usernames, type = { users: true, rooms: true }, rid) {
+		const result = {
+			users: [],
+			rooms: [],
+		};
+		const userOptions = {
+			limit: 5,
+			fields: {
+				username: 1,
+				name: 1,
+				status: 1,
+				customFields: 1,
+			},
+			sort: {},
+		};
+		if (settings.get('UI_Use_Real_Name')) {
+			userOptions.sort.name = 1;
+		} else {
+			userOptions.sort.username = 1;
+		}
+
+		if (text.toUpperCase().startsWith('ID')) {
+			const maybeId = text.substring(2);
+			if (maybeId && !isNaN(Number(maybeId))) {
+				const user = Users.findOneByAnonymId(maybeId, userOptions);
+				return result.users.push(user);
+			}
+		}
+
 		const searchForChannels = text[0] === '#';
 		const searchForDMs = text[0] === '@';
 		if (searchForChannels) {
@@ -30,10 +58,6 @@ Meteor.methods({
 			text = text.slice(1);
 		}
 		const regex = new RegExp(s.trim(s.escapeRegExp(text)), 'i');
-		const result = {
-			users: [],
-			rooms: [],
-		};
 		const roomOptions = {
 			limit: 5,
 			fields: {
@@ -54,21 +78,6 @@ Meteor.methods({
 			}
 			return result;
 		}
-		const userOptions = {
-			limit: 5,
-			fields: {
-				username: 1,
-				name: 1,
-				status: 1,
-				customFields: 1,
-			},
-			sort: {},
-		};
-		if (settings.get('UI_Use_Real_Name')) {
-			userOptions.sort.name = 1;
-		} else {
-			userOptions.sort.username = 1;
-		}
 
 		if (hasPermission(userId, 'view-outside-room')) {
 			if (type.users === true && hasPermission(userId, 'view-d-room')) {
@@ -79,9 +88,11 @@ Meteor.methods({
 				const searchableRoomTypes = Object.entries(roomTypes.roomTypes)
 					.filter((roomType) => roomType[1].includeInRoomSearch())
 					.map((roomType) => roomType[0]);
+				console.log('spotlight', text, usernames, type, rid, searchableRoomTypes);
 
 				const roomIds = Subscriptions.findByUserIdAndTypes(userId, searchableRoomTypes, { fields: { rid: 1 } }).fetch().map((s) => s.rid);
 				result.rooms = fetchRooms(userId, Rooms.findByNameAndTypesNotInIds(regex, searchableRoomTypes, roomIds, roomOptions).fetch());
+				console.log('spotlight', result.rooms);
 			}
 		} else if (type.users === true && rid) {
 			const subscriptions = Subscriptions.find({

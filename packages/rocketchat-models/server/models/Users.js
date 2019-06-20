@@ -376,6 +376,10 @@ export class Users extends Base {
 		return this.findOne({ importIds: _id }, options);
 	}
 
+	findOneByAnonymId(anonymId, options) {
+		return this.findOne({ 'customFields.anonym_id': anonymId }, options);
+	}
+
 	findOneByUsername(username, options) {
 		if (typeof username === 'string') {
 			username = new RegExp(`^${ username }$`, 'i');
