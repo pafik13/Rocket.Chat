@@ -793,7 +793,7 @@ export class Rooms extends Base {
 
 		const query = {
 			_id: {
-				$ne: ids,
+				$nin: ids,
 			},
 			t: {
 				$in: types,
