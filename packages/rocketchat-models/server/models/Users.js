@@ -377,7 +377,9 @@ export class Users extends Base {
 	}
 
 	findOneByAnonymId(anonymId, options) {
-		return this.findOne({ 'customFields.anonym_id': anonymId }, options);
+		const query = { 'customFields.anonym_id': parseInt(anonymId, 10) };
+		console.log('findOneByAnonymId', query);
+		return this.findOne(query, options);
 	}
 
 	findOneByUsername(username, options) {

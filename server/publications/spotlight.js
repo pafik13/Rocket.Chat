@@ -43,7 +43,8 @@ Meteor.methods({
 			const maybeId = text.substring(2);
 			if (maybeId && !isNaN(Number(maybeId))) {
 				const user = Users.findOneByAnonymId(maybeId, userOptions);
-				return result.users.push(user);
+				if (user) { result.users.push(user); }
+				return result;
 			}
 		}
 
