@@ -105,7 +105,7 @@ Subscriptions.on('change', ({ clientAction, id, data }) => {
 			break;
 
 		case 'removed':
-			data = Subscriptions.trashFindOneById(id, { fields: { u: 1, rid: 1 } });
+			data = Subscriptions.trashFindOneById(id, { fields: { u: 1, rid: 1, t: 1, name: 1, fname: 1 } });
 			break;
 	}
 
