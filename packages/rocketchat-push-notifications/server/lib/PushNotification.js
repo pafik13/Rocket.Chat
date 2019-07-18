@@ -1,3 +1,4 @@
+import { Random } from 'meteor/random';
 import { Push } from 'meteor/rocketchat:push';
 import { settings } from 'meteor/rocketchat:settings';
 import { metrics } from 'meteor/rocketchat:metrics';
@@ -36,7 +37,7 @@ export class PushNotification {
 		}
 
 		const config = {
-			from: 'push',
+			from: `${ Random.id() }`,
 			badge,
 			sound: 'default',
 			title,
