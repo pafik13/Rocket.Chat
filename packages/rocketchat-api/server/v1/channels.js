@@ -343,13 +343,15 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 
 		const s3 = new S3(options);
 		const { filename, mimetype } = file;
+		const filenameInBase64 = new Buffer(filename).toString('base64');
+		const mimetypeInBase64 = new Buffer(mimetype).toString('base64');
 		const prefix = 'images/rocket_room_avatars';
 		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
 		const params = {
 			Body: file.fileBuffer,
 			Bucket: 'fotoanon',
 			Key: key,
-			Tagging: `rid=${ rid }&userId=${ userId }&filename=${ filename }&mimetype=${ mimetype }`,
+			Tagging: `rid=${ rid }&userId=${ userId }&filenameInBase64=${ filenameInBase64 }&mimetypeInBase64=${ mimetypeInBase64 }`,
 			ACL: 'public-read',
 		};
 
