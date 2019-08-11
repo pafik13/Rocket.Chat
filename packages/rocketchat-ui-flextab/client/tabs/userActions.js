@@ -40,6 +40,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			return !!RoomRoles.findOne({ rid: Session.get('openedRoom'), 'u._id': user._id, roles: 'leader' });
 		}
 	};
+	const isBanned = () => (user && user._id && user.isBanned);
 	const isOwner = () => {
 		if (user && user._id) {
 			return !!RoomRoles.findOne({ rid: Session.get('openedRoom'), 'u._id': user._id, roles: 'owner' });
@@ -406,6 +407,78 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				})));
 			}),
 			condition: () => directActions && canRemoveUser(),
+		}, () => {
+			if (!directActions && !canRemoveUser()) {
+				return;
+			}
+			if (!isBanned()) {
+				return {
+					group: 'channel',
+					icon: 'sign-out',
+					modifier: 'alert',
+					name: t('Ban_user'),
+					action: prevent(getUser, (user) => {
+						const rid = Session.get('openedRoom');
+						const room = ChatRoom.findOne(rid);
+						if (!hasAllPermission('remove-user', rid)) {
+							return toastr.error(TAPi18n.__('error-not-allowed'));
+						}
+						modal.open({
+							title: t('Are_you_sure'),
+							text: t('The_user_will_be_removed_from_s_and_banned', room.name),
+							type: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#DD6B55',
+							confirmButtonText: t('Yes_remove_and_ban_user'),
+							cancelButtonText: t('Cancel'),
+							closeOnConfirm: false,
+							html: false,
+						}, () => Meteor.call('banUser', { rid, username: user.username }, success(() => {
+							modal.open({
+								title: t('Removed_and_banned'),
+								text: t('User_has_been_removed_from_s_and_banned', room.name),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+							});
+							return this.instance.clear();
+						})));
+					}),
+				};
+			}
+			return {
+				group: 'channel',
+				icon: 'sign-out',
+				modifier: 'alert',
+				name: t('Unban_user'),
+				action: prevent(getUser, (user) => {
+					const rid = Session.get('openedRoom');
+					const room = ChatRoom.findOne(rid);
+					if (!hasAllPermission('remove-user', rid)) {
+						return toastr.error(TAPi18n.__('error-not-allowed'));
+					}
+					modal.open({
+						title: t('Are_you_sure'),
+						text: t('The_user_will_be_unbanned_in_s', room.name),
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Yes_unban_user'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+					}, () => Meteor.call('unbanUser', { rid, username: user.username }, success(() => {
+						modal.open({
+							title: t('Unbanned'),
+							text: t('User_has_been_unbanned_in_s', room.name),
+							type: 'success',
+							timer: 2000,
+							showConfirmButton: false,
+						});
+						return this.instance.clear();
+					})));
+				}),
+			};
 		}, {
 			icon : 'edit',
 			name: 'Edit',

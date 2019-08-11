@@ -31,6 +31,7 @@ import LivechatPageVisited from './models/LivechatPageVisited';
 import LivechatTrigger from './models/LivechatTrigger';
 import LivechatVisitors from './models/LivechatVisitors';
 import ReadReceipts from './models/ReadReceipts';
+import BannedUsers from './models/BannedUsers';
 
 export { AppsLogsModel } from './models/apps-logs-model';
 export { AppsPersistenceModel } from './models/apps-persistence-model';
@@ -73,4 +74,5 @@ export {
 	LivechatTrigger,
 	LivechatVisitors,
 	ReadReceipts,
+	BannedUsers,
 };

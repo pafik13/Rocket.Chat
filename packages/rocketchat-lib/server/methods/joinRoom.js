@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 import { hasPermission, canAccessRoom } from 'meteor/rocketchat:authorization';
 import { Rooms } from 'meteor/rocketchat:models';
 import { Tokenpass, updateUserTokenpassBalances } from 'meteor/rocketchat:tokenpass';
-import { addUserToRoom } from '../functions';
+import { addUserToRoom, isUserBanned } from '../functions';
 
 Meteor.methods({
 	joinRoom(rid, code) {
@@ -11,6 +11,10 @@ Meteor.methods({
 
 		if (!Meteor.userId()) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'joinRoom' });
+		}
+
+		if (isUserBanned(rid, Meteor.userId())) {
+			throw new Meteor.Error('error-banned-user', 'Banned user', { method: 'joinRoom' });
 		}
 
 		const room = Rooms.findOneById(rid);

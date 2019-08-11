@@ -68,3 +68,7 @@ import './methods/unarchiveRoom';
 import './methods/unblockUser';
 import './methods/updateMessage';
 import './publications/settings';
+import './methods/banUser';
+import './methods/unbanUser';
+import './methods/getBannedUsers';
+import './methods/isUserBanned';

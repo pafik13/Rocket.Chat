@@ -187,8 +187,7 @@ Template.membersList.events({
 		instance.filter.set(e.target.value.trim());
 	},
 	'change .js-type'(e, instance) {
-		const seeAll = instance.showAllUsers.get();
-		instance.showAllUsers.set(!seeAll);
+		instance.statusType.set(e.target.value.trim());
 	},
 	'click .see-all'(e, instance) {
 		const seeAll = instance.showAllUsers.get();
@@ -275,6 +274,7 @@ Template.membersList.events({
 
 Template.membersList.onCreated(function() {
 	this.showAllUsers = new ReactiveVar(false);
+	this.statusType = new ReactiveVar('online');
 	this.usersLimit = new ReactiveVar(100);
 	this.userDetail = new ReactiveVar;
 	this.showDetail = new ReactiveVar(false);
@@ -288,16 +288,40 @@ Template.membersList.onCreated(function() {
 	this.tabBar = Template.instance().tabBar;
 
 	Tracker.autorun(() => {
+		console.log('trigger!!');
 		if (this.data.rid == null) { return; }
 		this.loading.set(true);
-		return Meteor.call('getUsersOfRoom', this.data.rid, this.showAllUsers.get(), (error, users) => {
-			this.users.set(users.records);
-			this.total.set(users.total);
-			return this.loading.set(false);
+		const statusType = this.statusType.get();
+		switch (statusType) {
+			case 'online':
+			case 'all':
+				return Meteor.call('getUsersOfRoom', this.data.rid, statusType !== 'online', (error, users) => {
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			case 'leaders':
+			case 'moderators':
+			case 'owners':
+				return Meteor.call('getUsersOfRoomByRole', this.data.rid, statusType.slice(0, -1), (error, users) => {
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			case 'banned':
+				return Meteor.call('getBannedUsers', this.data.rid, (error, users) => {
+					for (let recs = users.records, i = 0, len = recs.length; i < len; i++) {
+						recs[i].isBanned = true;
+					}
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			default:
+				return;
 		}
-		);
-	}
-	);
+
+	});
 
 	this.clearUserDetail = () => {
 		this.showDetail.set(false);

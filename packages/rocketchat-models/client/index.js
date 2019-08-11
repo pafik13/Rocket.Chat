@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Base } from './models/_Base';
 import Avatars from './models/Avatars';
+import BannedUsers from './models/BannedUsers';
 import Uploads from './models/Uploads';
 import UserDataFiles from './models/UserDataFiles';
 import { Roles } from './models/Roles';
@@ -53,4 +54,5 @@ export {
 	CustomSounds,
 	EmojiCustom,
 	WebdavAccounts,
+	BannedUsers,
 };

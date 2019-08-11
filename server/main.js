@@ -34,6 +34,7 @@ import './methods/getRoomIdByNameOrId';
 import './methods/getRoomNameById';
 import './methods/getTotalChannels';
 import './methods/getUsersOfRoom';
+import './methods/getUsersOfRoomByRole';
 import './methods/hideRoom';
 import './methods/ignoreUser';
 import './methods/loadHistory';
