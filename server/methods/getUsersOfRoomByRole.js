@@ -24,7 +24,8 @@ Meteor.methods({
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoomByRole' });
 		}
 
-		const users = Subscriptions.findUsersInRoles([role]);
+		const userFields = { name: 1, username: 1, status: 1, customFields: 1 };
+		const users = Subscriptions.findUsersInRoles([role], rid, { fields: userFields });
 
 		return {
 			total: users.count(),
