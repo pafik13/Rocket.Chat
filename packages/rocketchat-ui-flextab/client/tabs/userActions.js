@@ -406,7 +406,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 					return this.instance.clear();
 				})));
 			}),
-			condition: () => directActions && canRemoveUser(),
+			condition: () => directActions && canRemoveUser() && !isBanned(),
 		}, () => {
 			if (!directActions && !canRemoveUser()) {
 				return;
