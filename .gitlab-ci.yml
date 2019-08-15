@@ -1,5 +1,6 @@
 stages:
   - build
+  - deploy
 
 build:
   stage: build
@@ -21,3 +22,10 @@ build:
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Обновление исходного кода ЗАВЕРШЕНО!"}}'
   tags:
     - chat-dev
+
+prod deploy:
+  stage: deploy
+  script:
+    - sudo /bin/systemctl restart rocketchat.service
+    - for i in {1..4}; do sudo /bin/systemctl restart rocketchat@300${i}.service; done
+  when: manual
