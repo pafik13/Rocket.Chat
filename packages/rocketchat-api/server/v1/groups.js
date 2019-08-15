@@ -295,7 +295,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
-			fields.readOnly = Boolean(fields.readOnly);
+			fields.readOnly = (fields.readOnly === 'true');
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);

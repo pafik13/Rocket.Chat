@@ -297,7 +297,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
-			fields.readOnly = Boolean(fields.readOnly);
+			fields.readOnly = (fields.readOnly === 'true');
 
 			API.channels.create.validate({
 				user: {
