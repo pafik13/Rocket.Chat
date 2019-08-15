@@ -263,6 +263,64 @@ API.v1.addRoute('rooms.favorite', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('rooms.banUser', { authRequired: true }, {
+	post() {
+		const { username } = this.bodyParams;
+
+		if (!this.bodyParams.hasOwnProperty('username')) {
+			return API.v1.failure('The \'username\' param is required');
+		}
+
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('banUser', { rid: room._id, username }));
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('rooms.unbanUser', { authRequired: true }, {
+	post() {
+		const { username } = this.bodyParams;
+
+		if (!this.bodyParams.hasOwnProperty('username')) {
+			return API.v1.failure('The \'username\' param is required');
+		}
+
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('unbanUser', { rid: room._id, username }));
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('rooms.getUsersByRole', { authRequired: true }, {
+	post() {
+		const { role } = this.bodyParams;
+
+		if (!this.bodyParams.hasOwnProperty('role')) {
+			return API.v1.failure('The \'role\' param is required');
+		}
+
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		const data = Meteor.runAsUser(this.userId, () => Meteor.call('getUsersOfRoomByRole', room._id, role));
+
+		return API.v1.success({ data });
+	},
+});
+
+API.v1.addRoute('rooms.getBannedUsers', { authRequired: true }, {
+	post() {
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		const data = Meteor.runAsUser(this.userId, () => Meteor.call('getBannedUsers', room._id));
+
+		return API.v1.success({ data });
+	},
+});
+
 API.v1.addRoute('rooms.cleanHistory', { authRequired: true }, {
 	post() {
 		const findResult = findRoomByIdOrName({ params: this.bodyParams });
