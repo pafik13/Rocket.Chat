@@ -30,3 +30,5 @@ prod deploy:
     - for i in {1..4}; do sudo /bin/systemctl restart rocketchat@300${i}.service; done
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here Релиз в продакшене!"}}'
   when: manual
+  tags:
+    - chat-dev
