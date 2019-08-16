@@ -58,13 +58,30 @@ Meteor.methods({
 			},
 		});
 
+		const isBanned = Meteor.call('isUserBanned', { rid: message.rid, username: user.username });
+
+		if (isBanned) {
+			throw new Meteor.Error('You can\'t send messages because you are banned');
+		}
+
 		const room = Meteor.call('canAccessRoom', message.rid, user._id);
 		if (!room) {
 			return false;
 		}
 
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(message.rid, Meteor.userId());
-		if (subscription && (subscription.blocked || subscription.blocker)) {
+		if (!subscription) {
+			Notifications.notifyUser(Meteor.userId(), 'message', {
+				_id: Random.id(),
+				rid: room._id,
+				ts: new Date,
+				msg: TAPi18n.__('error-logged-user-not-in-room', {
+					postProcess: 'sprintf',
+					sprintf: [room.name],
+				}, user.language),
+			});
+			throw new Meteor.Error('You can\'t send messages because you are not in room');
+		} else if (subscription.blocked || subscription.blocker) {
 			Notifications.notifyUser(Meteor.userId(), 'message', {
 				_id: Random.id(),
 				rid: room._id,
