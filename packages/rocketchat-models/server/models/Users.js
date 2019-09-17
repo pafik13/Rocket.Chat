@@ -14,6 +14,8 @@ export class Users extends Base {
 		this.tryEnsureIndex({ lastLogin: 1 });
 		this.tryEnsureIndex({ status: 1 });
 		this.tryEnsureIndex({ active: 1 }, { sparse: 1 });
+		this.tryEnsureIndex({ active: 1, name: 1 });
+		this.tryEnsureIndex({ name: 1, active: 1 });
 		this.tryEnsureIndex({ statusConnection: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ type: 1 });
 		this.tryEnsureIndex({ 'visitorEmails.address': 1 });
@@ -1067,6 +1069,91 @@ Find users to send a message by email if:
 		};
 
 		return this.find(query, options);
+	}
+
+	findByNameAndRoomId(name, roomId, skip = 0, limit = 50) {
+		const timeLabel = `findByNameAndRoomId${ _.random(0, 1000) }`;
+		console.time(timeLabel);
+		const query = {
+			rid: roomId,
+		};
+
+		const subscriptionsCount = Subscriptions.find(query).count();
+		const allUsersCount = this.find({}).count();
+		console.log(`findByNameAndRoomId: subscriptionsCount=${ subscriptionsCount }`);
+		console.log(`findByNameAndRoomId: allUsersCount=${ allUsersCount }`);
+
+		let users = [];
+		const sort = { name: 1 };
+		if (subscriptionsCount < allUsersCount / 10) {
+			console.log('findByNameAndRoomId: strategy=[Subscriptions]');
+			users = Promise.await(
+				Subscriptions.model.rawCollection().aggregate([
+					{ $match: { rid: roomId } },
+					{ $lookup: {
+						from: 'users',
+						localField: 'u._id',
+						foreignField: '_id',
+						as: 'user',
+					},
+					},
+					{ $unwind: '$user' },
+					{ $match: { 'user.active': true, 'user.name': name } },
+					{ $skip: skip },
+					{ $limit: limit },
+					{ $project: {
+						_id: '$user._id',
+						username: '$user.username',
+						name: '$user.name',
+						status: '$user.status',
+						customFields: '$user.customFields',
+					},
+					},
+					{ $sort: sort },
+				]).toArray());
+		} else {
+			console.log('findByNameAndRoomId: strategy=[Users]');
+			users = Promise.await(
+				this.model.rawCollection().aggregate([{
+					$match: {
+						active: true,
+						name,
+					},
+				}, {
+					$lookup: {
+						from: 'rocketchat_subscription',
+						let: {
+							userId: '$_id',
+							roomId,
+						},
+						pipeline: [{
+							$match: {
+								$expr: {
+									$and: [
+										{ $eq: ['$rid', '$$roomId'] },
+										{ $eq: ['$u._id', '$$userId'] },
+									],
+								},
+							},
+						}],
+						as: 'subscription',
+					},
+				},
+				{ $unwind: '$subscription' },
+				{ $match: { subscription : { $exists: true } } },
+				{ $skip: skip },
+				{ $limit: limit },
+				{ $project: { username: 1, name: 1, status: 1, customFields: 1 } },
+				{ $sort: sort },
+				], { hint: { name: 1, active: 1 },
+				}).toArray());
+		}
+
+		console.timeEnd(timeLabel);
+		//     while (cursor.hasNext()) {
+
+		//     }
+		return users;
 	}
 }
 
