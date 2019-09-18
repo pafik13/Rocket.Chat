@@ -4,6 +4,7 @@ import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
+import s from 'underscore.string';
 import Busboy from 'busboy';
 import { Random } from 'meteor/random';
 import S3 from 'aws-sdk/clients/s3';
@@ -688,22 +689,31 @@ API.v1.addRoute('channels.members', { authRequired: true }, {
 
 		const { offset, count } = this.getPaginationItems();
 		const { sort = {} } = this.parseJsonQuery();
+		const { name } = this.requestParams();
 
-		const subscriptions = Subscriptions.findByRoomId(findResult._id, {
-			fields: { 'u._id': 1 },
-			sort: { 'u.username': sort.username != null ? sort.username : 1 },
-			skip: offset,
-			limit: count,
-		});
+		let users = [];
+		let total = 0;
+		if (name) {
+			const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`, 'i');
+			users = Users.findByNameAndRoomId(nameRE, findResult._id, offset, count);
+			total = users.length;
+		} else {
+			const subscriptions = Subscriptions.findByRoomId(findResult._id, {
+				fields: { 'u._id': 1 },
+				sort: { 'u.username': sort.username != null ? sort.username : 1 },
+				skip: offset,
+				limit: count,
+			});
 
-		const total = subscriptions.count();
+			total = subscriptions.count();
 
-		const members = subscriptions.fetch().map((s) => s.u && s.u._id);
+			const members = subscriptions.fetch().map((s) => s.u && s.u._id);
 
-		const users = Users.find({ _id: { $in: members } }, {
-			fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields : 1 },
-			sort: { username: sort.username != null ? sort.username : 1 },
-		}).fetch();
+			users = Users.find({ _id: { $in: members } }, {
+				fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields : 1 },
+				sort: { username: sort.username != null ? sort.username : 1 },
+			}).fetch();
+		}
 
 		return API.v1.success({
 			members: users,
