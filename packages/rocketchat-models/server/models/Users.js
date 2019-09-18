@@ -1106,6 +1106,7 @@ Find users to send a message by email if:
 						username: '$user.username',
 						name: '$user.name',
 						status: '$user.status',
+						utcOffset: '$user.utcOffset',
 						customFields: '$user.customFields',
 					},
 					},
@@ -1143,7 +1144,7 @@ Find users to send a message by email if:
 				{ $match: { subscription : { $exists: true } } },
 				{ $skip: skip },
 				{ $limit: limit },
-				{ $project: { username: 1, name: 1, status: 1, customFields: 1 } },
+				{ $project: { username: 1, name: 1, status: 1, utcOffset:1, customFields: 1 } },
 				{ $sort: sort },
 				], { hint: { name: 1, active: 1 },
 				}).toArray());
