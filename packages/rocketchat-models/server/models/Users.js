@@ -1099,19 +1099,25 @@ Find users to send a message by email if:
 					},
 					{ $unwind: '$user' },
 					{ $match: { 'user.active': true, 'user.name': name } },
-					{ $skip: skip },
-					{ $limit: limit },
-					{ $project: {
-						_id: '$user._id',
-						username: '$user.username',
-						name: '$user.name',
-						status: '$user.status',
-						utcOffset: '$user.utcOffset',
-						customFields: '$user.customFields',
+					{ $facet: {
+						count: [{ $count: 'total' }],
+						data: [
+							{ $skip: skip },
+							{ $limit: limit },
+							{ $project: {
+								_id: '$user._id',
+								username: '$user.username',
+								name: '$user.name',
+								status: '$user.status',
+								utcOffset: '$user.utcOffset',
+								customFields: '$user.customFields',
+							},
+							},
+							{ $sort: sort },
+						],
 					},
 					},
-					{ $sort: sort },
-				]).toArray());
+				]).next());
 		} else {
 			console.log('findByNameAndRoomId: strategy=[Users]');
 			users = Promise.await(
@@ -1142,12 +1148,18 @@ Find users to send a message by email if:
 				},
 				{ $unwind: '$subscription' },
 				{ $match: { subscription : { $exists: true } } },
-				{ $skip: skip },
-				{ $limit: limit },
-				{ $project: { username: 1, name: 1, status: 1, utcOffset:1, customFields: 1 } },
-				{ $sort: sort },
+				{ $facet: {
+					count: [{ $count: 'total' }],
+					data: [
+						{ $skip: skip },
+						{ $limit: limit },
+						{ $project: { username: 1, name: 1, status: 1, utcOffset:1, customFields: 1 } },
+						{ $sort: sort },
+					],
+				},
+				},
 				], { hint: { name: 1, active: 1 },
-				}).toArray());
+				}).next());
 		}
 
 		console.timeEnd(timeLabel);

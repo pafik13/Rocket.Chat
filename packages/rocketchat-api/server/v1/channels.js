@@ -695,8 +695,13 @@ API.v1.addRoute('channels.members', { authRequired: true }, {
 		let total = 0;
 		if (name) {
 			const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`, 'i');
-			users = Users.findByNameAndRoomId(nameRE, findResult._id, offset, count);
-			total = users.length;
+			const result = Users.findByNameAndRoomId(nameRE, findResult._id, offset, count);
+			if (result.count && result.count[0]) {
+				total = result.count[0].total;
+			}
+			if (result.data && result.data.length) {
+				users = result.data;
+			}
 		} else {
 			const subscriptions = Subscriptions.findByRoomId(findResult._id, {
 				fields: { 'u._id': 1 },
