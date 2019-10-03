@@ -798,7 +798,10 @@ export class Rooms extends Base {
 			t: {
 				$in: types,
 			},
-			name,
+			$or: [
+				{ name },
+				{ fname: name },
+			],
 		};
 		console.log('findByNameAndTypesNotInIds', query);
 
