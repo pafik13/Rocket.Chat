@@ -33,6 +33,7 @@ import './methods/createChannel';
 import './methods/createPrivateGroup';
 import './methods/createToken';
 import './methods/deleteMessage';
+import './methods/deleteMessagesAfterBan';
 import './methods/deleteUserOwnAccount';
 import './methods/executeSlashCommandPreview';
 import './methods/filterATAllTag';

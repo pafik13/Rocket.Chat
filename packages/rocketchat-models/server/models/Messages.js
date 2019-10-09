@@ -156,6 +156,14 @@ export class Messages extends Base {
 		return this.find(query, { fields: { 'file._id': 1 }, ...options });
 	}
 
+	findByRoomIdAndUserId(roomId, userId, options = {}) {
+		const query = {
+			rid: roomId,
+			'u._id': userId,
+		};
+		return this.find(query, options);
+	}
+
 	findFilesByRoomIdPinnedTimestampAndUsers(rid, excludePinned, ts, users = [], options = {}) {
 		const query = {
 			rid,
@@ -884,6 +892,16 @@ export class Messages extends Base {
 	removeByUserId(userId) {
 		const query =	{ 'u._id': userId };
 
+		return this.remove(query);
+	}
+
+	removeByRoomIdAndUserId(roomId, userId) {
+		const query =	{
+			rid: roomId,
+			'u._id': userId,
+		};
+
+		console.log('removeByRoomIdAndUserId', query);
 		return this.remove(query);
 	}
 

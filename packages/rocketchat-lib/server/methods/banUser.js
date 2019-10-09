@@ -17,6 +17,8 @@ Meteor.methods({
 
 		BannedUsers.createRecord(rid, userForBan._id);
 
+		Meteor.call('deleteMessagesAfterBan', userForBan._id, rid);
+
 		return true;
 	},
 });
