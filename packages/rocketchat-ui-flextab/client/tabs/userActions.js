@@ -425,7 +425,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 						}
 						modal.open({
 							title: t('Are_you_sure'),
-							text: t('The_user_will_be_removed_from_s_and_banned', room.name),
+							text: t('The_user_will_be_removed_from_s_and_will_be_banned', room.name),
 							type: 'warning',
 							showCancelButton: true,
 							confirmButtonColor: '#DD6B55',
