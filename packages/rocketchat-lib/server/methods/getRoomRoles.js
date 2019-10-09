@@ -25,19 +25,13 @@ Meteor.methods({
 			},
 		};
 
-		const UI_Use_Real_Name = settings.get('UI_Use_Real_Name') === true;
-
 		const roles = Roles.find({ scope: 'Subscriptions', description: { $exists: 1, $ne: '' } }).fetch();
 		const subscriptions = Subscriptions.findByRoomIdAndRoles(rid, _.pluck(roles, '_id'), options).fetch();
 
-		if (!UI_Use_Real_Name) {
-			return subscriptions;
-		} else {
-			return subscriptions.map((subscription) => {
-				const user = Users.findOneById(subscription.u._id);
-				subscription.u.name = user && user.name;
-				return subscription;
-			});
-		}
+		return subscriptions.map((subscription) => {
+			const user = Users.findOneByIdWithCustomFields(subscription.u._id);
+			subscription.u = user;
+			return subscription;
+		});
 	},
 });
