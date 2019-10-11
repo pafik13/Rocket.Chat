@@ -11,6 +11,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import * as Models from 'meteor/rocketchat:models';
 import { FileUpload as _FileUpload } from '../../lib/FileUpload';
 import { roomTypes } from 'meteor/rocketchat:utils';
+import * as probe from 'ffmpeg-probe';
 
 const cookie = new Cookies();
 
@@ -150,7 +151,14 @@ export const FileUpload = Object.assign(_FileUpload, {
 	},
 
 	uploadsOnValidate(file) {
-		if (!/^image\/((x-windows-)?bmp|p?jpeg|png)$/.test(file.type)) {
+		let fileType = 'UNKNOWN';
+		if (/^audio\/.+/.test(file.type)) {
+			fileType = 'AUDIO';
+		} else if (/^image\/((x-windows-)?bmp|p?jpeg|png)$/.test(file.type)) {
+			fileType = 'IMAGE';
+		} else if (/^video\/.+/.test(file.type)) {
+			fileType = 'VIDEO';
+		} else {
 			return;
 		}
 
@@ -158,50 +166,70 @@ export const FileUpload = Object.assign(_FileUpload, {
 
 		const fut = new Future();
 
-		const s = sharp(tmpFile);
-		s.metadata(Meteor.bindEnvironment((err, metadata) => {
-			if (err != null) {
-				console.error(err);
-				return fut.return();
-			}
-
-			const identify = {
-				format: metadata.format,
-				size: {
-					width: metadata.width,
-					height: metadata.height,
-				},
-			};
-
-			const reorientation = (cb) => {
-				if (!metadata.orientation) {
-					return cb();
-				}
-				s.rotate()
-					.toFile(`${ tmpFile }.tmp`)
-					.then(Meteor.bindEnvironment(() => {
-						fs.unlink(tmpFile, Meteor.bindEnvironment(() => {
-							fs.rename(`${ tmpFile }.tmp`, tmpFile, Meteor.bindEnvironment(() => {
-								cb();
-							}));
-						}));
-					})).catch((err) => {
+		switch (fileType) {
+			case 'AUDIO':
+			case 'VIDEO':
+				probe.default(tmpFile)
+					.then((identify) => {
+						this.getCollection().direct.update({ _id: file._id }, {
+							$set: { identify },
+						});
+						fut.return();
+					})
+					.catch((err) => {
 						console.error(err);
 						fut.return();
 					});
+				break;
+			case 'IMAGE':
+				const s = sharp(tmpFile);
+				s.metadata(Meteor.bindEnvironment((err, metadata) => {
+					if (err != null) {
+						console.error(err);
+						return fut.return();
+					}
 
-				return;
-			};
+					const identify = {
+						format: metadata.format,
+						size: {
+							width: metadata.width,
+							height: metadata.height,
+						},
+					};
 
-			reorientation(() => {
-				const { size } = fs.lstatSync(tmpFile);
-				this.getCollection().direct.update({ _id: file._id }, {
-					$set: { size, identify },
-				});
+					const reorientation = (cb) => {
+						if (!metadata.orientation) {
+							return cb();
+						}
+						s.rotate()
+							.toFile(`${ tmpFile }.tmp`)
+							.then(Meteor.bindEnvironment(() => {
+								fs.unlink(tmpFile, Meteor.bindEnvironment(() => {
+									fs.rename(`${ tmpFile }.tmp`, tmpFile, Meteor.bindEnvironment(() => {
+										cb();
+									}));
+								}));
+							})).catch((err) => {
+								console.error(err);
+								fut.return();
+							});
 
+						return;
+					};
+
+					reorientation(() => {
+						const { size } = fs.lstatSync(tmpFile);
+						this.getCollection().direct.update({ _id: file._id }, {
+							$set: { size, identify },
+						});
+
+						fut.return();
+					});
+				}));
+				break;
+			default:
 				fut.return();
-			});
-		}));
+		}
 
 		return fut.wait();
 	},

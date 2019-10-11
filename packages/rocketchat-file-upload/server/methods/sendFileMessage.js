@@ -8,11 +8,12 @@ import _ from 'underscore';
 
 Meteor.methods({
 	async sendFileMessage(roomId, store, file, msgData = {}) {
-		if (!Meteor.userId()) {
+		const callUserId = Meteor.userId();
+		if (!callUserId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'sendFileMessage' });
 		}
 
-		const room = Meteor.call('canAccessRoom', roomId, Meteor.userId());
+		const room = Meteor.call('canAccessRoom', roomId, callUserId);
 
 		if (!room) {
 			return false;
@@ -26,7 +27,7 @@ Meteor.methods({
 			msg: Match.Optional(String),
 		});
 
-		Uploads.updateFileComplete(file._id, Meteor.userId(), _.omit(file, '_id'));
+		Uploads.updateFileComplete(file._id, callUserId, _.omit(file, '_id'));
 
 		const fileUrl = `/file-upload/${ file._id }/${ encodeURI(file.name) }`;
 
@@ -57,10 +58,27 @@ Meteor.methods({
 			attachment.audio_url = fileUrl;
 			attachment.audio_type = file.type;
 			attachment.audio_size = file.size;
+			if (file.identify && file.identify.duration) {
+				attachment.audio_duration = file.identify.duration;
+			}
 		} else if (/^video\/.+/.test(file.type)) {
 			attachment.video_url = fileUrl;
 			attachment.video_type = file.type;
 			attachment.video_size = file.size;
+			if (file.identify) {
+				if (file.identify.duration) {
+					attachment.video_duration = file.identify.duration;
+				}
+				if (file.identify.height && file.identify.width) {
+					attachment.video_dimensions = {
+						height: file.identify.height,
+						width: file.identify.width,
+					};
+				}
+				if (file.identify.fps) {
+					attachment.video_fps = file.identify.fps;
+				}
+			}
 		}
 
 		const user = Meteor.user();
