@@ -49,7 +49,7 @@ API.v1.addRoute('users.create', { authRequired: true }, {
 
 		// Fix messages WO customFields
 		if (originalJoinDefaultChannels) {
-			Meteor.runAsUser(newUserId, () => Meteor.call('joinDefaultChannels', false));
+			Meteor.runAsUser(newUserId, () => Meteor.call('joinDefaultChannels', true));
 		}
 
 		if (typeof this.bodyParams.active !== 'undefined') {
