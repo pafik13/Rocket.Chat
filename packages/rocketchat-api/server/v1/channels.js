@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Rooms, Subscriptions, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
+import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -10,6 +10,7 @@ import { Random } from 'meteor/random';
 import S3 from 'aws-sdk/clients/s3';
 import Path from 'path';
 import { settings } from 'meteor/rocketchat:settings';
+
 
 // Returns the channel IF found otherwise it will return the failure of why it didn't. Check the `statusCode` property
 function findChannelByIdOrName({ params, checkedArchived = true, userId }) {
@@ -298,7 +299,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
-			fields.readOnly = (fields.readOnly === 'true');
+			fields.readOnly = stringToBoolean(fields.readOnly);
 
 			API.channels.create.validate({
 				user: {
@@ -330,8 +331,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			return errorResponse;
 		}
 
-		const { channel } = API.channels.create.execute(userId, fields);
-		const rid = channel._id;
+		const rid = API.channels.create.execute(userId, fields);
 
 		const file = files[0];
 

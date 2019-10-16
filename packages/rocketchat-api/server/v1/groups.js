@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Subscriptions, Rooms, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
+import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -10,6 +10,7 @@ import { Random } from 'meteor/random';
 import S3 from 'aws-sdk/clients/s3';
 import Path from 'path';
 import { settings } from 'meteor/rocketchat:settings';
+
 
 // Returns the private group subscription IF found otherwise it will return the failure of why it didn't. Check the `statusCode` property
 function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) {
@@ -296,7 +297,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
-			fields.readOnly = (fields.readOnly === 'true');
+			fields.readOnly = stringToBoolean(fields.readOnly);
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
