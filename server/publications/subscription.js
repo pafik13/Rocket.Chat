@@ -40,6 +40,7 @@ const fields = {
 	hideUnreadStatus: 1,
 	muteGroupMentions: 1,
 	ignored: 1,
+	isUploadsAccepted: 1,
 	E2EKey: 1,
 };
 

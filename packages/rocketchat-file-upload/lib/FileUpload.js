@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { Rooms, Settings } from 'meteor/rocketchat:models';
+import { Rooms, Settings, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { fileUploadIsValidContentType } from 'meteor/rocketchat:utils';
 import { canAccessRoom } from 'meteor/rocketchat:authorization';
@@ -25,14 +25,31 @@ export const FileUpload = {
 			return false;
 		}
 		const language = user ? user.language : 'en';
+		// Here check of rights
 		if (!fileUploadAllowed) {
 			const reason = TAPi18n.__('FileUpload_Disabled', language);
 			throw new Meteor.Error('error-file-upload-disabled', reason);
 		}
 
-		if (!directMessageAllow && room.t === 'd') {
-			const reason = TAPi18n.__('File_not_allowed_direct_messages', language);
-			throw new Meteor.Error('error-direct-message-file-upload-not-allowed', reason);
+
+		if (room.t === 'd') {
+			if (!directMessageAllow) {
+				const reason = TAPi18n.__('File_not_allowed_direct_messages', language);
+				throw new Meteor.Error('error-direct-message-file-upload-not-allowed', reason);
+			}
+
+			const subscription = Subscriptions.findOneByRoomIdAndInterlocutorId(room._id, user._id);
+			//       console.log('subscription', subscription);
+			if (typeof subscription.isUploadsAccepted === 'undefined') {
+				Subscriptions.disableDirectUploads(subscription._id);
+			} else if (!subscription.isUploadsAccepted) {
+				const sentFilesCount = Messages.findFilesByUserIdAndRoomId(user._id, room._id).count();
+				//           console.log('sentFilesCount', sentFilesCount);
+				if (sentFilesCount > 0) {
+					const reason = TAPi18n.__('File_not_accepted_by_interlocutor', language);
+					throw new Meteor.Error('error-interlocutor-file-upload-not-accepted', reason);
+				}
+			}
 		}
 
 		// -1 maxFileSize means there is no limit
@@ -43,6 +60,7 @@ export const FileUpload = {
 			throw new Meteor.Error('error-file-too-large', reason);
 		}
 
+		// 		console.log('fileUploadIsValidContentType', file.type);
 		if (!fileUploadIsValidContentType(file.type)) {
 			const reason = TAPi18n.__('File_type_is_not_accepted', language);
 			throw new Meteor.Error('error-invalid-file-type', reason);

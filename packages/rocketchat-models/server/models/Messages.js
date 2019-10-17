@@ -156,6 +156,15 @@ export class Messages extends Base {
 		return this.find(query, { fields: { 'file._id': 1 }, ...options });
 	}
 
+	findFilesByUserIdAndRoomId(userId, roomId, options = {}) {
+		const query = {
+			rid: roomId,
+			'u._id': userId,
+			'file._id': { $exists: true },
+		};
+		return this.find(query, { fields: { 'file._id': 1 }, ...options });
+	}
+
 	findByRoomIdAndUserId(roomId, userId, options = {}) {
 		const query = {
 			rid: roomId,

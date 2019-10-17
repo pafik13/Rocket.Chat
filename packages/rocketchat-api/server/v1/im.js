@@ -42,6 +42,18 @@ API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute(['dm.accept.uploads', 'im.accept.uploads'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('acceptDirectUploads', findResult.room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute(['dm.create', 'im.create'], { authRequired: true }, {
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);

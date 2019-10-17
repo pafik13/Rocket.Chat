@@ -1247,6 +1247,7 @@
   "File_name_Placeholder": "Искать файлы...",
   "File_removed_by_automatic_prune": "Файл удаляется автоматической обрезкой",
   "File_not_allowed_direct_messages": "Передача файлов не разрешена в личных сообщениях",
+  "File_not_accepted_by_interlocutor": "Получение файлов не было разрешено собеседником",
   "File_removed_by_prune": "Файл удален снизу",
   "File_type_is_not_accepted": "Недопустимый тип файла",
   "File_uploaded": "Файл загружен",

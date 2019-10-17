@@ -464,6 +464,16 @@ export class Subscriptions extends Base {
 		return this.findOne(query, options);
 	}
 
+	findOneByRoomIdAndInterlocutorId(roomId, interlocutorId, options) {
+		const query = {
+			t: 'd',
+			rid: roomId,
+			'i._id': interlocutorId,
+		};
+
+		return this.findOne(query, options);
+	}
+
 	findOneByRoomIdAndUsername(roomId, username, options) {
 		const query = {
 			rid: roomId,
@@ -656,6 +666,34 @@ export class Subscriptions extends Base {
 		const update = {
 			$unset: {
 				unaccepted: '',
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	acceptDirectUploads(_id) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: {
+				isUploadsAccepted: true,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	disableDirectUploads(_id) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: {
+				isUploadsAccepted: false,
 			},
 		};
 
