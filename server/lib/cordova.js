@@ -175,8 +175,8 @@ function configurePush() {
 			apn,
 			gcm,
 			production: settings.get('Push_production'),
-			sendInterval: 5000,
-			sendBatchSize: 10,
+			sendInterval: 1000,
+			sendBatchSize: 500,
 			// debug: true,
 		});
 
