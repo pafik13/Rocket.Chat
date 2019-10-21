@@ -244,9 +244,9 @@ function createGroup(userId, params) {
 	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
 	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields));
 
-	console.log('createGroup', id);
+	console.log('createGroup', id, userId);
 	return {
-		group: findPrivateGroupByIdOrName({ params: { roomId: id.rid }, userId: this.userId }),
+		group: findPrivateGroupByIdOrName({ params: { roomId: id.rid }, userId }),
 	};
 }
 
