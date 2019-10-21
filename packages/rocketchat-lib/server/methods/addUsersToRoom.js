@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
-import { Rooms, Subscriptions, Users } from 'meteor/rocketchat:models';
+import { Rooms, Subscriptions, Users, BannedUsers } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { addUserToRoom } from '../functions';
 
@@ -62,6 +62,11 @@ Meteor.methods({
 			const newUser = Users.findOneByUsername(username);
 			if (!newUser) {
 				throw new Meteor.Error('error-invalid-username', 'Invalid username', {
+					method: 'addUsersToRoom',
+				});
+			}
+			if (BannedUsers.isUserIsBanned(room._id, newUser._id)) {
+				throw new Meteor.Error('error-user-is-banned', 'Banned user', {
 					method: 'addUsersToRoom',
 				});
 			}

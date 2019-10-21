@@ -5,7 +5,7 @@ import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { AutoComplete } from 'meteor/mizzao:autocomplete';
 import { settings } from 'meteor/rocketchat:settings';
-import { t } from 'meteor/rocketchat:utils';
+import { t, handleError } from 'meteor/rocketchat:utils';
 import { Deps } from 'meteor/deps';
 import toastr from 'toastr';
 
@@ -105,7 +105,7 @@ Template.inviteUsers.events({
 			users,
 		}, function(err) {
 			if (err) {
-				return toastr.error(err);
+				return handleError(err);
 			}
 			toastr.success(t('Users_added'));
 			instance.selectedUsers.set([]);
