@@ -25,6 +25,7 @@ Meteor.methods({
 			alias: Match.Optional(String),
 			groupable: Match.Optional(Boolean),
 			msg: Match.Optional(String),
+			isVoice: Match.Optional(Boolean),
 		});
 
 		Uploads.updateFileComplete(file._id, callUserId, _.omit(file, '_id'));

@@ -7,6 +7,7 @@ import { API } from '../api';
 import S3 from 'aws-sdk/clients/s3';
 import Path from 'path';
 import { settings } from 'meteor/rocketchat:settings';
+import { stringToBoolean } from 'meteor/rocketchat:utils';
 
 
 function findRoomByIdOrName({ params, checkedArchived = true }) {
@@ -138,6 +139,9 @@ API.v1.addRoute('rooms.upload/:rid', { authRequired: true }, {
 			uploadedFile.description = fields.description;
 
 			delete fields.description;
+			if (fields.isVoice) {
+				fields.isVoice = stringToBoolean(fields.isVoice);
+			}
 
 			API.v1.success(Meteor.call('sendFileMessage', this.urlParams.rid, null, uploadedFile, fields));
 		});
