@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { Users, Subscriptions, Messages } from 'meteor/rocketchat:models';
+import { Users, Subscriptions, Messages, Rooms } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
 
@@ -29,6 +29,8 @@ Meteor.methods({
 				method: 'addRoomOwner',
 			});
 		}
+
+		Rooms.unmuteUsernameByRoomId(rid, user.username);
 
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 
