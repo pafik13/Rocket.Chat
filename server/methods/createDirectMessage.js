@@ -70,8 +70,11 @@ Meteor.methods({
 			},
 		});
 
+		const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
 		const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
-		console.log('createDirectMessage:myDefaultSubscriptionPref', myDefaultSubscriptionPref);
+		if (!isNeedAcceptUploads) {
+			myDefaultSubscriptionPref.isUploadsAccepted = true;
+		}
 
 		// Make user I have a subcription to this room
 		const upsertSubscription = {
@@ -111,7 +114,9 @@ Meteor.methods({
 		}, upsertSubscription);
 
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
-		console.log('createDirectMessage:toDefaultSubscriptionPref', toDefaultSubscriptionPref);
+		if (!isNeedAcceptUploads) {
+			myDefaultSubscriptionPref.isUploadsAccepted = true;
+		}
 
 		Subscriptions.upsert({
 			rid,

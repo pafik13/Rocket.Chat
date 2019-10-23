@@ -1,4 +1,8 @@
+import { settings } from 'meteor/rocketchat:settings';
+
 export const getDefaultSubscriptionPref = (userPref) => {
+	const getDefaultValue = (key) => settings.get(`Accounts_Default_User_Preferences_${ key }`);
+
 	const subscription = {};
 
 	const {
@@ -34,25 +38,25 @@ export const getDefaultSubscriptionPref = (userPref) => {
 	if (typeof isImageFilesAllowed !== 'undefined') {
 		subscription.isImageFilesAllowed = isImageFilesAllowed;
 	} else {
-		subscription.isImageFilesAllowed = true;
+		subscription.isImageFilesAllowed = getDefaultValue('isImageFilesAllowed');
 	}
 
 	if (typeof isAudioFilesAllowed !== 'undefined') {
 		subscription.isAudioFilesAllowed = isAudioFilesAllowed;
 	} else {
-		subscription.isAudioFilesAllowed = true;
+		subscription.isAudioFilesAllowed = getDefaultValue('isAudioFilesAllowed');
 	}
 
 	if (typeof isVideoFilesAllowed !== 'undefined') {
 		subscription.isVideoFilesAllowed = isVideoFilesAllowed;
 	} else {
-		subscription.isVideoFilesAllowed = true;
+		subscription.isVideoFilesAllowed = getDefaultValue('isVideoFilesAllowed');
 	}
 
 	if (typeof isOtherFilesAllowed !== 'undefined') {
 		subscription.isOtherFilesAllowed = isOtherFilesAllowed;
 	} else {
-		subscription.isOtherFilesAllowed = true;
+		subscription.isOtherFilesAllowed = getDefaultValue('isOtherFilesAllowed');
 	}
 
 	return subscription;

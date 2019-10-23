@@ -237,3 +237,9 @@ settings.addGroup('FileUpload', function() {
 		public: true,
 	});
 });
+
+settings.add('Message_Need_Accept_Uploads', true, {
+	type: 'boolean',
+	group: 'Message',
+	public: true,
+});

@@ -251,6 +251,26 @@ API.v1.addRoute('rooms.saveNotification', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('rooms.saveFilesPreferences', { authRequired: true }, {
+	post() {
+		const { roomId, preferences } = this.bodyParams;
+
+		if (!roomId) {
+			return API.v1.failure('The \'roomId\' param is required');
+		}
+
+		if (!preferences || Object.keys(preferences).length === 0) {
+			return API.v1.failure('The \'preferences\' param is required');
+		}
+
+		Meteor.runAsUser(this.userId, () =>
+			Meteor.call('saveUploadsSettings', roomId, preferences)
+		);
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('rooms.favorite', { authRequired: true }, {
 	post() {
 		const { favorite } = this.bodyParams;
