@@ -111,7 +111,8 @@ describe('miscellaneous', function() {
 					'saveMobileBandwidth', 'collapseMediaByDefault', 'hideUsernames', 'hideRoles', 'hideFlexTab', 'hideAvatars',
 					'sidebarViewMode', 'sidebarHideAvatar', 'sidebarShowUnread', 'sidebarShowFavorites', 'sidebarGroupByType',
 					'sendOnEnter', 'messageViewMode', 'emailNotificationMode', 'roomCounterSidebar', 'newRoomNotification', 'newMessageNotification',
-					'muteFocusedConversations', 'notificationsSoundVolume'];
+					'muteFocusedConversations', 'notificationsSoundVolume', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed',
+					'isOtherFilesAllowed'];
 				expect(res.body).to.have.property('success', true);
 				expect(res.body).to.have.property('_id', credentials['X-User-Id']);
 				expect(res.body).to.have.property('username', login.user);
