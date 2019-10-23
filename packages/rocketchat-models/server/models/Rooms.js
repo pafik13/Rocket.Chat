@@ -1204,6 +1204,7 @@ export class Rooms extends Base {
 	}
 
 	unmuteUsernameByRoomId(_id, username) {
+		console.log('unmuteUsernameByRoomId', _id, username);
 		const query = { _id };
 
 		const update = {

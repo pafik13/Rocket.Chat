@@ -26,6 +26,8 @@ Package.onUse(function(api) {
 		'tracker',
 		'webapp',
 		'konecty:multiple-instances-status',
+		'templating',
+		'rocketchat:ui-utils',
 	]);
 	api.mainModule('client/index.js', 'client');
 	api.mainModule('server/index.js', 'server');

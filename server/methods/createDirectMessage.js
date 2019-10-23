@@ -70,7 +70,8 @@ Meteor.methods({
 			},
 		});
 
-		const myNotificationPref = getDefaultSubscriptionPref(me);
+		const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
+		console.log('createDirectMessage:myDefaultSubscriptionPref', myDefaultSubscriptionPref);
 
 		// Make user I have a subcription to this room
 		const upsertSubscription = {
@@ -96,7 +97,7 @@ Meteor.methods({
 					username: me.username,
 				},
 				ts: now,
-				...myNotificationPref,
+				...myDefaultSubscriptionPref,
 			},
 		};
 
@@ -109,7 +110,8 @@ Meteor.methods({
 			$and: [{ 'u._id': me._id }], // work around to solve problems with upsert and dot
 		}, upsertSubscription);
 
-		const toNotificationPref = getDefaultSubscriptionPref(to);
+		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
+		console.log('createDirectMessage:toDefaultSubscriptionPref', toDefaultSubscriptionPref);
 
 		Subscriptions.upsert({
 			rid,
@@ -135,7 +137,7 @@ Meteor.methods({
 					username: to.username,
 				},
 				ts: now,
-				...toNotificationPref,
+				...toDefaultSubscriptionPref,
 			},
 		});
 

@@ -128,6 +128,18 @@ export class Subscriptions extends Base {
 		return this.find(query, options);
 	}
 
+	updateUploadsSettingsById(_id, settings) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: settings,
+		};
+
+		return this.update(query, update);
+	}
+
 	updateAudioNotificationsById(_id, audioNotifications) {
 		const query = {
 			_id,

@@ -41,6 +41,10 @@ const fields = {
 	muteGroupMentions: 1,
 	ignored: 1,
 	isUploadsAccepted: 1,
+	isImageFilesAllowed: 1,
+	isAudioFilesAllowed: 1,
+	isVideoFilesAllowed: 1,
+	isOtherFilesAllowed: 1,
 	E2EKey: 1,
 };
 

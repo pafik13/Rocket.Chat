@@ -160,6 +160,10 @@ Template.accountPreferences.onCreated(function() {
 		data.messageViewMode = parseInt($('#messageViewMode').find('select').val());
 		data.hideFlexTab = JSON.parse($('#hideFlexTab').find('input:checked').val());
 		data.hideAvatars = JSON.parse($('#hideAvatars').find('input:checked').val());
+		data.isImageFilesAllowed = JSON.parse($('#isImageFilesAllowed').find('input:checked').val());
+		data.isAudioFilesAllowed = JSON.parse($('#isAudioFilesAllowed').find('input:checked').val());
+		data.isVideoFilesAllowed = JSON.parse($('#isVideoFilesAllowed').find('input:checked').val());
+		data.isOtherFilesAllowed = JSON.parse($('#isOtherFilesAllowed').find('input:checked').val());
 		data.sendOnEnter = $('#sendOnEnter').find('select').val();
 		data.autoImageLoad = JSON.parse($('input[name=autoImageLoad]:checked').val());
 		data.emailNotificationMode = $('select[name=emailNotificationMode]').val();

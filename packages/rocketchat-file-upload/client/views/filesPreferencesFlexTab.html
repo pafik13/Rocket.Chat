@@ -1,0 +1,130 @@
+<template name="filesPreferencesFlexTab">
+	<main class="rc-user-info__scroll">
+		<div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isUploadsAccepted}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Reject_Uploads"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+							<input type="checkbox" class="rc-switch__input js-input-check" value="0" id="isUploadsAccepted" name="isUploadsAccepted" checked="{{$eq isUploadsAccepted true}}">
+							<span class="rc-switch__button">
+								<span class="rc-switch__button-inside"></span>
+							</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isUploadsAccepted}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Accept_Uploads"}}
+					</div>
+				</div>
+			</div>
+		</div>
+    {{#if isUploadsAccepted}}
+    <div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isImageFilesAllowed}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Disallow_Image_Files"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+						<input type="checkbox" class="rc-switch__input js-input-check" id="isImageFilesAllowed" name="isImageFilesAllowed" value="1" checked="{{$eq isImageFilesAllowed true}}">
+						<span class="rc-switch__button">
+							<span class="rc-switch__button-inside"></span>
+						</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isImageFilesAllowed}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Allow_Image_Files"}}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isAudioFilesAllowed}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Disallow_Audio_Files"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+						<input type="checkbox" class="rc-switch__input js-input-check" id="isAudioFilesAllowed" name="isAudioFilesAllowed" value="1" checked="{{$eq isAudioFilesAllowed true}}">
+						<span class="rc-switch__button">
+							<span class="rc-switch__button-inside"></span>
+						</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isAudioFilesAllowed}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Allow_Audio_Files"}}
+					</div>
+				</div>
+			</div>
+		</div>
+    <div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isVideoFilesAllowed}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Disallow_Video_Files"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+						<input type="checkbox" class="rc-switch__input js-input-check" id="isVideoFilesAllowed" name="isVideoFilesAllowed" value="1" checked="{{$eq isVideoFilesAllowed true}}">
+						<span class="rc-switch__button">
+							<span class="rc-switch__button-inside"></span>
+						</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isVideoFilesAllowed}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Allow_Video_Files"}}
+					</div>
+				</div>
+			</div>
+		</div>
+    <div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isOtherFilesAllowed}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Disallow_Other_Files"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+						<input type="checkbox" class="rc-switch__input js-input-check" id="isOtherFilesAllowed" name="isOtherFilesAllowed" value="1" checked="{{$eq isOtherFilesAllowed true}}">
+						<span class="rc-switch__button">
+							<span class="rc-switch__button-inside"></span>
+						</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isOtherFilesAllowed}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Allow_Other_Files"}}
+					</div>
+				</div>
+			</div>
+		</div>
+		{{/if}}
+	</main>
+	<div class="rc-user-info__flex rc-user-info__row">
+		<button class="rc-button js-cancel rc-button--outline" title="{{_ 'Cancel'}}">{{_ 'Cancel'}}</button>
+		<button class="rc-button rc-button--primary js-save" title="{{_ 'Save'}}" disabled={{disabled}}>{{_ 'Save'}}</button>
+	</div>
+</template>

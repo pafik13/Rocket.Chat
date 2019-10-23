@@ -319,6 +319,26 @@ settings.addGroup('Accounts', function() {
 			public: true,
 			i18nLabel: 'Hide_Avatars',
 		});
+		this.add('Accounts_Default_User_Preferences_isImageFilesAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Image_Files_Allowed',
+		});
+		this.add('Accounts_Default_User_Preferences_isAudioFilesAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Audio_Files_Allowed',
+		});
+		this.add('Accounts_Default_User_Preferences_isVideoFilesAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Video_Files_Allowed',
+		});
+		this.add('Accounts_Default_User_Preferences_isOtherFilesAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Other_Files_Allowed',
+		});
 		this.add('Accounts_Default_User_Preferences_sidebarGroupByType', true, {
 			type: 'boolean',
 			public: true,

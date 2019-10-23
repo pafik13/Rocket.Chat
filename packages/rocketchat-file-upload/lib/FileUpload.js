@@ -47,7 +47,37 @@ export const FileUpload = {
 				//           console.log('sentFilesCount', sentFilesCount);
 				if (sentFilesCount > 0) {
 					const reason = TAPi18n.__('File_not_accepted_by_interlocutor', language);
-					throw new Meteor.Error('error-interlocutor-file-upload-not-accepted', reason);
+					throw new Meteor.Error('error-direct-message-file-upload-not-accepted', reason);
+				}
+			} else if (file.type) {
+				console.log('validateFileUpload', subscription);
+
+				const {
+					isImageFilesAllowed = true,
+					isAudioFilesAllowed = true,
+					isVideoFilesAllowed = true,
+					isOtherFilesAllowed = true,
+				} = (subscription) || {};
+
+				const preferences = {
+					isImageFilesAllowed,
+					isAudioFilesAllowed,
+					isVideoFilesAllowed,
+					isOtherFilesAllowed,
+				};
+
+				let fileType = 'Other';
+				if (/^audio\/.+/.test(file.type)) {
+					fileType = 'Audio';
+				} else if (/^image\/((x-windows-)?bmp|p?jpeg|png)$/.test(file.type)) {
+					fileType = 'Image';
+				} else if (/^video\/.+/.test(file.type)) {
+					fileType = 'Video';
+				}
+
+				if (!preferences[`is${ fileType }FilesAllowed`]) {
+					const reason = TAPi18n.__('File_type_is_not_allowed', language);
+					throw new Meteor.Error('error-invalid-file-type', reason);
 				}
 			}
 		}
