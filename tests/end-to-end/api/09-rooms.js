@@ -276,9 +276,8 @@ describe('[Rooms]', function() {
 		let testGroup;
 		let testDM;
 		const expectedKeys = [
-			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'ro',
-			'sysMes', 'default', '_updatedAt', 'isUploadsAccepted', 'isImageFilesAllowed',
-			'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed',
+			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'ro', 'sysMes', 'default',
+			'_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed',
 		];
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
