@@ -395,15 +395,14 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 			fields: {
 				blocker: 1,
 				blocked: 1,
-				...filesPrefFields,
+				...(fields ? filesPrefFields : {}),
 			},
 		};
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
 		delete subscription._id;
 
 		const result = Rooms.findOneByIdOrName(room._id, {
-			...filesPrefFields,
-			...fields,
+			...(fields || filesPrefFields),
 		});
 
 		return API.v1.success({ room: {
