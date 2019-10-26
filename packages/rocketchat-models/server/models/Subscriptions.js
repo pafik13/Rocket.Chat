@@ -1266,6 +1266,15 @@ export class Subscriptions extends Base {
 			const Utils = await import('meteor/rocketchat:utils');
 			this.getDefaultSubscriptionPref = Utils.getDefaultSubscriptionPref;
 		}
+		const defSubPref = this.getDefaultSubscriptionPref(user);
+		if (room.t !== 'd') {
+			delete defSubPref.isUploadsAccepted;
+			delete defSubPref.isImageFilesAllowed;
+			delete defSubPref.isAudioFilesAllowed;
+			delete defSubPref.isVideoFilesAllowed;
+			delete defSubPref.isOtherFilesAllowed;
+		}
+
 		const subscription = {
 			open: false,
 			alert: false,
@@ -1283,7 +1292,7 @@ export class Subscriptions extends Base {
 				username: user.username,
 				name: user.name,
 			},
-			...this.getDefaultSubscriptionPref(user),
+			...defSubPref,
 			...extraData,
 		};
 

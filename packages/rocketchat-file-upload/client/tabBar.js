@@ -3,7 +3,7 @@ import { TabBar } from 'meteor/rocketchat:ui-utils';
 
 Meteor.startup(function() {
 	TabBar.addButton({
-		groups: ['direct'],
+		groups: ['channel', 'group', 'direct'],
 		id: 'files-preferences',
 		i18nTitle: 'Files_Preferences',
 		icon: 'download',

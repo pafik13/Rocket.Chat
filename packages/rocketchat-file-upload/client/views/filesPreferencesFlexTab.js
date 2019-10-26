@@ -3,7 +3,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { handleError } from 'meteor/rocketchat:utils';
-import { ChatSubscription } from 'meteor/rocketchat:models';
+import { ChatRoom, ChatSubscription } from 'meteor/rocketchat:models';
 
 const call = (method, ...params) => new Promise((resolve, reject) => {
 	Meteor.call(method, ...params, (err, result) => {
@@ -16,6 +16,11 @@ const call = (method, ...params) => new Promise((resolve, reject) => {
 });
 
 Template.filesPreferencesFlexTab.helpers({
+//   canChangeUploadsAccept() {
+//     const rid = Session.get('openedRoom');
+//   	const room = ChatRoom.findOne({ _id: rid }, options) || {};
+//     return room.t === 'd';
+//   },
 	isUploadsAccepted() {
 		return Template.instance().form.isUploadsAccepted.get();
 	},
@@ -37,43 +42,54 @@ Template.filesPreferencesFlexTab.helpers({
 	},
 });
 
-Template.filesPreferencesFlexTab.onCreated(function() {
+Template.filesPreferencesFlexTab.onRendered(() => {
 	const rid = Session.get('openedRoom');
-	const sub = ChatSubscription.findOne({ rid }, {
-		fields: {
-			isUploadsAccepted: 1,
-			isImageFilesAllowed: 1,
-			isAudioFilesAllowed: 1,
-			isVideoFilesAllowed: 1,
-			isOtherFilesAllowed: 1,
-		},
-	}) || {};
+	const room = ChatRoom.findOne({ _id: rid }, { fields: { t: 1 } }) || {};
+	this.$('#isUploadsAccepted').prop('disabled', room.t !== 'd');
+});
 
-	const {
-		isUploadsAccepted = false,
-		isImageFilesAllowed = true,
-		isAudioFilesAllowed = true,
-		isVideoFilesAllowed = true,
-		isOtherFilesAllowed = true,
-	} = sub;
+Template.filesPreferencesFlexTab.onCreated(function() {
+	const fileTypes = ['Image', 'Audio', 'Video', 'Other'];
+	const values = {};
+	const options = { fields: { t: 1 } };
+	for (let i = 0, len = fileTypes.length; i < len; i++) {
+		options.fields[`is${ fileTypes[i] }FilesAllowed`] = 1;
+		values[`is${ fileTypes[i] }FilesAllowed`] = true;
+	}
 
-	console.log(sub);
-	console.log('filesPreferencesFlexTab', { isUploadsAccepted, isImageFilesAllowed, isAudioFilesAllowed, isVideoFilesAllowed, isOtherFilesAllowed });
+	options.fields.isUploadsAccepted = 1;
+	values.isUploadsAccepted = true;
+
+	const rid = Session.get('openedRoom');
+
+	const room = ChatRoom.findOne({ _id: rid }, options) || {};
+	if (room.t !== 'd') {
+		for (let i = 0, len = fileTypes.length; i < len; i++) {
+			values[`is${ fileTypes[i] }FilesAllowed`] = room[`is${ fileTypes[i] }FilesAllowed`] ;
+		}
+	} else {
+		const sub = ChatSubscription.findOne({ rid }, options) || {};
+		console.log('filesPreferencesFlexTab:sub', sub);
+		for (let i = 0, len = fileTypes.length; i < len; i++) {
+			values[`is${ fileTypes[i] }FilesAllowed`] = sub[`is${ fileTypes[i] }FilesAllowed`] ;
+		}
+		values.isUploadsAccepted = sub.isUploadsAccepted;
+	}
 
 	this.original = {
-		isUploadsAccepted: new ReactiveVar(isUploadsAccepted),
-		isImageFilesAllowed: new ReactiveVar(isImageFilesAllowed),
-		isAudioFilesAllowed: new ReactiveVar(isAudioFilesAllowed),
-		isVideoFilesAllowed: new ReactiveVar(isVideoFilesAllowed),
-		isOtherFilesAllowed: new ReactiveVar(isOtherFilesAllowed),
+		isUploadsAccepted: new ReactiveVar(values.isUploadsAccepted),
+		isImageFilesAllowed: new ReactiveVar(values.isImageFilesAllowed),
+		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
+		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
+		isOtherFilesAllowed: new ReactiveVar(values.isOtherFilesAllowed),
 	};
 
 	this.form = {
-		isUploadsAccepted: new ReactiveVar(isUploadsAccepted),
-		isImageFilesAllowed: new ReactiveVar(isImageFilesAllowed),
-		isAudioFilesAllowed: new ReactiveVar(isAudioFilesAllowed),
-		isVideoFilesAllowed: new ReactiveVar(isVideoFilesAllowed),
-		isOtherFilesAllowed: new ReactiveVar(isOtherFilesAllowed),
+		isUploadsAccepted: new ReactiveVar(values.isUploadsAccepted),
+		isImageFilesAllowed: new ReactiveVar(values.isImageFilesAllowed),
+		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
+		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
+		isOtherFilesAllowed: new ReactiveVar(values.isOtherFilesAllowed),
 	};
 
 	this.saveSetting = async() => {

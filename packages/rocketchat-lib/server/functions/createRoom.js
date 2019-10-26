@@ -112,6 +112,10 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		ts: now,
 		ro: readOnly === true,
 		sysMes: readOnly !== true,
+		isImageFilesAllowed: true,
+		isAudioFilesAllowed: true,
+		isVideoFilesAllowed: true,
+		isOtherFilesAllowed: true,
 	});
 
 	if (type === 'd') {

@@ -45,6 +45,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	updateUploadsSettingsById(_id, settings) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: settings,
+		};
+
+		return this.update(query, update);
+	}
+
 	updateLivechatDataByToken(token, key, value, overwrite = true) {
 		const query = {
 			'v.token': token,

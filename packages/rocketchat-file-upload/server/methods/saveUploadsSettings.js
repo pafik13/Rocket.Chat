@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { hasPermission } from 'meteor/rocketchat:authorization';
+import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
 
 Meteor.methods({
 	saveUploadsSettings(roomId, settings) {
@@ -22,7 +23,15 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-subscription', 'Invalid subscription', { method: 'saveUploadsSettings' });
 		}
 
-		Subscriptions.updateUploadsSettingsById(subscription._id, settings);
+		if (subscription.t === 'd') {
+			Subscriptions.updateUploadsSettingsById(subscription._id, settings);
+		} else {
+			if (!hasPermission(userId, 'edit-room', roomId)) {
+				throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'saveUploadsSettings', action: 'Editing_room' });
+			}
+			delete settings.isUploadsAccepted;
+			Rooms.updateUploadsSettingsById(roomId, settings);
+		}
 
 		return true;
 	},

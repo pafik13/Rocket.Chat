@@ -47,6 +47,10 @@ const fields = {
 	encrypted: 1,
 	e2eKeyId: 1,
 	departmentId: 1,
+	isImageFilesAllowed: 1,
+	isAudioFilesAllowed: 1,
+	isVideoFilesAllowed: 1,
+	isOtherFilesAllowed: 1,
 };
 
 const roomMap = (record) => {
