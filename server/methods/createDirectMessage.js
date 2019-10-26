@@ -115,7 +115,7 @@ Meteor.methods({
 
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
 		if (!isNeedAcceptUploads) {
-			myDefaultSubscriptionPref.isUploadsAccepted = true;
+			toDefaultSubscriptionPref.isUploadsAccepted = true;
 		}
 
 		Subscriptions.upsert({
