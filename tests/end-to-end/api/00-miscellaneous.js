@@ -344,6 +344,7 @@ describe('miscellaneous', function() {
 					expect(res.body.users[0]).to.have.property('name');
 					expect(res.body.users[0]).to.have.property('username');
 					expect(res.body.users[0]).to.have.property('status');
+					expect(res.body.users[0]).to.have.property('customFields');
 					expect(res.body).to.have.property('rooms').and.to.be.an('array');
 				})
 				.end(done);
@@ -363,6 +364,9 @@ describe('miscellaneous', function() {
 					expect(res.body.rooms[0]).to.have.property('_id');
 					expect(res.body.rooms[0]).to.have.property('name');
 					expect(res.body.rooms[0]).to.have.property('t');
+					expect(res.body.rooms[0]).to.have.property('fname');
+					expect(res.body.rooms[0]).to.have.property('customFields');
+					expect(res.body.rooms[0]).to.have.property('usersCount');
 				})
 				.end(done);
 		});

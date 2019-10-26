@@ -68,6 +68,7 @@ Meteor.methods({
 				joinCodeRequired: 1,
 				lastMessage: 1,
 				customFields: 1,
+				usersCount: 1,
 			},
 			sort: {
 				name: 1,

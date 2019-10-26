@@ -379,7 +379,7 @@ API.v1.addRoute('rooms.cleanHistory', { authRequired: true }, {
 
 API.v1.addRoute('rooms.info', { authRequired: true }, {
 	get() {
-		const filesPrefFields = {
+		const filesPrefsFields = {
 			isUploadsAccepted: 1,
 			isImageFilesAllowed: 1,
 			isAudioFilesAllowed: 1,
@@ -391,18 +391,23 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		if (!Meteor.call('canAccessRoom', room._id, this.userId, {})) {
 			return API.v1.failure('not-allowed', 'Not Allowed');
 		}
+		if (fields) {
+			const result = Rooms.findOneByIdOrName(room._id, { fields });
+			return API.v1.success({ room: result });
+		}
+
 		const options = {
 			fields: {
 				blocker: 1,
 				blocked: 1,
-				...(fields ? filesPrefFields : {}),
+				...filesPrefsFields,
 			},
 		};
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
 		delete subscription._id;
 
 		const result = Rooms.findOneByIdOrName(room._id, {
-			...(fields || filesPrefFields),
+			...filesPrefsFields,
 		});
 
 		return API.v1.success({ room: {
