@@ -4,7 +4,7 @@ import { Rooms } from 'meteor/rocketchat:models';
 Migrations.add({
 	version: 140,
 	up() {
-		Rooms.update({
+		Rooms.model.rawCollection().update({
 			t: {
 				$ne: 'd',
 			},

@@ -4,7 +4,7 @@ import { Subscriptions } from 'meteor/rocketchat:models';
 Migrations.add({
 	version: 141,
 	up() {
-		Subscriptions.update({
+		Subscriptions.model.rawCollection().update({
 			t: {
 				$ne: 'd',
 			},
