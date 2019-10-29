@@ -3,15 +3,22 @@ import { check } from 'meteor/check';
 import { Subscriptions } from 'meteor/rocketchat:models';
 
 Meteor.methods({
-	acceptDirectUploads(rid) {
+	setDirectUploadsState(rid, state) {
 		this.unblock();
 		check(rid, String);
+		check(state, String);
+
+		if (!['needAccept', 'acceptedOne', 'acceptedAll', 'declined'].includes(state)) {
+			throw new Meteor.Error('error-invalid-state', 'Invalid state', {
+				method: 'setDirectUploadsState',
+			});
+		}
 
 		const fromId = Meteor.userId();
 
 		if (!fromId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'acceptDirectUploads',
+				method: 'setDirectUploadsState',
 			});
 		}
 
@@ -21,13 +28,13 @@ Meteor.methods({
 			return false;
 		}
 
-		const options = { fields: { _id: 1, isUploadsAccepted: 1 } };
+		const options = { fields: { _id: 1, uploadsState: 1 } };
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, fromId, options);
 
-		if (room.t === 'd' && !subscription) {
+		if (room.t !== 'd' || !subscription) {
 			return false;
 		}
 
-		return Subscriptions.acceptDirectUploads(subscription._id);
+		return Subscriptions.updateUploadsSettingsById(subscription._id, { uploadsState: state });
 	},
 });

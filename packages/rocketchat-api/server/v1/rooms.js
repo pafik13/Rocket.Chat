@@ -380,7 +380,7 @@ API.v1.addRoute('rooms.cleanHistory', { authRequired: true }, {
 API.v1.addRoute('rooms.info', { authRequired: true }, {
 	get() {
 		const filesPrefsFields = {
-			isUploadsAccepted: 1,
+			uploadsState: 1,
 			isImageFilesAllowed: 1,
 			isAudioFilesAllowed: 1,
 			isVideoFilesAllowed: 1,
@@ -400,6 +400,7 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 			fields: {
 				blocker: 1,
 				blocked: 1,
+				mobilePushNotifications: 1,
 				...filesPrefsFields,
 			},
 		};

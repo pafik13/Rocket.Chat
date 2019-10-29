@@ -11,6 +11,7 @@ Meteor.methods({
 		}
 		check(roomId, String);
 		const keys = {
+			uploadsState: Match.Optional(String),
 			isImageFilesAllowed: Match.Optional(Boolean),
 			isAudioFilesAllowed: Match.Optional(Boolean),
 			isVideoFilesAllowed: Match.Optional(Boolean),
@@ -29,7 +30,7 @@ Meteor.methods({
 			if (!hasPermission(userId, 'edit-room', roomId)) {
 				throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'saveUploadsSettings', action: 'Editing_room' });
 			}
-			delete settings.isUploadsAccepted;
+			delete settings.uploadsState;
 			Rooms.updateUploadsSettingsById(roomId, settings);
 		}
 

@@ -40,7 +40,7 @@ const fields = {
 	hideUnreadStatus: 1,
 	muteGroupMentions: 1,
 	ignored: 1,
-	isUploadsAccepted: 1,
+	uploadsState: 1,
 	isImageFilesAllowed: 1,
 	isAudioFilesAllowed: 1,
 	isVideoFilesAllowed: 1,

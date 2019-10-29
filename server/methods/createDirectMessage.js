@@ -73,7 +73,7 @@ Meteor.methods({
 		const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
 		const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
 		if (!isNeedAcceptUploads) {
-			myDefaultSubscriptionPref.isUploadsAccepted = true;
+			myDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}
 
 		// Make user I have a subcription to this room
@@ -115,7 +115,7 @@ Meteor.methods({
 
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
 		if (!isNeedAcceptUploads) {
-			toDefaultSubscriptionPref.isUploadsAccepted = true;
+			toDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}
 
 		Subscriptions.upsert({

@@ -10,6 +10,7 @@ export const getDefaultSubscriptionPref = (userPref) => {
 		mobileNotifications,
 		emailNotificationMode,
 		highlights,
+		uploadsState,
 		isImageFilesAllowed,
 		isAudioFilesAllowed,
 		isVideoFilesAllowed,
@@ -57,6 +58,12 @@ export const getDefaultSubscriptionPref = (userPref) => {
 		subscription.isOtherFilesAllowed = isOtherFilesAllowed;
 	} else {
 		subscription.isOtherFilesAllowed = getDefaultValue('isOtherFilesAllowed');
+	}
+
+	if (typeof uploadsState !== 'undefined') {
+		subscription.uploadsState = uploadsState;
+	} else {
+		subscription.uploadsState = getDefaultValue('uploadsState');
 	}
 
 	return subscription;

@@ -73,23 +73,39 @@ export const FileUpload = {
 
 			const subscription = Subscriptions.findOneByRoomIdAndInterlocutorId(room._id, user._id);
 			//       console.log('subscription', subscription);
-			if (typeof subscription.isUploadsAccepted === 'undefined') {
-				Subscriptions.disableDirectUploads(subscription._id);
-			} else if (!subscription.isUploadsAccepted) {
-				const sentFilesCount = Messages.findFilesByUserIdAndRoomId(user._id, room._id).count();
-				//         console.log('sentFilesCount', sentFilesCount);
-				if (sentFilesCount > 0) {
-					const reason = TAPi18n.__('File_not_accepted_by_interlocutor', language);
-					throw new Meteor.Error('error-direct-message-file-upload-not-accepted', reason);
-				}
-			} else {
-				console.log('validateFileUpload', subscription);
-
-				for (let i = 0, len = prefKeys.length, key = ''; i < len; i++) {
-					key = prefKeys[i];
-					if (subscription.hasOwnProperty(key)) {
-						preferences[key] = subscription[key];
+			const { uploadsState } = subscription;
+			switch (uploadsState) {
+				case 'needAccept':
+				case 'acceptedOne':
+					const sentFilesCount = Messages.findFilesByUserIdAndRoomId(user._id, room._id).count();
+					if (sentFilesCount > 0) {
+						if (uploadsState === 'needAccept') {
+							const reason = TAPi18n.__('File_not_accepted_by_interlocutor', language);
+							throw new Meteor.Error('error-direct-message-file-upload-not-accepted', reason);
+						} else {
+							const reason = TAPi18n.__('One_file_accepted_by_interlocutor', language);
+							throw new Meteor.Error('error-direct-message-one-file-upload-accepted', reason);
+						}
 					}
+					break;
+				case 'declined': {
+					const reason = TAPi18n.__('File_declined_by_interlocutor', language);
+					throw new Meteor.Error('error-direct-message-file-upload-declined', reason);
+				}
+				case 'acceptedAll':
+					break;
+				default: {
+					const reason = TAPi18n.__('File_uploads_invalid_state', language);
+					throw new Meteor.Error('error-direct-message-invalid-accept-state', reason);
+				}
+			}
+
+			console.log('validateFileUpload', subscription);
+
+			for (let i = 0, len = prefKeys.length, key = ''; i < len; i++) {
+				key = prefKeys[i];
+				if (subscription.hasOwnProperty(key)) {
+					preferences[key] = subscription[key];
 				}
 			}
 		}

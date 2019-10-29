@@ -319,6 +319,20 @@ settings.addGroup('Accounts', function() {
 			public: true,
 			i18nLabel: 'Hide_Avatars',
 		});
+		this.add('Accounts_Default_User_Preferences_uploadsState', 'acceptedAll', {
+			type: 'select',
+			values: [
+				'needAccept',
+				'acceptedOne',
+				'acceptedAll',
+				'declined',
+			].map((item) => ({
+				key: item,
+				i18nLabel: `UploadsState_${ item }`,
+			})),
+			public: true,
+			i18nLabel: 'UploadsState',
+		});
 		this.add('Accounts_Default_User_Preferences_isImageFilesAllowed', true, {
 			type: 'boolean',
 			public: true,

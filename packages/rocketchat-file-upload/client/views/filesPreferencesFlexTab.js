@@ -2,7 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
-import { handleError } from 'meteor/rocketchat:utils';
+import { handleError, t } from 'meteor/rocketchat:utils';
+import { popover } from 'meteor/rocketchat:ui-utils';
 import { ChatRoom, ChatSubscription } from 'meteor/rocketchat:models';
 
 const call = (method, ...params) => new Promise((resolve, reject) => {
@@ -16,13 +17,12 @@ const call = (method, ...params) => new Promise((resolve, reject) => {
 });
 
 Template.filesPreferencesFlexTab.helpers({
-//   canChangeUploadsAccept() {
-//     const rid = Session.get('openedRoom');
-//   	const room = ChatRoom.findOne({ _id: rid }, options) || {};
-//     return room.t === 'd';
-//   },
-	isUploadsAccepted() {
-		return Template.instance().form.isUploadsAccepted.get();
+	uploadsState() {
+		return Template.instance().form.uploadsState.get();
+	},
+	uploadsStateValue() {
+		const value = Template.instance().form.uploadsState.get();
+		return t(`UploadsState_${ value }`);
 	},
 	isImageFilesAllowed() {
 		return Template.instance().form.isImageFilesAllowed.get();
@@ -45,7 +45,7 @@ Template.filesPreferencesFlexTab.helpers({
 Template.filesPreferencesFlexTab.onRendered(() => {
 	const rid = Session.get('openedRoom');
 	const room = ChatRoom.findOne({ _id: rid }, { fields: { t: 1 } }) || {};
-	this.$('#isUploadsAccepted').prop('disabled', room.t !== 'd');
+	this.$('#uploadsState').prop('disabled', room.t !== 'd');
 });
 
 Template.filesPreferencesFlexTab.onCreated(function() {
@@ -57,8 +57,8 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 		values[`is${ fileTypes[i] }FilesAllowed`] = true;
 	}
 
-	options.fields.isUploadsAccepted = 1;
-	values.isUploadsAccepted = true;
+	options.fields.uploadsState = 1;
+	values.uploadsState = 'acceptedAll';
 
 	const rid = Session.get('openedRoom');
 
@@ -73,11 +73,11 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 		for (let i = 0, len = fileTypes.length; i < len; i++) {
 			values[`is${ fileTypes[i] }FilesAllowed`] = sub[`is${ fileTypes[i] }FilesAllowed`] ;
 		}
-		values.isUploadsAccepted = sub.isUploadsAccepted;
+		values.uploadsState = sub.uploadsState || 'acceptedAll';
 	}
 
 	this.original = {
-		isUploadsAccepted: new ReactiveVar(values.isUploadsAccepted),
+		uploadsState: new ReactiveVar(values.uploadsState),
 		isImageFilesAllowed: new ReactiveVar(values.isImageFilesAllowed),
 		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
 		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
@@ -85,7 +85,7 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 	};
 
 	this.form = {
-		isUploadsAccepted: new ReactiveVar(values.isUploadsAccepted),
+		uploadsState: new ReactiveVar(values.uploadsState),
 		isImageFilesAllowed: new ReactiveVar(values.isImageFilesAllowed),
 		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
 		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
@@ -138,4 +138,57 @@ Template.filesPreferencesFlexTab.events({
 		instance.form[name].set(checked);
 	},
 
+	'click #uploadsState'(e) {
+		const instance = Template.instance();
+		const value = instance.form.uploadsState.get();
+
+		const options = [
+			'needAccept',
+			'acceptedOne',
+			'acceptedAll',
+			'declined',
+		].map((item) => {
+			const key = `UploadsState_${ item }`;
+			return {
+				id: key,
+				name: 'uploadsState',
+				label: key,
+				value: item,
+			};
+		});
+
+		const config = {
+			popoverClass: 'files-preferences',
+			template: 'filesPreferencesPopover',
+			data: {
+				change : (val) => { console.log(val); instance.form.uploadsState.set(val); },
+				value,
+				options,
+			},
+			currentTarget: e.currentTarget,
+			offsetVertical: e.currentTarget.clientHeight + 10,
+		};
+		popover.open(config);
+	},
+
+});
+
+
+Template.filesPreferencesPopover.onCreated(function() {
+	this.change = this.data.change;
+});
+
+Template.filesPreferencesPopover.onRendered(function() {
+	this.find(`[value=${ this.data.value }]`).checked = true;
+});
+
+Template.filesPreferencesPopover.helpers({
+	options() {
+		return Template.instance().data.options;
+	},
+});
+Template.filesPreferencesPopover.events({
+	'change input'(e, instance) {
+		instance.change && instance.change(e.target.value);
+	},
 });

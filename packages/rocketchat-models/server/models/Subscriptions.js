@@ -684,34 +684,6 @@ export class Subscriptions extends Base {
 		return this.update(query, update);
 	}
 
-	acceptDirectUploads(_id) {
-		const query = {
-			_id,
-		};
-
-		const update = {
-			$set: {
-				isUploadsAccepted: true,
-			},
-		};
-
-		return this.update(query, update);
-	}
-
-	disableDirectUploads(_id) {
-		const query = {
-			_id,
-		};
-
-		const update = {
-			$set: {
-				isUploadsAccepted: false,
-			},
-		};
-
-		return this.update(query, update);
-	}
-
 	archiveByRoomId(roomId) {
 		const query =
 			{ rid: roomId };
@@ -1268,7 +1240,7 @@ export class Subscriptions extends Base {
 		}
 		const defSubPref = this.getDefaultSubscriptionPref(user);
 		if (room.t !== 'd') {
-			delete defSubPref.isUploadsAccepted;
+			delete defSubPref.uploadsState;
 			delete defSubPref.isImageFilesAllowed;
 			delete defSubPref.isAudioFilesAllowed;
 			delete defSubPref.isVideoFilesAllowed;
