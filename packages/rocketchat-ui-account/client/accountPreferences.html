@@ -230,6 +230,20 @@
 								<label><input type="radio" name="hideAvatars" value="false" checked="{{checked 'hideAvatars' false}}"/> {{_ "False"}}</label>
 							</div>
 						</div>
+						<div class="input-line double-col" id="uploadsState">
+							<label class="setting-label">{{_ "UploadsState"}}</label>
+							<div class="setting-field">
+								<div class="rc-select">
+									<select class="input-monitor rc-select__element" name="uploadsState">
+										<option value="needAccept" selected="{{selected 'uploadsState' 'needAccept' 'default'}}">{{_ "UploadsState_needAccept"}}</option>
+										<option value="acceptedOne" selected="{{selected 'uploadsState' 'acceptedOne'}}">{{_ "UploadsState_acceptedOne"}}</option>
+										<option value="acceptedAll" selected="{{selected 'uploadsState' 'acceptedAll'}}">{{_ "UploadsState_acceptedAll"}}</option>
+										<option value="declined" selected="{{selected 'uploadsState' 'declined'}}">{{_ "UploadsState_declined"}}</option>
+									</select>
+									{{> icon block="rc-select__arrow" icon="arrow-down" }}
+								</div>
+							</div>
+						</div>
 						<div class="input-line double-col" id="isImageFilesAllowed">
 							<label class="setting-label">{{_ "Is_Image_Files_Allowed"}}</label>
 							<div class="setting-field">
