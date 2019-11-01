@@ -58,7 +58,7 @@ API.v1.addRoute(['dm.setUploadsState', 'im.setUploadsState'], { authRequired: tr
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
 
-		const state = this.requestParams().userId;
+		const { state } = this.requestParams();
 
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('setDirectUploadsState', findResult.room._id, state);
