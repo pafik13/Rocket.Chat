@@ -406,10 +406,16 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		};
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
 		delete subscription._id;
+		console.log('rooms.info:subscription', subscription);
+
+		//     if (!subscription.mobilePushNotifications) {
+		//       subscription.mobilePushNotifications = settings.get('Accounts_Default_User_Preferences_mobileNotifications');
+		//     }
 
 		const result = Rooms.findOneByIdOrName(room._id, {
 			...filesPrefsFields,
 		});
+		console.log('rooms.info:room', result);
 
 		return API.v1.success({ room: {
 			...result,
