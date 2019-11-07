@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { Subscriptions, Messages } from 'meteor/rocketchat:models';
 
 Meteor.methods({
 	setDirectUploadsState(rid, state) {
@@ -28,13 +28,16 @@ Meteor.methods({
 			return false;
 		}
 
-		const options = { fields: { _id: 1, uploadsState: 1 } };
+		const options = { fields: { _id: 1, uploadsState: 1, i: 1 } };
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, fromId, options);
 
 		if (room.t !== 'd' || !subscription) {
 			return false;
 		}
 
+		if (state === 'declined' && subscription.i && subscription.i._id) {
+			Messages.removeFilesByRoomIdAndUserId(room._id, subscription.i._id);
+		}
 		return Subscriptions.updateUploadsSettingsById(subscription._id, { uploadsState: state });
 	},
 });
