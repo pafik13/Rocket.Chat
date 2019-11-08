@@ -388,16 +388,14 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		};
 		const room = findRoomByIdOrName({ params: this.requestParams() });
 		const { fields } = this.parseJsonQuery();
+		console.log('rooms.info:fields', fields);
 		if (!Meteor.call('canAccessRoom', room._id, this.userId, {})) {
 			return API.v1.failure('not-allowed', 'Not Allowed');
-		}
-		if (fields) {
-			const result = Rooms.findOneByIdOrName(room._id, { fields });
-			return API.v1.success({ room: result });
 		}
 
 		const options = {
 			fields: {
+				...fields,
 				blocker: 1,
 				blocked: 1,
 				mobilePushNotifications: 1,
@@ -413,6 +411,7 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		//     }
 
 		const result = Rooms.findOneByIdOrName(room._id, {
+			...fields,
 			...filesPrefsFields,
 		});
 		console.log('rooms.info:room', result);
