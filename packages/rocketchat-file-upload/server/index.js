@@ -1,4 +1,5 @@
 import '../lib/FileUploadBase';
+import '../lib/MessageTypes';
 import { FileUpload } from './lib/FileUpload';
 import './lib/proxy';
 import './lib/requests';

@@ -35,8 +35,14 @@ Meteor.methods({
 			return false;
 		}
 
+		console.log('setDirectUploadsState', state, subscription.i);
 		if (state === 'declined' && subscription.i && subscription.i._id) {
-			Messages.removeFilesByRoomIdAndUserId(room._id, subscription.i._id);
+			const sentFiles = Messages.findFilesByUserIdAndRoomId(subscription.i._id, room._id).fetch();
+			if (sentFiles.length === 1) {
+				Meteor.runAsUser(subscription.i._id, () => {
+					Meteor.call('deleteMessage', sentFiles[0]);
+				});
+			}
 		}
 		return Subscriptions.updateUploadsSettingsById(subscription._id, { uploadsState: state });
 	},

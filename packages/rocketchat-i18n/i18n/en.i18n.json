@@ -3179,5 +3179,14 @@
   "Your_password_is_wrong": "Your password is wrong!",
   "Your_push_was_sent_to_s_devices": "Your push was sent to %s devices",
   "Your_server_link": "Your server link",
-  "Your_workspace_is_ready": "Your workspace is ready to use 🎉"
+  "Your_workspace_is_ready": "Your workspace is ready to use 🎉",
+  "Images_allowed_by": "User <em>__user_by__</em> allowed images.",
+  "Images_disallowed_by": "User <em>__user_by__</em> disallowed images.",
+  "Audios_allowed_by": "User <em>__user_by__</em> allowed audios.",
+  "Audios_disallowed_by": "User <em>__user_by__</em> disallowed audios.",
+  "Videos_allowed_by": "User <em>__user_by__</em> allowed videos.",
+  "Videos_disallowed_by": "User <em>__user_by__</em> disallowed videos.",
+  "Others_allowed_by": "User <em>__user_by__</em> allowed other files.",
+  "Others_disallowed_by": "User <em>__user_by__</em> disallowed other files.",
+  "Uploads_state_changed_by": "User <em>__user_by__</em> change uploads state to __uploads_state__"
 }

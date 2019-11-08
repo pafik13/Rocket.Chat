@@ -946,7 +946,10 @@ export class Messages extends Base {
 			fields: {
 				'file._id': 1,
 			},
-		}).fetch().forEach((document) => this.FileUpload.getStore('Uploads').deleteById(document.file._id));
+		}).fetch().forEach((document) => {
+			this.FileUpload.getStore('Uploads').deleteById(document.file._id);
+			this.removeById(document._id);
+		});
 	}
 
 	getMessageByFileId(fileID) {
