@@ -6,6 +6,7 @@ import Busboy from 'busboy';
 import { API } from '../api';
 import S3 from 'aws-sdk/clients/s3';
 import Path from 'path';
+import _ from 'underscore';
 import { settings } from 'meteor/rocketchat:settings';
 import { stringToBoolean } from 'meteor/rocketchat:utils';
 
@@ -391,6 +392,10 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		console.log('rooms.info:fields', fields);
 		if (!Meteor.call('canAccessRoom', room._id, this.userId, {})) {
 			return API.v1.failure('not-allowed', 'Not Allowed');
+		}
+		if (!_.isMatch(API.v1.defaultFieldsToExclude, fields)) {
+			const result = Rooms.findOneByIdOrName(room._id, { fields });
+			return API.v1.success({ room: result });
 		}
 
 		const options = {
