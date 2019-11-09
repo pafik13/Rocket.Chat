@@ -2399,6 +2399,7 @@
   "Room_uploaded_file_list": "Список файлов канала",
   "Room_uploaded_file_list_empty": "Нет доступных файлов",
   "Rooms": "Комнаты",
+  "Rooms_Max_Group_Members": "Максимальное количество участников в группе",
   "Routing": "Маршрутизация",
   "Run_only_once_for_each_visitor": "Запускать только один раз для каждого посетителя",
   "run-import": "Запустить импорт",

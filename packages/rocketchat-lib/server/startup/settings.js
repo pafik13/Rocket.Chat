@@ -879,6 +879,13 @@ settings.addGroup('General', function() {
 			type: 'boolean',
 		});
 	});
+	this.section('Rooms', function() {
+		this.add('Rooms_Max_Group_Members', 200, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Max_Group_Members',
+		});
+	});
 	this.section('Notifications', function() {
 		this.add('Notifications_Max_Room_Members', 100, {
 			type: 'int',

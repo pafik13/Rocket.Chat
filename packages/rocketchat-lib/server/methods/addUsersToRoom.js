@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { Rooms, Subscriptions, Users, BannedUsers } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
+import { settings } from 'meteor/rocketchat:settings';
 import { addUserToRoom } from '../functions';
 
 Meteor.methods({
@@ -54,6 +55,15 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-arguments', 'Invalid arguments', {
 				method: 'addUsersToRoom',
 			});
+		}
+
+		if (room.t === 'p') {
+			const maxMembers = settings.get('Rooms_Max_Group_Members');
+			if (room.usersCount + data.users.length > maxMembers) {
+				throw new Meteor.Error('error-reached-users-limit', 'Reached users limit', {
+					method: 'addUsersToRoom',
+				});
+			}
 		}
 
 		// Validate each user, then add to room
