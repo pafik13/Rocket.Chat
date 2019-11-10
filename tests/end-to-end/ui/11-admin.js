@@ -699,7 +699,7 @@ describe('[Administration]', () => {
 				});
 			});
 
-			describe('stream cast:', () => {
+			describe('utf8 regex:', () => {
 				before(() => {
 					admin.generalButtonExpandUTF8.waitForVisible(5000);
 					admin.generalButtonExpandUTF8.click();

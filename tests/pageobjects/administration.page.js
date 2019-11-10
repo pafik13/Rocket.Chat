@@ -72,7 +72,7 @@ class Administration extends Page {
 	get generalButtonExpandRooms() { return browser.element('.section:nth-of-type(8) .expand'); }
 	get generalButtonExpandStreamCast() { return browser.element('.section:nth-of-type(9) .expand'); }
 	get generalButtonExpandTranslations() { return browser.element('.section:nth-of-type(10) .expand'); }
-	get generalButtonExpandUTF8() { return browser.element('.section:nth-of-type(10) .expand'); }
+	get generalButtonExpandUTF8() { return browser.element('.section:nth-of-type(11) .expand'); }
 
 	get generalSiteUrl() { return browser.element('[name="Site_Url"]'); }
 	get generalSiteUrlReset() { return browser.element('.reset-setting[data-setting="Site_Url"]'); }
