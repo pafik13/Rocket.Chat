@@ -673,6 +673,19 @@ describe('[Administration]', () => {
 				});
 			});
 
+			describe('rooms:', () => {
+				before(() => {
+					admin.generalButtonExpandRooms.waitForVisible(5000);
+					admin.generalButtonExpandRooms.click();
+					admin.generalRoomsMaxGroupMembers.waitForVisible(5000);
+					admin.generalRoomsMaxGroupMembers.scroll();
+				});
+
+				it('it should show the max group members field', () => {
+					admin.generalRoomsMaxGroupMembers.isVisible().should.be.true;
+				});
+			});
+
 			describe('stream cast:', () => {
 				before(() => {
 					admin.generalButtonExpandStreamCast.waitForVisible(5000);

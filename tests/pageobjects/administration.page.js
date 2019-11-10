@@ -69,8 +69,9 @@ class Administration extends Page {
 	get generalButtonExpandNotifications() { return browser.element('.section:nth-of-type(5) .expand'); }
 	get generalButtonExpandRest() { return browser.element('.section:nth-of-type(6) .expand'); }
 	get generalButtonExpandReporting() { return browser.element('.section:nth-of-type(7) .expand'); }
-	get generalButtonExpandStreamCast() { return browser.element('.section:nth-of-type(8) .expand'); }
-	get generalButtonExpandTranslations() { return browser.element('.section:nth-of-type(9) .expand'); }
+	get generalButtonExpandRooms() { return browser.element('.section:nth-of-type(8) .expand'); }
+	get generalButtonExpandStreamCast() { return browser.element('.section:nth-of-type(9) .expand'); }
+	get generalButtonExpandTranslations() { return browser.element('.section:nth-of-type(10) .expand'); }
 	get generalButtonExpandUTF8() { return browser.element('.section:nth-of-type(10) .expand'); }
 
 	get generalSiteUrl() { return browser.element('[name="Site_Url"]'); }
@@ -114,6 +115,8 @@ class Administration extends Page {
 	get generalReportingTrue() { return browser.element('label:nth-of-type(1) [name="Statistics_reporting"]'); }
 	get generalReportingFalse() { return browser.element('label:nth-of-type(2) [name="Statistics_reporting"]'); }
 	get generalReportingReset() { return browser.element('.reset-setting[data-setting="Statistics_reporting"]'); }
+	get generalRoomsMaxGroupMembers() { return browser.element('[name="Rooms_Max_Group_Members"]'); }
+	get generalRoomsMaxGroupMembersReset() { return browser.element('.reset-setting[data-setting="Rooms_Max_Group_Members"]'); }
 	get generalStreamCastAdress() { return browser.element('[name="Stream_Cast_Address"]'); }
 	get generalStreamCastAdressReset() { return browser.element('.reset-setting[data-setting="Stream_Cast_Address"]'); }
 	get generalUTF8Regex() { return browser.element('[name="UTF8_Names_Validation"]'); }
