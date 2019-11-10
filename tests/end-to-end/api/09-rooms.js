@@ -275,10 +275,12 @@ describe('[Rooms]', function() {
 		let testChannel;
 		let testGroup;
 		let testDM;
-		const expectedKeys = [
+		const channelExpectedKeys = [
 			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'ro', 'sysMes', 'default',
 			'_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed',
 		];
+		const groupExpectedKeys = Array.from(channelExpectedKeys);
+		groupExpectedKeys.push('membersHidden');
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
 		after((done) => {
@@ -316,7 +318,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.keys(expectedKeys);
+					expect(res.body.room).to.have.keys(channelExpectedKeys);
 				})
 				.end(done);
 		});
@@ -330,7 +332,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(channelExpectedKeys);
 				})
 				.end(done);
 		});
@@ -344,7 +346,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(groupExpectedKeys);
 				})
 				.end(done);
 		});
@@ -358,7 +360,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(groupExpectedKeys);
 				})
 				.end(done);
 		});
