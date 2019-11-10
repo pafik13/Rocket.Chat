@@ -631,6 +631,10 @@ API.v1.addRoute('groups.members', { authRequired: true }, {
 			return API.v1.unauthorized();
 		}
 
+		if (room.membersHidden && !hasPermission(this.userId, 'view-p-member-list')) {
+			return API.v1.unauthorized();
+		}
+
 		const { offset, count } = this.getPaginationItems();
 		const { sort = {} } = this.parseJsonQuery();
 		const { name } = this.requestParams();
@@ -898,6 +902,34 @@ API.v1.addRoute('groups.setReadOnly', { authRequired: true }, {
 
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('saveRoomSettings', findResult.rid, 'readOnly', this.bodyParams.readOnly);
+		});
+
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(findResult.rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+		});
+	},
+});
+
+
+API.v1.addRoute('groups.setMembersHidden', { authRequired: true }, {
+	post() {
+		const { membersHidden } = this.bodyParams.membersHidden;
+		if (typeof membersHidden === 'undefined') {
+			return API.v1.failure('The bodyParam "membersHidden" is required');
+		}
+
+		if (typeof membersHidden !== 'Boolean') {
+			return API.v1.failure('The bodyParam "membersHidden" must be a boolean');
+		}
+
+		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+
+		if (findResult.membersHidden === membersHidden) {
+			return API.v1.failure('The private group read only setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult.rid, 'membersHidden', membersHidden);
 		});
 
 		return API.v1.success({

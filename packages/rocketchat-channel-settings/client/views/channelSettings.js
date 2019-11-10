@@ -36,6 +36,10 @@ const common = {
 		const { room } = Template.instance();
 		return room.t === 'd';
 	},
+	isGroup() {
+		const { room } = Template.instance();
+		return room.t === 'p';
+	},
 };
 
 function roomFilesOnly(room) {
@@ -422,6 +426,30 @@ Template.channelSettingsEditing.onCreated(function() {
 					() => {
 						toastr.success(
 							t('System_messages_setting_changed_successfully')
+						);
+					}
+				);
+			},
+		},
+		membersHidden: {
+			type: 'boolean',
+			label: 'Hide_members',
+			isToggle: true,
+			processing: new ReactiveVar(false),
+			canView() {
+				return room.t === 'p';
+			},
+			getValue() {
+				return room.membersHidden;
+			},
+			canEdit() {
+				return hasAllPermission('edit-room', room._id);
+			},
+			save(value) {
+				return call('saveRoomSettings', room._id, 'membersHidden', value).then(
+					() => {
+						toastr.success(
+							t('Members_hidden_setting_changed_successfully')
 						);
 					}
 				);

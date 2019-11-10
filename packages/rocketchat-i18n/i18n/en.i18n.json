@@ -3049,6 +3049,7 @@
   "Videocall_declined": "Video Call Declined.",
   "Videocall_enabled": "Video Call Enabled",
   "view-broadcast-member-list": "View Members List in Broadcast Room",
+  "view-p-member-list": "View Members List in Group",
   "view-c-room": "View Public Channel",
   "view-c-room_description": "Permission to view public channels",
   "view-d-room": "View Direct Messages",
@@ -3189,5 +3190,7 @@
   "Videos_disallowed_by": "User <em>__user_by__</em> disallowed videos.",
   "Others_allowed_by": "User <em>__user_by__</em> allowed other files.",
   "Others_disallowed_by": "User <em>__user_by__</em> disallowed other files.",
-  "Uploads_state_changed_by": "User <em>__user_by__</em> change uploads state to __uploads_state__"
+  "Uploads_state_changed_by": "User <em>__user_by__</em> change uploads state to __uploads_state__",
+  "Members_hidden_setting_changed_successfully": "Members hidden setting changed successfully",
+  "Hide_members": "Hide members"
 }

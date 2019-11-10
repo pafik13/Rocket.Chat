@@ -1237,6 +1237,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	setMembersHiddenById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				membersHidden: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	saveRetentionEnabledById(_id, value) {
 		const query = { _id };
 

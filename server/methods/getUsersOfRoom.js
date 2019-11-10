@@ -18,6 +18,10 @@ Meteor.methods({
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoom' });
 		}
 
+		if (room.t === 'p' && room.membersHidden && !hasPermission(userId, 'view-p-member-list', rid)) {
+			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoom' });
+		}
+
 		const subscriptions = Subscriptions.findByRoomIdWhenUsernameExists(rid);
 
 		return {

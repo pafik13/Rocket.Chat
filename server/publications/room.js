@@ -51,6 +51,7 @@ const fields = {
 	isAudioFilesAllowed: 1,
 	isVideoFilesAllowed: 1,
 	isOtherFilesAllowed: 1,
+	membersHidden: 1,
 };
 
 const roomMap = (record) => {

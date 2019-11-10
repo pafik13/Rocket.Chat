@@ -18,7 +18,7 @@ import { saveRoomSystemMessages } from '../functions/saveRoomSystemMessages';
 import { saveRoomTokenpass } from '../functions/saveRoomTokens';
 import { saveStreamingOptions } from '../functions/saveStreamingOptions';
 
-const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted'];
+const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden'];
 Meteor.methods({
 	saveRoomSettings(rid, settings, value) {
 		const userId = Meteor.userId();
@@ -128,6 +128,12 @@ Meteor.methods({
 				delete settings.retentionExcludePinned;
 				delete settings.retentionFilesOnly;
 			}
+			if (setting === 'membersHidden' && !hasPermission(userId, 'edit-room', rid)) {
+				throw new Meteor.Error('error-action-not-allowed', 'Editing room members visibility is not allowed', {
+					method: 'saveRoomSettings',
+					action: 'Editing_room',
+				});
+			}
 		});
 
 		Object.keys(settings).forEach((setting) => {
@@ -216,6 +222,9 @@ Meteor.methods({
 					break;
 				case 'encrypted':
 					Rooms.saveEncryptedById(rid, value);
+					break;
+				case 'membersHidden':
+					Rooms.setMembersHiddenById(rid, value);
 					break;
 			}
 		});

@@ -2969,6 +2969,7 @@
   "Videocall_declined": "Видео-звонок отклонён.",
   "Videocall_enabled": "Включить видеозвонки",
   "view-broadcast-member-list": "Просмотр списка участников в трансляции Room",
+  "view-p-member-list": "Просмотр списка участников группы",
   "view-c-room": "Смотреть публичные каналы",
   "view-c-room_description": "Разрешение на просмотр публичных каналов",
   "view-d-room": "Просматривать личные сообщения",
@@ -3108,5 +3109,7 @@
   "Videos_disallowed_by": "Запрещена загрузка видео-файлов пользователем <em>__user_by__</em>.",
   "Others_allowed_by": "Разрешена загрузка прочих файлов пользователем <em>__user_by__</em>.",
   "Others_disallowed_by": "Запрещена загрузка прочих файлов пользователем <em>__user_by__</em>.",
-  "Uploads_state_changed_by": "Пользователь <em>__user_by__</em> изменил состояние обмена файлами на __uploads_state__"
+  "Uploads_state_changed_by": "Пользователь <em>__user_by__</em> изменил состояние обмена файлами на __uploads_state__",
+  "Members_hidden_setting_changed_successfully": "Видимость участников изменена успешно",
+  "Hide_members": "Скрыть участников"
 }
