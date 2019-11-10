@@ -33,6 +33,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 				expect(res.body).to.have.nested.property('group.t', 'p');
 				expect(res.body).to.have.nested.property('group.msgs', 0);
+				expect(res.body).to.have.nested.property('group.membersHidden', false);
 				group._id = res.body.group._id;
 			})
 			.end(done);
@@ -550,6 +551,23 @@ describe('[Groups]', function() {
 			.expect(200)
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
+			})
+			.end(done);
+	});
+
+	it('/groups.setMembersHidden', (done) => {
+		request.post(api('groups.setMembersHidden'))
+			.set(credentials)
+			.send({
+				roomId: group._id,
+				membersHidden: true,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				const { group } = res.body;
+				expect(group).to.have.property('membersHidden', true);
 			})
 			.end(done);
 	});

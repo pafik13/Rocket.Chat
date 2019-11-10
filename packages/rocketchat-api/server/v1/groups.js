@@ -200,16 +200,17 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			return API.v1.failure('Body param "members" must be an array if provided');
 		}
 
-		if (this.bodyParams.customFields && !(typeof this.bodyParams.customFields === 'object')) {
+		if (this.bodyParams.customFields && typeof this.bodyParams.customFields !== 'object') {
 			return API.v1.failure('Body param "customFields" must be an object if provided');
 		}
 
 		const readOnly = typeof this.bodyParams.readOnly !== 'undefined' ? this.bodyParams.readOnly : false;
+		const membersHidden = typeof this.bodyParams.membersHidden !== 'undefined' ? this.bodyParams.membersHidden : false;
 
 		let result;
 		let rid;
 		Meteor.runAsUser(this.userId, () => {
-			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields);
+			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields, { membersHidden });
 			rid = result.rid;
 
 			const { customFields, description, topic } = this.bodyParams;
@@ -242,7 +243,8 @@ function validateGroup(params) {
 
 function createGroup(userId, params) {
 	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
-	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields));
+	const membersHidden = typeof params.membersHidden !== 'undefined' ? params.membersHidden : false;
+	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields, { membersHidden }));
 
 	console.log('createGroup', id, userId);
 	return {
@@ -298,6 +300,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
+			fields.membersHidden = stringToBoolean(fields.membersHidden);
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
