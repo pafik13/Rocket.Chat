@@ -916,7 +916,7 @@ API.v1.addRoute('groups.setReadOnly', { authRequired: true }, {
 
 API.v1.addRoute('groups.setMembersHidden', { authRequired: true }, {
 	post() {
-		const { membersHidden } = this.bodyParams.membersHidden;
+		const { membersHidden } = this.bodyParams;
 		if (typeof membersHidden === 'undefined') {
 			return API.v1.failure('The bodyParam "membersHidden" is required');
 		}
