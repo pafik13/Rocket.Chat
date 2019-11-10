@@ -918,7 +918,7 @@ API.v1.addRoute('groups.setMembersHidden', { authRequired: true }, {
 			return API.v1.failure('The bodyParam "membersHidden" is required');
 		}
 
-		if (typeof membersHidden !== 'Boolean') {
+		if (typeof membersHidden !== 'boolean') {
 			return API.v1.failure('The bodyParam "membersHidden" must be a boolean');
 		}
 
