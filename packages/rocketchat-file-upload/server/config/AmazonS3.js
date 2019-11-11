@@ -9,6 +9,7 @@ import https from 'https';
 const get = function(file, req, res) {
 	const fileUrl = this.store.getRedirectURL(file);
 
+	console.log('AmazoneS3:get:fileUrl', fileUrl);
 	if (fileUrl) {
 		const storeType = file.store.split(':').pop();
 		if (settings.get(`FileUpload_S3_Proxy_${ storeType }`)) {
@@ -26,7 +27,7 @@ const get = function(file, req, res) {
 };
 
 const copy = function(file, out) {
-	const fileUrl = this.store.getRedirectURL(file);
+	const fileUrl = this.store.getRedirectURL(file, false);
 
 	if (fileUrl) {
 		const request = /^https:/.test(fileUrl) ? https : http;
@@ -66,7 +67,9 @@ const configure = _.debounce(function() {
 	const Region = settings.get('FileUpload_S3_Region');
 	const SignatureVersion = settings.get('FileUpload_S3_SignatureVersion');
 	const ForcePathStyle = settings.get('FileUpload_S3_ForcePathStyle');
-	// const CDN = RocketChat.settings.get('FileUpload_S3_CDN');
+	const CDNDomain = settings.get('FileUpload_S3_CDN');
+	const CDNAccessKeyId = settings.get('FileUpload_S3_CDN_AccessKeyId');
+	const CDNPrivateKey = settings.get('FileUpload_S3_CDN_PrivateKey');
 	const BucketURL = settings.get('FileUpload_S3_BucketURL');
 
 	if (!Bucket) {
@@ -85,6 +88,20 @@ const configure = _.debounce(function() {
 		},
 		URLExpiryTimeSpan,
 	};
+
+	if (CDNDomain && CDNAccessKeyId && CDNPrivateKey) {
+		let domain;
+		if (!/^https?:\/\//i.test(CDNDomain)) {
+			domain = `https://${ CDNDomain }`;
+		}
+		domain += domain.endsWith('/') ? '' : '/';
+
+		config.CDN = {
+			domain,
+			accessKeyId: CDNAccessKeyId,
+			privateKey: CDNPrivateKey,
+		};
+	}
 
 	if (AWSAccessKeyId) {
 		config.connection.accessKeyId = AWSAccessKeyId;

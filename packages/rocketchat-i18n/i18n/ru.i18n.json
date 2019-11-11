@@ -1293,6 +1293,8 @@
   "FileUpload_S3_Bucket": "Название Bucket",
   "FileUpload_S3_BucketURL": "Bucket URL",
   "FileUpload_S3_CDN": "Домен CDN для загрузок",
+  "FileUpload_S3_CDN_AccessKeyId": "CDN Access Key",
+  "FileUpload_S3_CDN_PrivateKey": "CDN Private Key",
   "FileUpload_S3_ForcePathStyle": "Форсировать Path Style",
   "FileUpload_S3_Proxy_Avatars": "Прокси-аватары",
   "FileUpload_S3_Proxy_Avatars_Description": "Передача файлов прокси-сервера через ваш сервер вместо прямого доступа к URL-адресу ресурса",

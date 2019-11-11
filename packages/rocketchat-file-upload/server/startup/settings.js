@@ -81,6 +81,21 @@ settings.addGroup('FileUpload', function() {
 				value: 'AmazonS3',
 			},
 		});
+		this.add('FileUpload_S3_CDN_AccessKeyId', '', {
+			type: 'string',
+			enableQuery: {
+				_id: 'FileUpload_Storage_Type',
+				value: 'AmazonS3',
+			},
+		});
+		this.add('FileUpload_S3_CDN_PrivateKey', '', {
+			type: 'string',
+			multiline: true,
+			enableQuery: {
+				_id: 'FileUpload_Storage_Type',
+				value: 'AmazonS3',
+			},
+		});
 		this.add('FileUpload_S3_Region', '', {
 			type: 'string',
 			enableQuery: {

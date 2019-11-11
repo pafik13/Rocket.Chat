@@ -1345,6 +1345,8 @@
   "FileUpload_S3_Bucket": "Bucket name",
   "FileUpload_S3_BucketURL": "Bucket URL",
   "FileUpload_S3_CDN": "CDN Domain for Downloads",
+  "FileUpload_S3_CDN_AccessKeyId": "CDN Access Key",
+  "FileUpload_S3_CDN_PrivateKey": "CDN Private Key",
   "FileUpload_S3_ForcePathStyle": "Force Path Style",
   "FileUpload_S3_Proxy_Avatars": "Proxy Avatars",
   "FileUpload_S3_Proxy_Avatars_Description": "Proxy avatar file transmissions through your server instead of direct access to the asset's URL",
