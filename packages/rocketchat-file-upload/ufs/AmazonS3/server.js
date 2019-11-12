@@ -30,7 +30,7 @@ export class AmazonS3Store extends UploadFS.Store {
 		super(options);
 
 		// 		console.log('AmazonS3Store:CloudFront.Signer', typeof CloudFront.Signer);
-		console.log('AmazonS3Store:options', options.CDN);
+		// 		console.log('AmazonS3Store:options', options.CDN);
 
 		const classOptions = options;
 
@@ -66,8 +66,8 @@ export class AmazonS3Store extends UploadFS.Store {
 					expires: Math.floor((new Date()).getTime() / 1000) + classOptions.URLExpiryTimeSpan,
 				};
 				url = cloudFront.getSignedUrl(params);
-				console.log('AmazonS3Store:getRedirectURL:url', params.url);
-				console.log('AmazonS3Store:getRedirectURL:getSignedUrl', url);
+				// 				console.log('AmazonS3Store:getRedirectURL:url', params.url);
+				// 				console.log('AmazonS3Store:getRedirectURL:getSignedUrl', url);
 			} else {
 				const params = {
 					Key: fileKey,
