@@ -2462,6 +2462,8 @@
   "Search_Private_Groups": "Поиск приватных групп",
   "Search_Provider": "Поисковый провайдер",
   "Search_Users": "Поиск пользователей",
+  "Search_RoomsBlackList": "Поиск комнат: запрещенные слова",
+  "Search_RoomsBlackListDescription": "Список слов, разделённый запятой. Оставьте его пустым, чтобы разрешить поиск по любым словам.",
   "seconds": "секунды",
   "Secret_token": "Секретный токен",
   "Security": "Безопасность",

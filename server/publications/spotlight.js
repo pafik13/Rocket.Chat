@@ -3,7 +3,7 @@ import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Users, Subscriptions, Rooms } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
-import { roomTypes } from 'meteor/rocketchat:utils';
+import { roomTypes, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
 import s from 'underscore.string';
 
 function fetchRooms(userId, rooms) {
@@ -23,6 +23,8 @@ Meteor.methods({
 			users: [],
 			rooms: [],
 		};
+		type.rooms = spotlightRoomsIsValidText(text);
+
 		const userOptions = {
 			limit: 5,
 			fields: {

@@ -2529,6 +2529,8 @@
   "Search_Private_Groups": "Search Private Groups",
   "Search_Provider": "Search Provider",
   "Search_Users": "Search Users",
+  "Search_RoomsBlackList": "Search Rooms: Restricted Words",
+  "Search_RoomsBlackListDescription": "Comma-separated list of words. Leave it blank for accepting all words.",
   "seconds": "seconds",
   "Secret_token": "Secret Token",
   "Security": "Security",

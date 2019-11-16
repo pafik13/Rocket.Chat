@@ -89,6 +89,12 @@ class SearchProviderService {
 				i18nLabel: 'Search_Provider',
 			});
 
+			this.add('Search_RoomsBlackList', '', {
+				type: 'string',
+				public: true,
+				i18nDescription: 'Search_RoomsBlackListDescription',
+			});
+
 			Object.keys(providers)
 				.filter((key) => providers[key].settings && providers[key].settings.length > 0)
 				.forEach(function(key) {
