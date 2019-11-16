@@ -50,6 +50,14 @@ export const FileUpload = {
 			fileType = 'Video';
 		}
 
+		if (room.t === 'd') {
+			const isAllowed = settings.get(`FileUpload_Allowed_${ fileType }_Files_In_Direct`);
+			if (!isAllowed) {
+				const reason = TAPi18n.__(`${ fileType }_files_not_allowed_direct_messages`, language);
+				throw new Meteor.Error(`error-direct-message-${ fileType }-files-upload-not-allowed`, reason);
+			}
+		}
+
 		const preferences = {
 			isImageFilesAllowed: true,
 			isAudioFilesAllowed: true,

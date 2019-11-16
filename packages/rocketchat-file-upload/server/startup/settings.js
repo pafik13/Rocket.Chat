@@ -251,6 +251,23 @@ settings.addGroup('FileUpload', function() {
 		type: 'boolean',
 		public: true,
 	});
+
+	this.add('FileUpload_Allowed_Audio_Files_In_Direct', true, {
+		type: 'boolean',
+		public: true,
+	});
+	this.add('FileUpload_Allowed_Image_Files_In_Direct', true, {
+		type: 'boolean',
+		public: true,
+	});
+	this.add('FileUpload_Allowed_Video_Files_In_Direct', true, {
+		type: 'boolean',
+		public: true,
+	});
+	this.add('FileUpload_Allowed_Other_Files_In_Direct', true, {
+		type: 'boolean',
+		public: true,
+	});
 });
 
 settings.add('Message_Need_Accept_Uploads', true, {
