@@ -4,7 +4,7 @@ import { Blaze } from 'meteor/blaze';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { isRtl, handleError } from 'meteor/rocketchat:utils';
+import { isRtl, handleError, complaintReasonsList } from 'meteor/rocketchat:utils';
 import { ChatSubscription } from 'meteor/rocketchat:models';
 import _ from 'underscore';
 import { hide, leave } from './ChannelActions';
@@ -150,6 +150,20 @@ Template.popover.onDestroyed(function() {
 	$(window).off('resize', this.position);
 });
 
+const success = function success(fn) {
+	return function(error, result) {
+		//     console.log('success', error, result);
+		if (error) {
+			return handleError(error);
+		}
+		if (result) {
+			fn.call(this, result);
+		} else {
+			fn.call(this);
+		}
+	};
+};
+
 Template.popover.events({
 	'click .js-action'(e, instance) {
 		!this.action || this.action.call(this, e, instance.data.data);
@@ -257,6 +271,48 @@ Template.popover.events({
 			});
 
 			return false;
+		}
+
+		if (action === 'complain') {
+			console.log('complain:trigger', rid);
+			const t = TAPi18n.__;
+			const optionName = t('Complaint_reason');
+			const reasons = complaintReasonsList();
+			const initValue = reasons[0];
+			const options = reasons.map((r, i) => ({
+				id: `reason_${ i }`,
+				name: optionName,
+				label: r,
+				value: String(r),
+			}));
+			modal.open({
+				title: t('Are_you_sure'),
+				type: 'warning',
+				showCancelButton: true,
+				confirmButtonColor: '#DD6B55',
+				confirmButtonText: t('Complain_about_room'),
+				cancelButtonText: t('Cancel'),
+				closeOnConfirm: false,
+				html: false,
+				popover: {
+					initValue,
+					options,
+				},
+			}, (reason) => {
+				console.log('complain:', reason);
+				Meteor.call('complainAboutRoom', rid, reason, success(() => {
+					modal.open({
+						title: t('Success'),
+						text: t('Complaint_has_been_saved'),
+						type: 'success',
+						timer: 2000,
+						showConfirmButton: false,
+						closeOnConfirm: false,
+					});
+					//           console.log(this);
+					//           return this.instance.clear();
+				}));
+			});
 		}
 	},
 });

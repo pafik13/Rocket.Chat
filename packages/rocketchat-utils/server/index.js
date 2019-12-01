@@ -20,4 +20,4 @@ export { composeMessageObjectWithUser } from './lib/composeMessageObjectWithUser
 export { templateVarHandler } from '../lib/templateVarHandler';
 export { stringToBoolean } from '../lib/stringToBoolean';
 export { hyphenate } from '../lib/hyphenate';
-
+export { complaintReasonsList } from '../lib/complaintReasons';

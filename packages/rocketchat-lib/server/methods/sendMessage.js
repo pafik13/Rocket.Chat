@@ -53,15 +53,36 @@ Meteor.methods({
 
 		const user = Users.findOneById(Meteor.userId(), {
 			fields: {
+				active: 1,
 				username: 1,
 				name: 1,
+				deactivatedUntil: 1,
+				language: 1,
 			},
 		});
+
+		const userLanguage = (user && user.language) || settings.get('Language') || 'en';
+
+		if (user.deactivatedUntil) {
+			const datetime = moment(user.deactivatedUntil).locale(userLanguage).format('LLL');
+
+			throw new Meteor.Error('error-user-deactivated', TAPi18n.__('You_cant_send_message_because_deactivated_until', { until: datetime }, userLanguage), {
+				method: 'sendMessage',
+			});
+		}
+
+		if (!user.active) {
+			throw new Meteor.Error('error-user-deactivated', TAPi18n.__('You_cant_send_message_because_deactivated', {}, userLanguage), {
+				method: 'validateFileUpload',
+			});
+		}
 
 		const isBanned = Meteor.call('isUserBanned', { rid: message.rid, username: user.username });
 
 		if (isBanned) {
-			throw new Meteor.Error('You can\'t send messages because you are banned');
+			throw new Meteor.Error('error-user-banned', 'You can\'t send messages because you are banned', {
+				method: 'sendMessage',
+			});
 		}
 
 		const room = Meteor.call('canAccessRoom', message.rid, user._id);

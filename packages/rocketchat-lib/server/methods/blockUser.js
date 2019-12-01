@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 import { Subscriptions } from 'meteor/rocketchat:models';
 
 Meteor.methods({
-	blockUser({ rid, blocked }) {
+	blockUser({ rid, blocked, reason = '' }) {
 
 		check(rid, String);
 		check(blocked, String);
@@ -19,7 +19,7 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'blockUser' });
 		}
 
-		Subscriptions.setBlockedByRoomId(rid, blocked, Meteor.userId());
+		Subscriptions.setBlockedByRoomId(rid, blocked, Meteor.userId(), reason);
 
 		return true;
 	},

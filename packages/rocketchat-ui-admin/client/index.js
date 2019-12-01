@@ -18,3 +18,5 @@ import './rooms/adminRooms';
 import './users/adminInviteUser';
 import './users/adminUserChannels';
 import './users/adminUsers';
+import './complaints/adminComplaints.html';
+import './complaints/adminComplaints';

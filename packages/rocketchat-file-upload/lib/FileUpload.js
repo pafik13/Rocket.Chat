@@ -6,6 +6,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { fileUploadIsValidContentType } from 'meteor/rocketchat:utils';
 import { canAccessRoom } from 'meteor/rocketchat:authorization';
 import filesize from 'filesize';
+import moment from 'moment';
 
 let maxFileSize = 0;
 
@@ -19,6 +20,8 @@ export const FileUpload = {
 
 		// livechat users can upload files but they don't have an userId
 		const user = file.userId ? Meteor.users.findOne(file.userId) : null;
+
+		console.log('validateFileUpload:user', user);
 
 		const room = Rooms.findOneById(file.rid, {
 			fields: {
@@ -34,7 +37,21 @@ export const FileUpload = {
 		if (canAccessRoom(room, user, file) !== true) {
 			return false;
 		}
-		const language = user ? user.language : 'en';
+		const language = (user && user.language) || settings.get('Language') || 'en';
+
+		if (user.deactivatedUntil) {
+			const datetime = moment(user.deactivatedUntil).locale(language).format('LLL');
+			throw new Meteor.Error('error-user-deactivated', TAPi18n.__('You_cant_upload_file_because_deactivated_until', { until: datetime }, language), {
+				method: 'validateFileUpload',
+			});
+		}
+
+		if (!user.active) {
+			throw new Meteor.Error('error-user-deactivated', TAPi18n.__('You_cant_upload_file_because_deactivated', {}, language), {
+				method: 'validateFileUpload',
+			});
+		}
+
 		// Here check of rights
 		if (!fileUploadAllowed) {
 			const reason = TAPi18n.__('FileUpload_Disabled', language);

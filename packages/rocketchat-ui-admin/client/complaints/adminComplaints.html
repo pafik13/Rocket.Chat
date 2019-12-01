@@ -1,0 +1,69 @@
+<template name="adminComplaints">
+	<div class="main-content-flex">
+		<section class="page-container page-list flex-tab-main-content" my-tag="myTag">
+			{{> header sectionName="Complaints" fixedHeight="true" fullpage="true"}}
+			<div class="content">
+				{{#unless hasPermission 'view-room-administration'}}
+					<p>{{_ "You_are_not_authorized_to_view_this_page"}}</p>
+				{{else}}
+					<form class="search-form" role="form">
+						<label><input type="checkbox" name="complaint-type" value="r"> {{_ "Rooms"}}</label>
+						<label><input type="checkbox" name="complaint-type" value="u"> {{_ "Users"}}</label>
+            <div class="rc-input">
+              <div class="rc-input__wrapper rc-datetime__left">
+                <div class="rc-input__icon">
+                  {{> icon block="rc-input__icon-svg" icon="calendar"}}
+                </div>
+                <input type="date" class="rc-input__element" value="" name="from__date" autocomplete="off" placeholder="YYYY-MM-DD"/>
+              </div>
+              <div class="rc-input__wrapper rc-datetime__right">
+                <div class="rc-input__icon">
+                  {{> icon block="rc-input__icon-svg" icon="clock"}}
+                </div>
+                <input type="time" class="rc-input__element" value="" name="from__time" autocomplete="off" placeholder="HH:MM"/>
+              </div>
+            </div>
+					</form>
+					<div class="results">
+            {{{_ "Showing_results" complaintsCount}}}
+					</div>
+					{{#table fixed='true' onItemClick=onTableItemClick onScroll=onTableScroll onResize=onTableResize}}
+						<thead>
+							<tr>
+								<th width="20%"><div class="table-fake-th">{{_ "Created_at"}}</div></th>
+								<th width="20%"><div class="table-fake-th">{{_ "Creator"}}</div></th>
+								<th width="20%"><div class="table-fake-th">{{_ "Complaint_reason"}}</div></th>
+								<th width="20%"><div class="table-fake-th">{{_ "User"}}</div></th>
+								<th width="20%"><div class="table-fake-th">{{_ "Room"}}</div></th>
+							</tr>
+						</thead>
+						<tbody>
+							{{#each complaints}}
+								<tr>
+									<td width="20%"><div class="rc-table-wrapper">{{ts}}</div></td>
+									<td width="20%"><div class="rc-table-wrapper">{{creator}}</div></td>
+									<td width="20%"><div class="rc-table-wrapper">{{reason}}</div></td>
+									<td width="20%"><div class="rc-table-wrapper">{{userName}}</div></td>
+									<td width="20%"><div class="rc-table-wrapper">{{roomName}}</div></td>
+								</tr>
+							 {{else}} {{# with searchText}}
+							<tr class="table-no-click">
+								<td>{{_ "No_results_found_for"}} {{.}}</td>
+							</tr>
+							{{/with}}
+							{{/each}}
+							{{#unless isReady}}
+								<tr class="table-no-click">
+									<td class="table-loading-td" colspan="{{#if showLastMessage}}5{{else}}4{{/if}}">{{> loading}}</td>
+								</tr>
+							{{/unless}}
+						</tbody>
+					{{/table}}
+				{{/unless}}
+			</div>
+		</section>
+		{{#with flexData}}
+			{{> flexTabBar}}
+		{{/with}}
+	</div>
+</template>

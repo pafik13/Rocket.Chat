@@ -25,14 +25,24 @@ function findRoomByIdOrName({ params, checkedArchived = true }) {
 		room = Rooms.findOneByName(params.roomName, { fields });
 	}
 	if (!room) {
-		throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any channel');
+		throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any room');
 	}
 	if (checkedArchived && room.archived) {
-		throw new Meteor.Error('error-room-archived', `The channel, ${ room.name }, is archived`);
+		throw new Meteor.Error('error-room-archived', `The room, ${ room.name }, is archived`);
 	}
 
 	return room;
 }
+
+API.v1.addRoute('rooms.complain', { authRequired: true }, {
+	post() {
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('complainAboutRoom', room._id, this.bodyParams.reason));
+
+		return API.v1.success();
+	},
+});
 
 API.v1.addRoute('rooms.get', { authRequired: true }, {
 	get() {

@@ -44,6 +44,10 @@ function generateStatistics() {
 // 	return Meteor.call('OEmbedCacheCleanup');
 // }
 
+function cleanupDeactivations() {
+	return Meteor.call('cleanupDeactivations');
+}
+
 Meteor.startup(function() {
 	return Meteor.defer(function() {
 		generateStatistics();
@@ -54,6 +58,14 @@ Meteor.startup(function() {
 				return parser.cron(`${ new Date().getMinutes() } * * * *`);
 			},
 			job: generateStatistics,
+		});
+
+		SyncedCron.add({
+			name: 'Cleanup Users Deactivations',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: cleanupDeactivations,
 		});
 
 		// SyncedCron.add({

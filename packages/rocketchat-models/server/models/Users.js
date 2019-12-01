@@ -19,6 +19,7 @@ export class Users extends Base {
 		this.tryEnsureIndex({ statusConnection: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ type: 1 });
 		this.tryEnsureIndex({ 'visitorEmails.address': 1 });
+		this.tryEnsureIndex({ deactivatedUntil: 1 });
 		this.loadSettings();
 	}
 
@@ -440,8 +441,8 @@ export class Users extends Base {
 		return this.find(query);
 	}
 
-	findByIds(users, options) {
-		const query = { _id: { $in: users } };
+	findByIds(userIds, options) {
+		const query = { _id: { $in: userIds } };
 		return this.find(query, options);
 	}
 
@@ -784,9 +785,46 @@ export class Users extends Base {
 				active,
 			},
 		};
+		if (active) {
+			update.$unset = {
+				deactivatedUntil: 1,
+			};
+		}
 
 		return this.update(_id, update);
 	}
+
+	deactivate(_id, until) {
+		const update = {
+			$set: {
+				active: false,
+			},
+		};
+		if (until) {
+			update.$set.deactivatedUntil = until;
+		}
+
+		return this.update(_id, update);
+	}
+
+	removeDeactivations() {
+		const query = {
+			deactivatedUntil: {
+				$lte: new Date(),
+			},
+		};
+		const update = {
+			$set: {
+				active: true,
+			},
+			$unset: {
+				deactivatedUntil: 1,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 
 	setAllUsersActive(active) {
 		const update = {

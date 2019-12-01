@@ -43,6 +43,13 @@
 						</div>
 						<div class="rc-modal__content-error"></div>
 					{{/if}}
+  				{{#if popover}}
+            <div class="rc-user-info__config-name">{{ popoverOptionName }}:</div>
+            <div class="rc-user-info__config-value">
+              {{ popoverOptionLabel }}
+              {{> icon block="rc-user-info__config-content-icon" icon="arrow-down"}}
+            </div>
+					{{/if}}
 					{{#if dontAskAgain}}
 						<label class="rc-checkbox">
 							<input type="checkbox" id="dont-ask-me-again" class="rc-checkbox__input js-modal-dont-ask">

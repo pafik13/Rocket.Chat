@@ -1,5 +1,7 @@
 import './modal.html';
+import { popover } from './popover';
 import { Meteor } from 'meteor/meteor';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { Blaze } from 'meteor/blaze';
 import { Template } from 'meteor/templating';
 import { t, getUserPreference, handleError } from 'meteor/rocketchat:utils';
@@ -37,6 +39,10 @@ export const modal = {
 			}
 		}
 
+
+		if (this.renderedModal) {
+			Blaze.remove(this.renderedModal);
+		}
 		this.renderedModal = Blaze.renderWithData(Template.rc_modal, config, document.body);
 		this.timer = null;
 		if (config.timer) {
@@ -93,6 +99,15 @@ export const modal = {
 };
 
 Template.rc_modal.helpers({
+	popoverValue() {
+		return Template.instance().popoverValue.get();
+	},
+	popoverOptionName() {
+		return Template.instance().popoverOptionName.get();
+	},
+	popoverOptionLabel() {
+		return Template.instance().popoverOptionLabel.get();
+	},
 	hasAction() {
 		return !!this.action;
 	},
@@ -124,6 +139,18 @@ Template.rc_modal.onRendered(function() {
 	}
 
 	document.addEventListener('keydown', modal.onKeydown);
+});
+
+Template.rc_modal.onCreated(function() {
+	if (this.data.popover) {
+		const dataPopover = this.data.popover;
+		this.popoverValue = new ReactiveVar(dataPopover.initValue);
+		if (Array.isArray(dataPopover.options)) {
+			const option = dataPopover.options.filter((o) => o.value === dataPopover.initValue)[0];
+			this.popoverOptionName = new ReactiveVar(option.name);
+			this.popoverOptionLabel = new ReactiveVar(option.label);
+		}
+	}
 });
 
 Template.rc_modal.onDestroyed(function() {
@@ -168,6 +195,11 @@ Template.rc_modal.events({
 			return;
 		}
 
+		if (instance.data.popover) {
+			modal.confirm(instance.popoverValue.get());
+			return;
+		}
+
 		modal.confirm(true);
 	},
 	'click .rc-modal-wrapper'(e, instance) {
@@ -179,5 +211,29 @@ Template.rc_modal.events({
 			e.stopPropagation();
 			modal.close();
 		}
+	},
+
+	'click .rc-user-info__config-value'(e, instance) {
+		const popoverConfig = instance.data.popover;
+		console.log(popoverConfig.options);
+		const config = {
+			popoverClass: 'notifications-preferences',
+			template: 'pushNotificationsPopover',
+			data: {
+				change : (value) => {
+					console.log(value);
+					instance.popoverValue.set(value);
+					const option = popoverConfig.options.filter((o) => o.value === value)[0];
+					console.log(option);
+					instance.popoverOptionName.set(option.name);
+					instance.popoverOptionLabel.set(option.label);
+				},
+				value: instance.popoverValue.get(),
+				options: popoverConfig.options,
+			},
+			currentTarget: e.currentTarget,
+			offsetVertical: e.currentTarget.clientHeight + 10,
+		};
+		popover.open(config);
 	},
 });

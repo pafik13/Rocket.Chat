@@ -15,6 +15,13 @@ FlowRouter.route('/admin/rooms', {
 	},
 });
 
+FlowRouter.route('/admin/complaints', {
+	name: 'admin-complaints',
+	action() {
+		BlazeLayout.render('main', { center: 'adminComplaints' });
+	},
+});
+
 FlowRouter.route('/admin/info', {
 	name: 'admin-info',
 	action() {

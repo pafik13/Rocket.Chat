@@ -73,3 +73,5 @@ import './methods/banUser';
 import './methods/unbanUser';
 import './methods/getBannedUsers';
 import './methods/isUserBanned';
+import './methods/complainAboutRoom';
+import './methods/complainAboutUser';

@@ -424,7 +424,7 @@ API.v1.addRoute(['dm.blockUser', 'im.blockUser'], { authRequired: true }, {
 		companion = Users.findOneByUsername(companion, { fields: { username: 1 } });
 
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('blockUser', { rid: room._id, blocked: companion._id });
+			Meteor.call('blockUser', { rid: room._id, blocked: companion._id, reason: params.reason });
 		});
 
 		return API.v1.success();

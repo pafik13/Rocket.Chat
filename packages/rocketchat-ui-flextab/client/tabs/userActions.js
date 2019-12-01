@@ -5,7 +5,7 @@ import { TAPi18n } from 'meteor/tap:i18n';
 import { WebRTC } from 'meteor/rocketchat:webrtc';
 import { ChatRoom, ChatSubscription, RoomRoles, Subscriptions } from 'meteor/rocketchat:models';
 import { modal } from 'meteor/rocketchat:ui-utils';
-import { t, handleError } from 'meteor/rocketchat:utils';
+import { t, handleError, complaintReasonsList } from 'meteor/rocketchat:utils';
 import { settings } from 'meteor/rocketchat:settings';
 import { hasAllPermission, hasRole } from 'meteor/rocketchat:authorization';
 import _ from 'underscore';
@@ -194,8 +194,35 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				icon : 'mic',
 				name:t('Block_User'),
 				modifier: 'alert',
-				action: prevent(getUser, ({ _id }) => Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id }, success(() => toastr.success(t('User_is_blocked'))))),
+				action: prevent(getUser, ({ _id }) => {
+					modal.open({
+						title: t('Reason_To_Block'),
+						type: 'input',
+						inputType: 'text',
+						inputPlaceholder: t('Reason_To_Block_Placeholder'),
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Block_User'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+					}, (reason) => {
+						console.log('userActions:blockUser:', reason);
+						Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id, reason }, success(() => {
+							modal.open({
+								title: t('Success'),
+								text: t('User_is_blocked'),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+								closeOnConfirm: false,
+							});
+						}));
+					});
+				}),
 			};
+			//         prevent(getUser, ({ _id }) => Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id }, success(() => toastr.success(t('User_is_blocked'))))),
+			// 			};
 		}, () => {
 			if (!directActions || !canSetOwner()) {
 				return;
@@ -408,7 +435,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			}),
 			condition: () => directActions && canRemoveUser() && !isBanned(),
 		}, () => {
-			if (!directActions && !canRemoveUser()) {
+			if (!directActions || !canRemoveUser()) {
 				return;
 			}
 			if (!isBanned()) {
@@ -447,7 +474,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				};
 			}
 			return {
-				group: 'channel',
+				group: 'admin',
 				icon: 'sign-out',
 				modifier: 'alert',
 				name: t('Unban_user'),
@@ -557,6 +584,122 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				id: 'activate',
 				name: t('Activate'),
 				action: prevent(getUser, ({ _id }) => Meteor.call('setUserActiveStatus', _id, true, success(() => toastr.success(t('User_has_been_activated'))))),
+			};
+		}, () => {
+			if (hideAdminControls || !hasPermission('edit-other-user-active-status')) {
+				return;
+			}
+			if (active()) {
+				const hour = 60 * 60;
+				const optionName = t('Deactivate_period');
+				return {
+					group: 'admin',
+					icon : 'user',
+					id: 'deactivate-for-period',
+					name: t('Deactivate_for_period'),
+					modifier: 'alert',
+					action: prevent(getUser, ({ _id }) => {
+						modal.open({
+							title: t('Are_you_sure'),
+							type: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#DD6B55',
+							confirmButtonText: t('Yes_deactivate_for_period'),
+							cancelButtonText: t('Cancel'),
+							closeOnConfirm: false,
+							html: false,
+							popover: {
+								initValue: String(hour * 2),
+								options: [{
+									id: '2hours',
+									name: optionName,
+									label: `${ t('2hours') }`,
+									value: String(hour * 2),
+								},
+								{
+									id: '24hours',
+									name: optionName,
+									label: `${ t('24hours') }`,
+									value: String(hour * 24),
+								},
+								{
+									id: '7days',
+									name: optionName,
+									label: `${ t('7days') }`,
+									value: String(hour * 24 * 7),
+								},
+								{
+									id: '14days',
+									name: optionName,
+									label: `${ t('14days') }`,
+									value: String(hour * 24 * 14),
+								},
+								],
+							},
+						}, (seconds) => {
+							console.log('userActions:', seconds);
+							Meteor.call('deactivateUserForPeriod', _id, parseInt(seconds), success(() => {
+								modal.open({
+									title: t('Success'),
+									text: t('User_has_been_deactivated'),
+									type: 'success',
+									timer: 2000,
+									showConfirmButton: false,
+									closeOnConfirm: false,
+								});
+								return this.instance.clear();
+							}));
+						});
+					}),
+				};
+			}
+		}, () => {
+			if (!hideAdminControls) {
+				return;
+			}
+			const optionName = t('Complaint_reason');
+			const reasons = complaintReasonsList();
+			const initValue = reasons[0];
+			const options = reasons.map((r, i) => ({
+				id: `reason_${ i }`,
+				name: optionName,
+				label: r,
+				value: String(r),
+			}));
+			return {
+				group: 'channel',
+				icon : 'file-document',
+				id: 'complain',
+				name: t('Complain'),
+				modifier: 'alert',
+				action: prevent(getUser, ({ _id }) => {
+					modal.open({
+						title: t('Are_you_sure'),
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Complain_about_user'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+						popover: {
+							initValue,
+							options,
+						},
+					}, (reason) => {
+						console.log('userActions:complain:', reason);
+						Meteor.call('complainAboutUser', _id, reason, success(() => {
+							modal.open({
+								title: t('Success'),
+								text: t('Complaint_has_been_saved'),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+								closeOnConfirm: false,
+							});
+						}));
+					});
+				}),
 			};
 		}, () => {
 			if (hideAdminControls || !hasPermission('reset-other-user-e2e-key')) {

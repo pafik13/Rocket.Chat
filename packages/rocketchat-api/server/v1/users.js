@@ -62,6 +62,17 @@ API.v1.addRoute('users.create', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('users.complain', { authRequired: true }, {
+	post() {
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('complainAboutUser', this.bodyParams.userId, this.bodyParams.reason);
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('users.delete', { authRequired: true }, {
 	post() {
 		if (!hasPermission(this.userId, 'delete-user')) {

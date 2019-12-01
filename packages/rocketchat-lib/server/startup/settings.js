@@ -863,6 +863,11 @@ settings.addGroup('General', function() {
 		public: true,
 		multiline: true,
 	});
+	this.add('Complaint_Reasons_List', '', {
+		type: 'string',
+		public: true,
+		i18nDescription: 'Complaint_Reasons_List_Description',
+	});
 	this.section('UTF8', function() {
 		this.add('UTF8_Names_Validation', '[0-9a-zA-Z-_.]+', {
 			type: 'string',

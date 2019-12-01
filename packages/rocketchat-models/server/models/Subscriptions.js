@@ -983,17 +983,27 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	setBlockedByRoomId(rid, blocked, blocker) {
+	setBlockedByRoomId(rid, blocked, blocker, reason = '') {
 		const query = {
 			rid,
 			'u._id': blocked,
 		};
 
-		const update = {
-			$set: {
-				blocked: true,
-			},
-		};
+		let update;
+		if (reason) {
+			update = {
+				$set: {
+					blocked: true,
+					blockReason: reason,
+				},
+			};
+		} else {
+			update = {
+				$set: {
+					blocked: true,
+				},
+			};
+		}
 
 		const query2 = {
 			rid,
@@ -1018,6 +1028,7 @@ export class Subscriptions extends Base {
 		const update = {
 			$unset: {
 				blocked: 1,
+				blockReason: 1,
 			},
 		};
 
@@ -1029,6 +1040,7 @@ export class Subscriptions extends Base {
 		const update2 = {
 			$unset: {
 				blocker: 1,
+				blockReason: 1,
 			},
 		};
 
