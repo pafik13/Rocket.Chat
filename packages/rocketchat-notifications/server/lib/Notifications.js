@@ -61,12 +61,12 @@ class Notifications {
 		this.streamLogged = new Meteor.Streamer('notify-logged');
 		this.streamRoom = new Meteor.Streamer('notify-room');
 
-		const rooms = Rooms.find({}, { name: 1 }).fetch();
-		rooms.forEach((room) => {
-			self.streamRoom.on(`${ room._id }/typing`, function(...args) {
-				console.log(`RocketChat.Notifications: action=[${ room._id }/typing] with args=[${ args }]`);
-			});
-		});
+		// 		const rooms = Rooms.find({}, { name: 1 }).fetch();
+		// 		rooms.forEach((room) => {
+		// 			self.streamRoom.on(`${ room._id }/typing`, function(...args) {
+		// 				console.log(`RocketChat.Notifications: action=[${ room._id }/typing] with args=[${ args }]`);
+		// 			});
+		// 		});
 
 		this.streamRoomUsers = new Meteor.Streamer('notify-room-users');
 		this.streamUser = new RoomStreamer('notify-user');
