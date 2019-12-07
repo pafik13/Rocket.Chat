@@ -139,6 +139,122 @@ describe('[Direct Messages]', function() {
 				})
 				.end(done);
 		});
+		it('block user', (done) => {
+			request.post(api('im.blockUser'))
+				.set(credentials)
+				.send({
+					username: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should not send a message after block', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						text: 'Sample message',
+						rid: testDM._id,
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+		it('remove DM', (done) => {
+			request.post(api('rooms.delete'))
+				.set(credentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should not send a message after deletion', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						text: 'Sample message',
+						rid: testDM._id,
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+		it('recreating new DM...', (done) => {
+			request.post(api('im.create'))
+				.set(credentials)
+				.send({
+					username: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					testDM = res.body.room;
+				})
+				.end(done);
+		});
+		it('should not send a message after creation', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						text: 'Sample message',
+						rid: testDM._id,
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+		it('unblock user', (done) => {
+			request.post(api('im.unblockUser'))
+				.set(credentials)
+				.send({
+					username: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should send a message after unblock', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						text: 'Sample message',
+						rid: testDM._id,
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
 	});
 
 	it('/im.history', (done) => {
