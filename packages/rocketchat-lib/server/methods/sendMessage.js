@@ -15,8 +15,9 @@ import moment from 'moment';
 Meteor.methods({
 	sendMessage(message) {
 		check(message, Object);
+		const callerId = Meteor.userId();
 
-		if (!Meteor.userId()) {
+		if (!callerId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'sendMessage',
 			});
@@ -51,7 +52,7 @@ Meteor.methods({
 			}
 		}
 
-		const user = Users.findOneById(Meteor.userId(), {
+		const user = Users.findOneById(callerId, {
 			fields: {
 				active: 1,
 				username: 1,
@@ -90,9 +91,9 @@ Meteor.methods({
 			return false;
 		}
 
-		const subscription = Subscriptions.findOneByRoomIdAndUserId(message.rid, Meteor.userId());
+		const subscription = Subscriptions.findOneByRoomIdAndUserId(message.rid, callerId);
 		if (!subscription) {
-			Notifications.notifyUser(Meteor.userId(), 'message', {
+			Notifications.notifyUser(callerId, 'message', {
 				_id: Random.id(),
 				rid: room._id,
 				ts: new Date,
@@ -103,7 +104,7 @@ Meteor.methods({
 			});
 			throw new Meteor.Error('You can\'t send messages because you are not in room');
 		} else if (subscription.blocked || subscription.blocker) {
-			Notifications.notifyUser(Meteor.userId(), 'message', {
+			Notifications.notifyUser(callerId, 'message', {
 				_id: Random.id(),
 				rid: room._id,
 				ts: new Date,
@@ -113,7 +114,7 @@ Meteor.methods({
 		}
 
 		if ((room.muted || []).includes(user.username)) {
-			Notifications.notifyUser(Meteor.userId(), 'message', {
+			Notifications.notifyUser(callerId, 'message', {
 				_id: Random.id(),
 				rid: room._id,
 				ts: new Date,

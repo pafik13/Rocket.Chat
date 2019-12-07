@@ -4,14 +4,15 @@ import { settings } from 'meteor/rocketchat:settings';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { getDefaultSubscriptionPref } from 'meteor/rocketchat:utils';
-import { RateLimiter } from 'meteor/rocketchat:lib';
+import { RateLimiter, getRecordAboutBlock } from 'meteor/rocketchat:lib';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
 Meteor.methods({
 	createDirectMessage(username) {
 		check(username, String);
+		const callerId = Meteor.userId();
 
-		if (!Meteor.userId()) {
+		if (!callerId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'createDirectMessage',
 			});
@@ -31,7 +32,7 @@ Meteor.methods({
 			});
 		}
 
-		if (!hasPermission(Meteor.userId(), 'create-d')) {
+		if (!hasPermission(callerId, 'create-d')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
 				method: 'createDirectMessage',
 			});
@@ -49,6 +50,20 @@ Meteor.methods({
 			throw new Meteor.Error('error-not-allowed', 'Target user not allowed to receive messages', {
 				method: 'createDirectMessage',
 			});
+		}
+
+		const block = getRecordAboutBlock([to._id, me._id]);
+		console.log('createDirectMessage', block);
+
+		let hasBlock = false;
+		if (block) {
+			if (block.blocker === me._id) {
+				hasBlock = true;
+			} else {
+				throw new Meteor.Error('error-not-allowed', 'You are blocked by target user', {
+					method: 'createDirectMessage',
+				});
+			}
 		}
 
 		const rid = [me._id, to._id].sort().join('');
@@ -148,6 +163,10 @@ Meteor.methods({
 
 		// If the room is new, run a callback
 		if (roomUpsertResult.insertedId) {
+			if (hasBlock) {
+				Meteor.call('blockUser', { rid, blocked: block.blocked, reason: block.reason });
+			}
+
 			const insertedRoom = Rooms.findOneById(rid);
 
 			callbacks.run('afterCreateDirectRoom', insertedRoom, { from: me, to });
