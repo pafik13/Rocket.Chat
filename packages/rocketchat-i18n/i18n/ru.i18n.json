@@ -3153,5 +3153,9 @@
   "Complaint_has_been_saved": "Жалоба была сохранена",
   "Complain_about_user": "Пожаловаться на пользователя",
   "Complain_about_room": "Пожаловаться на комнату",
-  "Creator": "Создатель"
+  "Creator": "Создатель",
+  "Channel_location": "Местонахождение",
+  "Incorrect_location": "Некорректные координаты",
+  "Channel_Location_Lng_Placeholder": "Долгота",
+  "Channel_Location_Lat_Placeholder": "Широта"
 }

@@ -157,7 +157,9 @@ const server = http.createServer(app);
 
 let timer;
 const updatePrometheusConfig = async() => {
-	const port = process.env.PROMETHEUS_PORT || settings.get('Prometheus_Port');
+	const portBySettings = settings.get('Prometheus_Port');
+	const port = process.env.PROMETHEUS_PORT || (portBySettings === '' ? Number(process.env.PORT) + 6300 : portBySettings);
+	console.log('Prometheus_Port', port);
 	const enabled = settings.get('Prometheus_Enabled');
 	if (port == null || enabled == null) {
 		return;
@@ -168,6 +170,7 @@ const updatePrometheusConfig = async() => {
 			port,
 			host: process.env.BIND_IP || '0.0.0.0',
 		});
+		console.log('Prometheus exporter starts on port: ', port);
 		timer = Meteor.setInterval(setPrometheusData, 5000);
 	} else {
 		server.close();

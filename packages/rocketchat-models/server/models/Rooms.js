@@ -17,6 +17,7 @@ export class Rooms extends Base {
 		this.tryEnsureIndex({ 'tokenpass.tokens.token': 1 });
 		this.tryEnsureIndex({ open: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ departmentId: 1 }, { sparse: 1 });
+		this.tryEnsureIndex({ location : '2dsphere' });
 	}
 
 	findOneByIdOrName(_idOrName, options) {
@@ -1243,6 +1244,18 @@ export class Rooms extends Base {
 		const update = {
 			$set: {
 				membersHidden: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	setLocationById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				location: val,
 			},
 		};
 

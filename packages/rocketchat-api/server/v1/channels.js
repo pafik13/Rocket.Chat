@@ -235,7 +235,7 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 
 		const rid = API.channels.create.execute(userId, bodyParams);
 
-		const { customFields, description, topic } = bodyParams;
+		const { customFields, description, topic, location } = bodyParams;
 
 		Meteor.runAsUser(this.userId, () => {
 			if (customFields) {
@@ -246,6 +246,9 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 			}
 			if (description) {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
+			}
+			if (location) {
+				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 		});
 
@@ -294,6 +297,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 		}
 
 		let customFields = {};
+		let location;
 		let errorResponse;
 		try {
 			if (fields.members) {
@@ -318,6 +322,10 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
 				delete fields.customFields;
+			}
+			if (fields.location) {
+				location = JSON.parse(fields.location);
+				delete fields.location;
 			}
 		} catch (e) {
 			if (e.message === 'unauthorized') {
@@ -367,6 +375,9 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			}
 			if (fields.description) {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
+			}
+			if (location) {
+				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 
 			return API.v1.success({
@@ -648,6 +659,51 @@ API.v1.addRoute('channels.list', { authRequired: true }, {
 				total,
 			});
 		},
+	},
+});
+
+API.v1.addRoute('channels.list.nearest', { authRequired: true }, {
+	get() {
+		const { offset, count } = this.getPaginationItems();
+		const { lng, lat, maxDistInMeters, minDistInMeters } = this.requestParams();
+
+
+		const point = {
+			type: 'Point',
+			coordinates: [Number(lng), Number(lat)],
+		};
+
+		let result;
+		Meteor.runAsUser(this.userId, () => {
+			result = Meteor.call('getNearestChannels', point, Number(maxDistInMeters), Number(minDistInMeters), offset, count);
+		});
+
+		const rooms = result.records;
+		return API.v1.success({
+			channels: rooms.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
+			offset,
+			count: rooms.length,
+			total: result.total,
+		});
+	},
+});
+
+API.v1.addRoute('channels.list.popular', { authRequired: true }, {
+	get() {
+		const { offset, count } = this.getPaginationItems();
+
+		let result;
+		Meteor.runAsUser(this.userId, () => {
+			result = Meteor.call('getPopularChannels', offset, count);
+		});
+
+		const rooms = result.records;
+		return API.v1.success({
+			channels: rooms.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
+			offset,
+			count: rooms.length,
+			total: result.total,
+		});
 	},
 });
 

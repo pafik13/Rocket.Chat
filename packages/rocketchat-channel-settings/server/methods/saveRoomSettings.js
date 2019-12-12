@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms } from 'meteor/rocketchat:models';
+import { validateGeoJSON } from 'meteor/rocketchat:utils';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { _ } from 'meteor/underscore';
 
@@ -18,7 +19,7 @@ import { saveRoomSystemMessages } from '../functions/saveRoomSystemMessages';
 import { saveRoomTokenpass } from '../functions/saveRoomTokens';
 import { saveStreamingOptions } from '../functions/saveStreamingOptions';
 
-const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden'];
+const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden', 'location'];
 Meteor.methods({
 	saveRoomSettings(rid, settings, value) {
 		const userId = Meteor.userId();
@@ -134,6 +135,21 @@ Meteor.methods({
 					action: 'Editing_room',
 				});
 			}
+			if (setting === 'location') {
+				if (!hasPermission(userId, 'edit-room', rid)) {
+					throw new Meteor.Error('error-action-not-allowed', 'Editing location is not allowed', {
+						method: 'saveRoomSettings',
+						action: 'Editing_room',
+					});
+				}
+				const locationErrors = validateGeoJSON(value);
+				if (locationErrors) {
+					throw new Meteor.Error('error-invalid-location', locationErrors, {
+						method: 'saveRoomSettings',
+						action: 'Editing_room',
+					});
+				}
+			}
 		});
 
 		Object.keys(settings).forEach((setting) => {
@@ -225,6 +241,9 @@ Meteor.methods({
 					break;
 				case 'membersHidden':
 					Rooms.setMembersHiddenById(rid, value);
+					break;
+				case 'location':
+					Rooms.setLocationById(rid, value);
 					break;
 			}
 		});

@@ -75,3 +75,5 @@ import './methods/getBannedUsers';
 import './methods/isUserBanned';
 import './methods/complainAboutRoom';
 import './methods/complainAboutUser';
+import './methods/getNearestChannels';
+import './methods/getPopularChannels';

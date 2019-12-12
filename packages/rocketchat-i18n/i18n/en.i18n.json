@@ -3234,5 +3234,9 @@
   "Complaint_has_been_saved": "Complaint has been saved",
   "Complain_about_user": "Complain about user",
   "Complain_about_room": "Complain about room",
-  "Creator": "Creator"
+  "Creator": "Creator",
+  "Channel_location": "Location",
+  "Incorrect_location": "Incorrect location",
+  "Channel_Location_Lng_Placeholder": "Longitude",
+  "Channel_Location_Lat_Placeholder": "Latitude"
 }

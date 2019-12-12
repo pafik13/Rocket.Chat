@@ -213,7 +213,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields, { membersHidden });
 			rid = result.rid;
 
-			const { customFields, description, topic } = this.bodyParams;
+			const { customFields, description, topic, location } = this.bodyParams;
 			if (customFields) {
 				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
 			}
@@ -222,6 +222,9 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			}
 			if (description) {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
+			}
+			if (location) {
+				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 		});
 
@@ -294,6 +297,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		}
 
 		let customFields = {};
+		let location;
 
 		try {
 			if (fields.members) {
@@ -305,6 +309,10 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
 				delete fields.customFields;
+			}
+			if (fields.location) {
+				location = JSON.parse(fields.location);
+				delete fields.location;
 			}
 		} catch (e) {
 			return API.v1.failure(e.message);
@@ -347,6 +355,9 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			}
 			if (fields.description) {
 				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
+			}
+			if (location) {
+				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 
 			return API.v1.success({

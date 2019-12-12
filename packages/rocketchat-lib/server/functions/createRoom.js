@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
-import { getValidRoomName } from 'meteor/rocketchat:utils';
+import { getValidRoomName, validateGeoJSON } from 'meteor/rocketchat:utils';
 import { Apps } from 'meteor/rocketchat:apps';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -88,6 +88,13 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 	if (extraData.broadcast) {
 		readOnly = true;
 		delete extraData.reactWhenReadOnly;
+	}
+
+	if (extraData.location) {
+		const locationErrors = validateGeoJSON(extraData.location);
+		if (locationErrors) {
+			throw new Meteor.Error('error-invalid-location', locationErrors, { function: 'RocketChat.createRoom' });
+		}
 	}
 
 	const now = new Date();
