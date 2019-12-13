@@ -33,6 +33,10 @@ describe('[Channels]', function() {
 			.set(credentials)
 			.send({
 				name: apiPublicChannelName,
+				location: {
+					type: 'Point',
+					coordinates: [33, 55],
+				},
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
@@ -497,6 +501,40 @@ describe('[Channels]', function() {
 			})
 			.end(done);
 	});
+
+	it('/channels.list.popular', (done) => {
+		request.get(api('channels.list.popular'))
+			.set(credentials)
+			.query({})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('count');
+				expect(res.body).to.have.property('total');
+			})
+			.end(done);
+	});
+
+	it('/channels.list.nearest', (done) => {
+		request.get(api('channels.list.nearest'))
+			.set(credentials)
+			.query({
+				lng: 33.1111,
+				lat: 55.1111,
+				minDistInMeters: 0,
+				maxDistInMeters: 5000,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('count');
+				expect(res.body).to.have.property('total');
+			})
+			.end(done);
+	});
+
 	it('/channels.counters', (done) => {
 		request.get(api('channels.counters'))
 			.set(credentials)
