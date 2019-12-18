@@ -16,12 +16,14 @@ export const FileUpload = {
 			return false;
 		}
 
-		// 		console.log('validateFileUpload', file);
-
+		if (file.mesId) {
+			const message = Messages.findOneById(file.mesId);
+			if (message) {
+				throw new Meteor.Error('error-invalid-message-id', 'Invalid message id!');
+			}
+		}
 		// livechat users can upload files but they don't have an userId
 		const user = file.userId ? Meteor.users.findOne(file.userId) : null;
-
-		console.log('validateFileUpload:user', user);
 
 		const room = Rooms.findOneById(file.rid, {
 			fields: {

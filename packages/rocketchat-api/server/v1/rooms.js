@@ -142,6 +142,7 @@ API.v1.addRoute('rooms.upload/:rid', { authRequired: true }, {
 			type: file.mimetype,
 			rid: this.urlParams.rid,
 			userId: this.userId,
+			mesId: fields._id,
 		};
 
 		Meteor.runAsUser(this.userId, () => {
