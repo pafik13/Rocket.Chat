@@ -60,10 +60,10 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 
-		it('should create for usernames ', (done) => {
-			request.get(api('admin.createDirectMessage'))
+		it('should create for usernames', (done) => {
+			request.post(api('admin.createDirectMessage'))
 				.set(credentials)
-				.query({
+				.send({
 					usernames: [username1, 'rocket.cat'],
 				})
 				.expect('Content-Type', 'application/json')
@@ -71,10 +71,10 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 
-		it('should create for userIds ', (done) => {
-			request.get(api('admin.createDirectMessage'))
+		it('should create for userIds', (done) => {
+			request.post(api('admin.createDirectMessage'))
 				.set(credentials)
-				.query({
+				.send({
 					userIds: [userId1, userId2],
 				})
 				.expect('Content-Type', 'application/json')
