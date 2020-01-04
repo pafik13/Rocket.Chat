@@ -6,9 +6,8 @@ import { Restivus } from 'meteor/nimble:restivus';
 import { Logger } from 'meteor/rocketchat:logger';
 import { settings } from 'meteor/rocketchat:settings';
 import { metrics } from 'meteor/rocketchat:metrics';
-import { hasPermission } from 'meteor/rocketchat:authorization';
+import { hasPermission, hasAllPermission } from 'meteor/rocketchat:authorization';
 import { RateLimiter } from 'meteor/rate-limit';
-import { hasAllPermission } from 'meteor/rocketchat:authorization';
 import _ from 'underscore';
 
 const logger = new Logger('API', {});
