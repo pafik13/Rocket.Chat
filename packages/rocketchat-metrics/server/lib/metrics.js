@@ -50,6 +50,13 @@ metrics.ddpAthenticatedSessions = new client.Gauge({ name: 'rocketchat_ddp_sessi
 metrics.ddpConnectedUsers = new client.Gauge({ name: 'rocketchat_ddp_connected_users', help: 'number of unique connected users' });
 metrics.ddpRateLimitExceeded = new client.Counter({ name: 'rocketchat_ddp_rate_limit_exceeded', labelNames: ['limit_name', 'user_id', 'client_address', 'type', 'name', 'connection_id'], help: 'number of times a ddp rate limiter was exceeded' });
 
+metrics.ddpOpenSockets = new client.Gauge({ name: 'rocketchat_ddp_open_sockets', help: 'number of open sockets' });
+metrics.ddpNamedSubs = new client.Gauge({ name: 'rocketchat_ddp_named_subs', help: 'number of named subscriptions' });
+metrics.ddpUniversalSubs = new client.Gauge({ name: 'rocketchat_ddp_universal_subs', help: 'number of universal subscriptions' });
+metrics.ddpCollectionViews = new client.Gauge({ name: 'rocketchat_ddp_collection_views', help: 'number of collection views' });
+metrics.ddpCollectionViewsDocs = new client.Gauge({ name: 'rocketchat_ddp_collection_views_docs', help: 'number of documents of collection views' });
+metrics.ddpInQueue = new client.Gauge({ name: 'rocketchat_ddp_in_queue', help: 'number of documents in queue' });
+
 metrics.version = new client.Gauge({ name: 'rocketchat_version', labelNames: ['version'], help: 'Rocket.Chat version' });
 metrics.migration = new client.Gauge({ name: 'rocketchat_migration', help: 'migration versoin' });
 metrics.instanceCount = new client.Gauge({ name: 'rocketchat_instance_count', help: 'instances running' });
@@ -89,7 +96,33 @@ const setPrometheusData = async() => {
 		version: Info.version,
 	});
 
-	const sessions = Object.values(Meteor.server.sessions);
+	const { server } = Meteor;
+	const sessions = Object.values(server.sessions);
+	let namedSubs = 0;
+	let universalSubs = 0;
+	let collectionViews = 0;
+	let collectionViewsDocs = 0;
+	let inQueue = 0;
+	for (let s = 0, len = sessions.length, session; s < len; s++) {
+		session = sessions[s];
+		namedSubs += Object.keys(session._namedSubs).length;
+		universalSubs += Object.keys(session._universalSubs).length;
+		inQueue += session.inQueue.length;
+		const colViewsKeys = Object.keys(session.collectionViews);
+		collectionViews += colViewsKeys.length;
+		for (let k = 0, len = colViewsKeys.length; k < len; k++) {
+			const collectionView = session.collectionViews[colViewsKeys[k]];
+			collectionViewsDocs += Object.keys(collectionView.documents).length;
+		}
+	}
+
+	metrics.ddpOpenSockets.set(server.stream_server.open_sockets.length);
+	metrics.ddpNamedSubs.set(namedSubs);
+	metrics.ddpUniversalSubs.set(universalSubs);
+	metrics.ddpCollectionViews.set(collectionViews);
+	metrics.ddpCollectionViewsDocs.set(collectionViewsDocs);
+	metrics.ddpInQueue.set(inQueue);
+
 	const authenticatedSessions = sessions.filter((s) => s.userId);
 	metrics.ddpSessions.set(sessions.length, date);
 	metrics.ddpAthenticatedSessions.set(authenticatedSessions.length, date);
