@@ -99,7 +99,6 @@ export const FileUpload = {
 			}
 
 			const subscription = Subscriptions.findOneByRoomIdAndInterlocutorId(room._id, user._id);
-			//       console.log('subscription', subscription);
 			const { uploadsState } = subscription;
 			switch (uploadsState) {
 				case 'needAccept':
@@ -127,8 +126,6 @@ export const FileUpload = {
 				}
 			}
 
-			console.log('validateFileUpload', subscription);
-
 			for (let i = 0, len = prefKeys.length, key = ''; i < len; i++) {
 				key = prefKeys[i];
 				if (subscription.hasOwnProperty(key)) {
@@ -137,7 +134,6 @@ export const FileUpload = {
 			}
 		}
 
-		console.log('validateFileUpload', fileType, preferences);
 		if (!preferences[`is${ fileType }FilesAllowed`]) {
 			const reason = TAPi18n.__('File_type_is_not_allowed', language);
 			throw new Meteor.Error('error-invalid-file-type', reason);
@@ -151,7 +147,6 @@ export const FileUpload = {
 			throw new Meteor.Error('error-file-too-large', reason);
 		}
 
-		// 		console.log('fileUploadIsValidContentType', file.type);
 		if (!fileUploadIsValidContentType(file.type)) {
 			const reason = TAPi18n.__('File_type_is_not_accepted', language);
 			throw new Meteor.Error('error-invalid-file-type', reason);

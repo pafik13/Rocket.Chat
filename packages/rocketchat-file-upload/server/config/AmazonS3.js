@@ -9,7 +9,6 @@ import https from 'https';
 const get = function(file, req, res) {
 	const fileUrl = this.store.getRedirectURL(file);
 
-	console.log('AmazoneS3:get:fileUrl', fileUrl);
 	if (fileUrl) {
 		const storeType = file.store.split(':').pop();
 		if (settings.get(`FileUpload_S3_Proxy_${ storeType }`)) {

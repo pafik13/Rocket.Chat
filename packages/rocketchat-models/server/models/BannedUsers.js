@@ -8,13 +8,11 @@ export class BannedUsers extends Base {
 
 	isUserIsBanned(rid, userId) {
 		const record = this.findOne({ rid, userId }, {});
-		console.log('isUserIsBanned:record', record);
 		return !!record;
 	}
 
 	createRecord(rid, userId) {
 		const data = { rid, userId };
-		console.log('create:data', data);
 		if (!this.isUserIsBanned(rid, userId)) {
 			this.insert(data);
 		}

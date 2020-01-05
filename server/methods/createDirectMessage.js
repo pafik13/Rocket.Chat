@@ -53,7 +53,6 @@ Meteor.methods({
 		}
 
 		const block = getRecordAboutBlock([to._id, me._id]);
-		console.log('createDirectMessage', block);
 
 		let hasBlock = false;
 		if (block) {

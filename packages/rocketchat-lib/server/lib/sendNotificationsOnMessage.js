@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random';
+// import { Random } from 'meteor/random';
 import moment from 'moment';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
@@ -259,8 +259,8 @@ async function sendAllNotifications(message, room) {
 
 	// the find bellow is crucial. all subscription records returned will receive at least one kind of notification.
 	// the query is defined by the server's default values and Notifications_Max_Room_Members setting.
-	const timeToken = `notification::${ Random.id() }`;
-	console.time(timeToken);
+	// 	const timeToken = `notification::${ Random.id() }`;
+	// 	console.time(timeToken);
 	const cursor = Subscriptions.model.rawCollection().aggregate([
 		{ $match: query },
 		lookup,
@@ -268,7 +268,7 @@ async function sendAllNotifications(message, room) {
 		project,
 	]);
 
-	let count = 0;
+	// 	let count = 0;
 	while (await cursor.hasNext()) {
 		// load   one document from the resultset into memory
 		const subscription = await cursor.next();
@@ -283,10 +283,10 @@ async function sendAllNotifications(message, room) {
 			mentionIds,
 			disableAllMessageNotifications,
 		});
-		count++;
+		// 		count++;
 	}
-	console.timeEnd(timeToken);
-	console.log(`${ timeToken }::count=${ count }`);
+	// 	console.timeEnd(timeToken);
+	// 	console.log(`${ timeToken }::count=${ count }`);
 
 	// on public channels, if a mentioned user is not member of the channel yet, he will first join the channel and then be notified based on his preferences.
 	if (room.t === 'c') {
