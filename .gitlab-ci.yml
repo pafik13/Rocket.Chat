@@ -27,7 +27,8 @@ prod deploy:
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here **ВНИМАНИЕ!** Сейчас будет запущена последняя собранная версия Rocket-Chat - сервер будет кратковременно не доступен!"}}'
     - rsync -a --delete /opt/rocket-build/bundle/ /opt/Rocket.Chat/
     - sudo /bin/systemctl restart rocketchat.service
-    - for i in {1..4}; do sudo /bin/systemctl restart rocketchat@300${i}.service; done
+    - sleep 1m
+    - for i in {1..4}; do sudo /bin/systemctl restart rocketchat@300${i}.service; sleep 1m; done
     - curl --header "X-Auth-Token:$Rocket_User_Auth" --header "X-User-Id:$Rocket_User_Id" --header "Content-type:application/json" 'https://corp.anonchat.pro/api/v1/chat.sendMessage' --data '{"message":{"rid":"GENERAL","msg":"@here Релиз в продакшене!"}}'
   when: manual
   tags:
