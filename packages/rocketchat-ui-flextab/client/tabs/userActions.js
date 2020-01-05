@@ -207,7 +207,6 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 						closeOnConfirm: false,
 						html: false,
 					}, (reason) => {
-						console.log('userActions:blockUser:', reason);
 						Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id, reason }, success(() => {
 							modal.open({
 								title: t('Success'),
@@ -637,7 +636,6 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 								],
 							},
 						}, (seconds) => {
-							console.log('userActions:', seconds);
 							Meteor.call('deactivateUserForPeriod', _id, parseInt(seconds), success(() => {
 								modal.open({
 									title: t('Success'),
@@ -687,7 +685,6 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 							options,
 						},
 					}, (reason) => {
-						console.log('userActions:complain:', reason);
 						Meteor.call('complainAboutUser', _id, reason, success(() => {
 							modal.open({
 								title: t('Success'),

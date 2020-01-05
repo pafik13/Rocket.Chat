@@ -12,11 +12,9 @@ export const composeMessageObjectWithUser = function(message, userId) {
 		if (message.u && message.u._id) {
 			user = getUser(message.u._id);
 			message.u = user;
-			// console.log(user);
 		}
 
 		if (message.t) {
-			// console.log('composeMessageObjectWithUser', message._id);
 			if (user && message.msg === user.username) {
 				message.msg = user.name;
 			} else {

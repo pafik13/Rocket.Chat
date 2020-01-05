@@ -20,7 +20,6 @@ Meteor.methods({
 
 		const bannedUsers = BannedUsers.findByRoomId(rid, { fields: { userId: 1 } }).fetch();
 		const userIds = bannedUsers.map((bu) => bu.userId);
-		console.log('getBannedUsers', userIds);
 
 		const users = Users.findByIds(userIds, { fields: { name: 1, username: 1, status: 1, customFields: 1 } });
 		return {

@@ -288,7 +288,6 @@ Template.membersList.onCreated(function() {
 	this.tabBar = Template.instance().tabBar;
 
 	Tracker.autorun(() => {
-		console.log('trigger!!');
 		if (this.data.rid == null) { return; }
 		this.loading.set(true);
 		const statusType = this.statusType.get();

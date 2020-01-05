@@ -494,7 +494,6 @@ export class Rooms extends Base {
 
 
 	setLastMessageRead(roomId, userId) {
-		console.log('setLastMessageRead', roomId, userId);
 		const query = {
 			_id: roomId,
 			'lastMessage.u._id': {
@@ -502,7 +501,6 @@ export class Rooms extends Base {
 			},
 		};
 
-		console.log('setLastMessageRead', query);
 		const update = {
 			$unset: {
 				'lastMessage.unread': 1,
@@ -813,7 +811,6 @@ export class Rooms extends Base {
 			},
 			fname: name,
 		};
-		console.log('findByNameAndTypesNotInIds', query);
 
 		// do not use cache
 		return this._db.find(query, options);
@@ -1214,7 +1211,6 @@ export class Rooms extends Base {
 	}
 
 	unmuteUsernameByRoomId(_id, username) {
-		console.log('unmuteUsernameByRoomId', _id, username);
 		const query = { _id };
 
 		const update = {

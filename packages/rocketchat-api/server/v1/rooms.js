@@ -400,7 +400,6 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		};
 		const room = findRoomByIdOrName({ params: this.requestParams() });
 		const { fields } = this.parseJsonQuery();
-		console.log('rooms.info:fields', fields);
 		if (!Meteor.call('canAccessRoom', room._id, this.userId, {})) {
 			return API.v1.failure('not-allowed', 'Not Allowed');
 		}
@@ -420,17 +419,11 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 		};
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
 		delete subscription._id;
-		console.log('rooms.info:subscription', subscription);
-
-		//     if (!subscription.mobilePushNotifications) {
-		//       subscription.mobilePushNotifications = settings.get('Accounts_Default_User_Preferences_mobileNotifications');
-		//     }
 
 		const result = Rooms.findOneByIdOrName(room._id, {
 			...fields,
 			...filesPrefsFields,
 		});
-		console.log('rooms.info:room', result);
 
 		return API.v1.success({ room: {
 			...result,

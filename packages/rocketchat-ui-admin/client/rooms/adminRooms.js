@@ -118,7 +118,6 @@ Template.adminRooms.onCreated(function() {
 		}
 		const limit = instance.limit.get();
 		const subscription = instance.subscribe('adminRooms', filter, types, limit);
-		console.log('adminComplaints:subscription', subscription.subscriptionId);
 		instance.ready.set(subscription.ready());
 	});
 	this.rooms = function() {

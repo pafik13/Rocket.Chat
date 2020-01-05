@@ -90,8 +90,6 @@ class Notifications {
 		this.streamAll.allowRead('all');
 		this.streamLogged.allowRead('logged');
 		this.streamRoom.allowRead(function(eventName, extraData) {
-			console.log(`RocketChat.Notifications.streamRoom: allowRead=[${ eventName }, ${ extraData }]`);
-
 			const [roomId] = eventName.split('/');
 			const room = Rooms.findOneById(roomId);
 			if (!room) {
@@ -182,7 +180,6 @@ class Notifications {
 const notifications = new Notifications();
 
 notifications.streamRoom.allowWrite(function(eventName, username, typing, extraData) {
-	console.log(`RocketChat.Notifications.streamRoom: allowWrite=[${ eventName }, ${ username }, ${ typing }, ${ extraData }]`);
 	const [roomId, e] = eventName.split('/');
 
 	if (e === 'webrtc') {

@@ -19,10 +19,8 @@ API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 				type: 'd',
 			});
 		} else if (usernames && usernames.length === 2) {
-			console.log('admin.createDirectMessage', usernames);
 			const userId_1 = Users.findOneByUsername(usernames[0])._id;
 			const userId_2 = Users.findOneByUsername(usernames[1])._id;
-			console.log('admin.createDirectMessage', userId_1, userId_2);
 			room = getRoomByNameOrIdWithOptionToJoin({
 				currentUserId: userId_1,
 				nameOrId: userId_2,

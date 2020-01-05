@@ -381,7 +381,6 @@ export class Users extends Base {
 
 	findOneByAnonymId(anonymId, options) {
 		const query = { 'customFields.anonym_id': parseInt(anonymId, 10) };
-		console.log('findOneByAnonymId', query);
 		return this.findOne(query, options);
 	}
 
@@ -1118,13 +1117,10 @@ Find users to send a message by email if:
 
 		const subscriptionsCount = Subscriptions.find(query).count();
 		const allUsersCount = this.find({}).count();
-		console.log(`findByNameAndRoomId: subscriptionsCount=${ subscriptionsCount }`);
-		console.log(`findByNameAndRoomId: allUsersCount=${ allUsersCount }`);
 
 		let users = [];
 		const sort = { name: 1 };
 		if (subscriptionsCount < allUsersCount / 10) {
-			console.log('findByNameAndRoomId: strategy=[Subscriptions]');
 			users = Promise.await(
 				Subscriptions.model.rawCollection().aggregate([
 					{ $match: { rid: roomId } },
@@ -1157,7 +1153,6 @@ Find users to send a message by email if:
 					},
 				]).next());
 		} else {
-			console.log('findByNameAndRoomId: strategy=[Users]');
 			users = Promise.await(
 				this.model.rawCollection().aggregate([{
 					$match: {

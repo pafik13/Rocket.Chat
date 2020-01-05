@@ -60,7 +60,6 @@ export class PushNotification {
 
 		SystemLogger.log('PushNotification:config', config);
 
-		Push.debug = true;
 		metrics.notificationsSent.inc({ notification_type: 'mobile' });
 		return Push.send(config);
 	}

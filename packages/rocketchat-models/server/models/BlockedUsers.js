@@ -8,13 +8,11 @@ export class BlockedUsers extends Base {
 
 	isUserBlocked(blocker, blocked) {
 		const record = this.findOne({ blocker, blocked }, {});
-		console.log('isUserBlocked:record', record);
 		return !!record;
 	}
 
 	createRecord(blocker, blocked, reason) {
 		const data = { blocker, blocked, ts: new Date(), reason };
-		console.log('create:data', data);
 		if (!this.isUserBlocked(blocker, blocked)) {
 			this.insert(data);
 		}

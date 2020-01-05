@@ -910,7 +910,6 @@ export class Messages extends Base {
 			'u._id': userId,
 		};
 
-		console.log('removeByRoomIdAndUserId', query);
 		return this.remove(query);
 	}
 

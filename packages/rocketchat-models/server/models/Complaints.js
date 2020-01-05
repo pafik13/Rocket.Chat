@@ -11,19 +11,16 @@ export class Complaints extends Base {
 
 	isExistsWithRoomId(creatorId, roomId, reason) {
 		const record = this.findOne({ creatorId, roomId, reason }, {});
-		console.log('isExistsWithRoomId:record', record);
 		return !!record;
 	}
 
 	isExistsWithUserId(creatorId, userId, reason) {
 		const record = this.findOne({ creatorId, userId, reason }, {});
-		console.log('isExistsWithUserId:record', record);
 		return !!record;
 	}
 
 	createWithRoomId(roomId, reason, creatorId) {
 		const data = { t: 'r', ts: new Date(), roomId, reason, creatorId };
-		console.log('createWithRoomId:data', data);
 		if (!this.isExistsWithRoomId(creatorId, roomId, reason)) {
 			this.insert(data);
 		}
@@ -31,7 +28,6 @@ export class Complaints extends Base {
 
 	createWithUserId(userId, reason, creatorId) {
 		const data = { t: 'u', ts: new Date(), userId, reason, creatorId };
-		console.log('createWithUserId:data', data);
 		if (!this.isExistsWithUserId(creatorId, userId, reason)) {
 			this.insert(data);
 		}
