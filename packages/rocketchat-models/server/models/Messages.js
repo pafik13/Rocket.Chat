@@ -975,7 +975,6 @@ export class Messages extends Base {
 
 
 	setAsRead2(rid, userId) {
-		console.log('setAsRead2', rid, userId);
 		return this.update({
 			rid,
 			unread: true,
