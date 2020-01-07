@@ -22,3 +22,5 @@ public/mp3-realtime-worker.js
 public/lame.min.js
 !.scripts
 !packages/rocketchat-livechat/.app
+packages/rocketchat-push
+
