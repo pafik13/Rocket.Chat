@@ -22,7 +22,6 @@ Meteor.methods({
 		check(settings, Match.ObjectIncluding(keys));
 
 		const user = Meteor.user();
-		console.log('saveUploadsSettings:settings', settings);
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(roomId, userId);
 		if (!subscription) {
 			throw new Meteor.Error('error-invalid-subscription', 'Invalid subscription', { method: 'saveUploadsSettings' });
@@ -63,7 +62,6 @@ Meteor.methods({
 					return;
 			}
 
-			console.log('saveUploadsSettings:type', k, type);
 			Messages.createRoomSettingsChangedWithTypeRoomIdMessageAndUser(type, roomId, user.username, user);
 		});
 

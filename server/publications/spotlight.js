@@ -93,11 +93,9 @@ Meteor.methods({
 				const searchableRoomTypes = Object.entries(roomTypes.roomTypes)
 					.filter((roomType) => roomType[1].includeInRoomSearch())
 					.map((roomType) => roomType[0]);
-				console.log('spotlight', text, usernames, type, rid, searchableRoomTypes);
 
 				const roomIds = Subscriptions.findByUserIdAndTypes(userId, searchableRoomTypes, { fields: { rid: 1 } }).fetch().map((s) => s.rid);
 				result.rooms = fetchRooms(userId, Rooms.findByNameAndTypesNotInIds(regex, searchableRoomTypes, roomIds, roomOptions).fetch());
-				console.log('spotlight', result.rooms);
 			}
 		} else if (type.users === true && rid) {
 			const subscriptions = Subscriptions.find({
