@@ -42,7 +42,6 @@ tracker@1.2.0
 rocketchat:2fa
 rocketchat:action-links
 rocketchat:accounts
-rocketchat:analytics
 rocketchat:api
 rocketchat:assets
 rocketchat:authorization
@@ -52,13 +51,9 @@ rocketchat:bot-helpers
 rocketchat:cas
 rocketchat:channel-settings
 rocketchat:channel-settings-mail-messages
-rocketchat:cloud
 rocketchat:colors
-rocketchat:crowd
 rocketchat:custom-oauth
 rocketchat:custom-sounds
-rocketchat:dolphin
-rocketchat:drupal
 rocketchat:emoji
 rocketchat:emoji-custom
 rocketchat:emoji-emojione
@@ -67,8 +62,6 @@ rocketchat:favico
 rocketchat:federation
 rocketchat:file
 rocketchat:file-upload
-rocketchat:github-enterprise
-rocketchat:gitlab
 #rocketchat:google-natural-language
 rocketchat:google-vision
 rocketchat:grant
@@ -80,15 +73,10 @@ rocketchat:highlight-words
 rocketchat:iframe-login
 rocketchat:importer
 rocketchat:importer-csv
-rocketchat:importer-hipchat
-rocketchat:importer-hipchat-enterprise
-rocketchat:importer-slack
-rocketchat:importer-slack-users
 rocketchat:integrations
 rocketchat:irc
 rocketchat:issuelinks
 rocketchat:katex
-rocketchat:ldap
 rocketchat:lib
 rocketchat:livechat
 rocketchat:livestream
@@ -114,9 +102,7 @@ rocketchat:push-notifications
 rocketchat:reactions
 rocketchat:retention-policy
 rocketchat:apps
-rocketchat:sandstorm
 rocketchat:setup-wizard
-rocketchat:slackbridge
 rocketchat:slashcommands-archive
 rocketchat:slashcommands-asciiarts
 rocketchat:slashcommands-create
@@ -134,8 +120,6 @@ rocketchat:slashcommands-open
 rocketchat:slashcommands-topic
 rocketchat:slashcommands-unarchive
 rocketchat:slider
-rocketchat:smarsh-connector
-rocketchat:spotify
 rocketchat:statistics
 rocketchat:streamer
 rocketchat:theme
@@ -151,7 +135,6 @@ rocketchat:ui-master
 rocketchat:ui-message
 rocketchat:ui-sidenav
 rocketchat:ui-vrecord
-rocketchat:user-data-download
 rocketchat:version
 rocketchat:videobridge
 rocketchat:webdav
@@ -186,13 +169,10 @@ pauli:accounts-linkedin
 raix:handlebar-helpers
 rocketchat:push
 raix:ui-dropped-event
-steffo:meteor-accounts-saml
 todda00:friendly-slugs
 yasinuslu:blaze-meta
 rocketchat:e2e
 
-rocketchat:blockstack
-rocketchat:version-check
 rocketchat:search
 rocketchat:lazy-load
 tap:i18n

@@ -43,7 +43,6 @@ Package.onUse(function(api) {
 		'rocketchat:i18n',
 		'rocketchat:mailer',
 		'rocketchat:settings',
-		'rocketchat:sandstorm',
 		'rocketchat:authorization',
 		'rocketchat:custom-oauth',
 		'rocketchat:file',
