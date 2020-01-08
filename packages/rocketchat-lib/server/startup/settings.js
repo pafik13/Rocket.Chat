@@ -1,6 +1,5 @@
 import { Random } from 'meteor/random';
 import { settings } from 'meteor/rocketchat:settings';
-import './email';
 
 // Insert server unique id if it doesn't exist
 settings.add('uniqueID', process.env.DEPLOYMENT_ID || Random.id(), {

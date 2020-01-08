@@ -3,7 +3,6 @@ import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
 import { getValidRoomName, validateGeoJSON } from 'meteor/rocketchat:utils';
-import { Apps } from 'meteor/rocketchat:apps';
 import _ from 'underscore';
 import s from 'underscore.string';
 
@@ -127,21 +126,6 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 	if (type === 'd') {
 		room.usernames = members;
-	}
-
-	if (Apps && Apps.isLoaded()) {
-		const prevent = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreatePrevent', room));
-		if (prevent) {
-			throw new Meteor.Error('error-app-prevented-creation', 'A Rocket.Chat App prevented the room creation.');
-		}
-
-		let result;
-		result = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreateExtend', room));
-		result = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreateModify', result));
-
-		if (typeof result === 'object') {
-			room = Object.assign(room, result);
-		}
 	}
 
 	if (type === 'c') {

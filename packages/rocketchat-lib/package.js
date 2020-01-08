@@ -52,7 +52,6 @@ Package.onUse(function(api) {
 		'rocketchat:markdown',
 		'rocketchat:channel-settings',
 		'rocketchat:tokenpass',
-		'rocketchat:apps',
 		'rocketchat:streamer',
 	]);
 	api.imply('tap:i18n');

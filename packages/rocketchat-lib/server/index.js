@@ -1,8 +1,6 @@
 export { hostname } from '../lib/startup/settingsOnLoadSiteUrl';
 export * from './lib';
 export * from './functions';
-import './startup/email';
-import './startup/oAuthServicesUpdate';
 import './startup/rateLimiter';
 import './startup/robots';
 import './startup/settings';
