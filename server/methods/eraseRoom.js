@@ -3,7 +3,6 @@ import { check } from 'meteor/check';
 import { roomTypes } from 'meteor/rocketchat:utils';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms, Messages, Subscriptions } from 'meteor/rocketchat:models';
-import { Apps } from 'meteor/rocketchat:apps';
 
 Meteor.methods({
 	eraseRoom(rid) {
@@ -23,13 +22,6 @@ Meteor.methods({
 			});
 		}
 
-		if (Apps && Apps.isLoaded()) {
-			const prevent = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomDeletePrevent', room));
-			if (prevent) {
-				throw new Meteor.Error('error-app-prevented-deleting', 'A Rocket.Chat App prevented the room erasing.');
-			}
-		}
-
 		if (!roomTypes.roomTypes[room.t].canBeDeleted(hasPermission, room)) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
 				method: 'eraseRoom',
@@ -40,10 +32,6 @@ Meteor.methods({
 		Messages.removeByRoomId(rid);
 		Subscriptions.removeByRoomId(rid);
 		const result = Rooms.removeById(rid);
-
-		if (Apps && Apps.isLoaded()) {
-			Apps.getBridges().getListenerBridge().roomEvent('IPostRoomDeleted', room);
-		}
 
 		return result;
 	},
