@@ -114,6 +114,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 			_id: owner._id,
 			username: owner.username,
 		},
+		default: false,
 	}, extraData, {
 		ts: now,
 		ro: readOnly === true,
