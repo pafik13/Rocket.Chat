@@ -1,6 +1,7 @@
 export { hostname } from '../lib/startup/settingsOnLoadSiteUrl';
 export * from './lib';
 export * from './functions';
+import './startup/email';
 import './startup/rateLimiter';
 import './startup/robots';
 import './startup/settings';
@@ -8,7 +9,7 @@ import './startup/settingsOnLoadCdnPrefix';
 import './startup/settingsOnLoadDirectReply';
 import './startup/settingsOnLoadSMTP';
 import '../lib/MessageTypes';
-import '../startup';
+import '../startup/';
 import '../startup/defaultRoomTypes';
 import './lib/bugsnag';
 import './lib/configLogger';

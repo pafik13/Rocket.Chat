@@ -7,7 +7,6 @@ import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Subscriptions } from 'meteor/rocketchat:models';
 import { roomTypes } from 'meteor/rocketchat:utils';
 import { callJoinRoom, messageContainsHighlight, parseMessageTextPerUser, replaceMentionedUsernamesWithFullNames } from '../functions/notifications/';
-import { sendEmail, shouldNotifyEmail } from '../functions/notifications/email';
 import { sendSinglePush, shouldNotifyMobile } from '../functions/notifications/mobile';
 import { notifyDesktopUser, shouldNotifyDesktop } from '../functions/notifications/desktop';
 import { notifyAudioUser, shouldNotifyAudio } from '../functions/notifications/audio';
@@ -52,7 +51,6 @@ const sendNotification = async({
 		audioNotifications,
 		desktopNotifications,
 		mobilePushNotifications,
-		emailNotifications,
 	} = subscription;
 
 	// busy users don't receive audio notification
@@ -110,25 +108,6 @@ const sendNotification = async({
 			senderUsername: sender.username,
 			senderName: sender.name,
 			receiverUsername: receiver.username,
-		});
-	}
-
-	if (receiver.emails && shouldNotifyEmail({
-		disableAllMessageNotifications,
-		statusConnection: receiver.statusConnection,
-		emailNotifications,
-		isHighlighted,
-		hasMentionToUser,
-		hasMentionToAll,
-		roomType,
-	})) {
-		receiver.emails.some((email) => {
-			if (email.verified) {
-				sendEmail({ message, receiver, subscription, room, emailAddress: email.address, hasMentionToUser });
-
-				return true;
-			}
-			return false;
 		});
 	}
 };

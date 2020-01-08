@@ -14,7 +14,6 @@ import s from 'underscore.string';
 import moment from 'moment';
 import dns from 'dns';
 import UAParser from 'ua-parser-js';
-import * as Mailer from 'meteor/rocketchat:mailer';
 import { LivechatInquiry } from '../../lib/LivechatInquiry';
 import { QueueMethods } from './QueueMethods';
 import { Analytics } from './Analytics';
@@ -801,14 +800,8 @@ export const Livechat = {
 		}
 	},
 
-	sendEmail(from, to, replyTo, subject, html) {
-		Mailer.send({
-			to,
-			from,
-			replyTo,
-			subject,
-			html,
-		});
+	sendEmail(/* from, to, replyTo, subject, html*/) {
+		console.warn('sendEmail is deprecated!');
 	},
 
 	sendTranscript({ token, rid, email }) {
