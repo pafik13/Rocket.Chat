@@ -19,11 +19,15 @@ Meteor.methods({
 
 		// TODO: move this calls to an exported function
 		const userSubscription = Subscriptions.findOneByRoomIdAndUserId(rid, userId, { fields: { ls: 1 } });
-		Subscriptions.setAsReadByRoomIdAndUserId(rid, userId);
-		Rooms.setLastMessageRead(rid, userId);
+		if (userSubscription) {
+			Subscriptions.setAsReadByRoomIdAndUserId(rid, userId);
+			Rooms.setLastMessageRead(rid, userId);
 
-		Meteor.defer(() => {
-			callbacks.run('afterReadMessages', rid, { userId, lastSeen: userSubscription.ls });
-		});
+			Meteor.defer(() => {
+				callbacks.run('afterReadMessages', rid, { userId, lastSeen: userSubscription.ls });
+			});
+		} else {
+			console.warn('readMessages called by user without subscription: params [', rid, userId, ']');
+		}
 	},
 });
