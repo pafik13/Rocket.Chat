@@ -229,7 +229,19 @@ class APIClass extends Restivus {
 					});
 
 					logger.debug(`${ this.request.method.toUpperCase() }: ${ this.request.url }`);
-					const requestIp = this.request.headers['x-forwarded-for'] || this.request.connection.remoteAddress || this.request.socket.remoteAddress || this.request.connection.socket.remoteAddress;
+					let requestIp;
+					if (this.request.headers['x-forwarded-for']) {
+						requestIp = this.request.headers['x-forwarded-for'];
+					}
+					if (!requestIp && this.request.connection && this.request.connection.remoteAddress) {
+						requestIp = this.request.connection.remoteAddress;
+					}
+					if (!requestIp && this.request.socket && this.request.socket.remoteAddress) {
+						requestIp = this.request.socket.remoteAddress;
+					}
+					if (!requestIp && this.request.connection && this.request.connection.socket && this.request.connection.socket.remoteAddress) {
+						requestIp = this.request.connection.socket.remoteAddress;
+					}
 					const objectForRateLimitMatch = {
 						IPAddr: requestIp,
 						route: `${ this.request.route }${ this.request.method.toLowerCase() }`,
