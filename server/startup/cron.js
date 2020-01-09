@@ -1,9 +1,8 @@
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http';
 import { Logger } from 'meteor/rocketchat:logger';
 import { SyncedCron } from 'meteor/littledata:synced-cron';
 import { statistics } from 'meteor/rocketchat:statistics';
-import { settings } from 'meteor/rocketchat:settings';
+import { randomInteger } from 'meteor/rocketchat:utils';
 
 const logger = new Logger('SyncedCron');
 
@@ -15,23 +14,7 @@ SyncedCron.config({
 });
 
 function generateStatistics() {
-	const cronStatistics = statistics.save();
-
-	cronStatistics.host = Meteor.absoluteUrl();
-
-	if (settings.get('Statistics_reporting')) {
-		try {
-			const headers = {};
-
-			HTTP.post('https://collector.rocket.chat/', {
-				data: cronStatistics,
-				headers,
-			});
-		} catch (error) {
-			/* error*/
-			logger.warn('Failed to send usage report');
-		}
-	}
+	statistics.save();
 }
 
 // function cleanupOEmbedCache() {
@@ -49,7 +32,8 @@ Meteor.startup(function() {
 		SyncedCron.add({
 			name: 'Generate and save statistics',
 			schedule(parser) {
-				return parser.cron(`${ new Date().getMinutes() } * * * *`);
+				const minutes = randomInteger(0, 59);
+				return parser.cron(`${ minutes } * * * *`);
 			},
 			job: generateStatistics,
 		});
