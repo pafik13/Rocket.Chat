@@ -3,6 +3,7 @@ import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
 import { Users } from 'meteor/rocketchat:models';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { API } from '../api';
+import * as heapdump from 'heapdump';
 
 API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 	post() {
@@ -32,6 +33,24 @@ API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 
 		return API.v1.success({
 			room,
+		});
+	},
+});
+
+API.v1.addRoute('admin.createHeapdump', { authRequired: true }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		heapdump.writeSnapshot(function(err, filename) {
+			if (err) {
+				console.error(err);
+				return API.v1.failure(err.message);
+			} else {
+				console.log('dump written to', filename);
+				return API.v1.success();
+			}
 		});
 	},
 });
