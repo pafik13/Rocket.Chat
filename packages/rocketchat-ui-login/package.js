@@ -21,7 +21,6 @@ Package.onUse(function(api) {
 		'rocketchat:assets',
 		'rocketchat:settings',
 		'rocketchat:callbacks',
-		'rocketchat:2fa',
 		'kadira:flow-router',
 		'kadira:blaze-layout',
 	]);

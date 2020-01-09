@@ -20,7 +20,6 @@ Package.onUse(function(api) {
 		'rocketchat:settings',
 		'rocketchat:utils',
 		'rocketchat:models',
-		'rocketchat:livechat',
 		'rocketchat:ui-utils',
 		'kadira:flow-router',
 		'kadira:blaze-layout',

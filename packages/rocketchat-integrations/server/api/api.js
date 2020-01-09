@@ -4,7 +4,6 @@ import { Random } from 'meteor/random';
 import * as Models from 'meteor/rocketchat:models';
 import { Restivus } from 'meteor/nimble:restivus';
 import { API } from 'meteor/rocketchat:api';
-import { Livechat } from 'meteor/rocketchat:livechat';
 import { processWebhookMessage } from 'meteor/rocketchat:lib';
 import { logger } from '../logger';
 import Fiber from 'fibers';
@@ -77,7 +76,6 @@ function buildSandbox(store = {}) {
 		moment,
 		Fiber,
 		Promise,
-		Livechat,
 		Store: {
 			set(key, val) {
 				return store[key] = val;

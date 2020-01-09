@@ -127,7 +127,6 @@ reactive-dict@1.2.1
 reactive-var@1.0.11
 reload@1.2.0
 retry@1.1.0
-rocketchat:2fa@0.0.1
 rocketchat:accounts@0.0.1
 rocketchat:action-links@0.0.1
 rocketchat:api@0.0.1
@@ -165,7 +164,6 @@ rocketchat:issuelinks@0.0.1
 rocketchat:katex@0.0.1
 rocketchat:lazy-load@0.0.1
 rocketchat:lib@0.0.1
-rocketchat:livechat@0.0.1
 rocketchat:livestream@0.0.5
 rocketchat:logger@0.0.1
 rocketchat:login-token@1.0.0
@@ -217,7 +215,6 @@ rocketchat:slashcommands-open@0.0.1
 rocketchat:slashcommands-topic@0.0.1
 rocketchat:slashcommands-unarchive@0.0.1
 rocketchat:slider@0.0.1
-rocketchat:sms@0.0.1
 rocketchat:statistics@0.0.1
 rocketchat:streamer@1.0.1
 rocketchat:theme@0.0.1
