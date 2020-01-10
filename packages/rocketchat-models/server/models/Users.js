@@ -386,7 +386,7 @@ export class Users extends Base {
 
 	findOneByUsername(username, options) {
 		if (typeof username === 'string') {
-			username = new RegExp(`^${ username }$`, 'i');
+			username = new RegExp(`^${ s.escapeRegExp(username) }$`, 'i');
 		}
 
 		const query = { username };

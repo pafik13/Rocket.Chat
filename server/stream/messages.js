@@ -89,8 +89,11 @@ Meteor.startup(function() {
 			case 'inserted':
 			case 'updated':
 				const message = data || Messages.findOne({ _id: id });
-				publishMessage(clientAction, message);
-				// console.log(clientAction, id, data);
+				if (message) {
+					publishMessage(clientAction, message);
+				} else {
+					console.warn('publishMessage', clientAction, id, data);
+				}
 				break;
 		}
 	});

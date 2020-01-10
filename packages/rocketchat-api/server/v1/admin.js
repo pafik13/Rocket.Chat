@@ -4,6 +4,7 @@ import { Users } from 'meteor/rocketchat:models';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { API } from '../api';
 import * as heapdump from 'heapdump';
+import { existsSync, mkdirSync } from 'fs';
 
 API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 	post() {
@@ -42,13 +43,20 @@ API.v1.addRoute('admin.createHeapdump', { authRequired: true }, {
 		if (!hasRole(this.userId, 'admin')) {
 			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
 		}
+		const folder = `/tmp/rocketchat_${ process.env.PORT }`;
+		if (!existsSync(folder)) {
+			mkdirSync(folder);
+		}
 
-		heapdump.writeSnapshot(function(err, filename) {
+		const hrtime = process.hrtime();
+		const filename = `heapdump-${ hrtime[1] }.${ hrtime[0] }.heapsnapshot`;
+		const filepath = `${ folder }/${ filename }`;
+		heapdump.writeSnapshot(filepath, function(err, location) {
 			if (err) {
 				console.error(err);
 				return API.v1.failure(err.message);
 			} else {
-				console.log('dump written to', filename);
+				console.log('dump written to', location);
 				return API.v1.success();
 			}
 		});

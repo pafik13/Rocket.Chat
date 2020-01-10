@@ -114,7 +114,11 @@ Subscriptions.on('change', ({ clientAction, id, data }) => {
 			break;
 	}
 
-	Notifications.streamUser.__emit(data.u._id, clientAction, data);
+	if (data && data.u && data._id) {
+		Notifications.streamUser.__emit(data.u._id, clientAction, data);
+		Notifications.notifyUserInThisInstance(data.u._id, 'subscriptions-changed', clientAction, data);
+	} else {
+		console.warn('Subscriptions.on(', clientAction, id, data);
+	}
 
-	Notifications.notifyUserInThisInstance(data.u._id, 'subscriptions-changed', clientAction, data);
 });
