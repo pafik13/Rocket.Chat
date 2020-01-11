@@ -67,7 +67,6 @@ rocketchat:iframe-login
 rocketchat:importer
 rocketchat:importer-csv
 rocketchat:integrations
-rocketchat:irc
 rocketchat:issuelinks
 rocketchat:katex
 rocketchat:lib

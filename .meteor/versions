@@ -159,7 +159,6 @@ rocketchat:iframe-login@1.0.0
 rocketchat:importer@0.0.1
 rocketchat:importer-csv@1.0.0
 rocketchat:integrations@0.0.1
-rocketchat:irc@0.0.1
 rocketchat:issuelinks@0.0.1
 rocketchat:katex@0.0.1
 rocketchat:lazy-load@0.0.1
