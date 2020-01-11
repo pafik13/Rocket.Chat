@@ -10,7 +10,6 @@ import { KonchatNotification, fileUpload, chatMessages, ChatMessages } from 'met
 import { RoomManager, popover, messageBox, Layout } from 'meteor/rocketchat:ui-utils';
 import { ChatSubscription } from 'meteor/rocketchat:models';
 import { t, roomTypes, getUserPreference } from 'meteor/rocketchat:utils';
-import { katex } from 'meteor/rocketchat:katex';
 import moment from 'moment';
 import './messageBoxReplyPreview';
 import './messageBoxTyping';
@@ -63,22 +62,6 @@ const formattingButtons = [
 		icon: 'multiline',
 		pattern: '```\n{{text}}\n``` ',
 		condition: () => Markdown && settings.get('Markdown_Parser') !== 'disabled',
-	},
-	{
-		label: 'KaTeX',
-		text: () => {
-			if (!katex.isEnabled()) {
-				return;
-			}
-			if (katex.isDollarSyntaxEnabled()) {
-				return '$$KaTeX$$';
-			}
-			if (katex.isParenthesisSyntaxEnabled()) {
-				return '\\[KaTeX\\]';
-			}
-		},
-		link: 'https://khan.github.io/KaTeX/function-support.html',
-		condition: () => katex.isEnabled(),
 	},
 ];
 

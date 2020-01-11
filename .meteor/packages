@@ -68,7 +68,6 @@ rocketchat:importer
 rocketchat:importer-csv
 rocketchat:integrations
 rocketchat:issuelinks
-rocketchat:katex
 rocketchat:lib
 rocketchat:livestream
 rocketchat:logger
