@@ -1,4 +1,5 @@
 import client from 'prom-client';
+import gcStats from 'prometheus-gc-stats';
 import connect from 'connect';
 import http from 'http';
 import _ from 'underscore';
@@ -9,6 +10,8 @@ import { settings } from 'meteor/rocketchat:settings';
 import { Statistics } from 'meteor/rocketchat:models';
 
 client.collectDefaultMetrics();
+const startGcStats = gcStats(client.register); // gcStats() would have the same effect in this case
+startGcStats();
 
 export const metrics = {};
 
