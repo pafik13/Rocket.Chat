@@ -141,7 +141,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 		file = FileUpload.addExtensionTo(file);
 		const image = FileUpload.getStore('Uploads')._store.getReadStream(file._id, file);
 
-		const transformer = sharp()
+		const transformer = sharp({ failOnError: false })
 			.resize({ width: 32, height: 32, fit: 'inside' })
 			.jpeg()
 			.blur();
