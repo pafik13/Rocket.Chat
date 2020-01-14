@@ -93,7 +93,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 		const height = settings.get('Accounts_AvatarSize');
 		const future = new Future();
 
-		const s = sharp(tempFilePath);
+		const s = sharp(tempFilePath, { failOnError: false });
 		s.rotate();
 		// Get metadata to resize the image the first time to keep "inside" the dimensions
 		// then resize again to create the canvas around
@@ -110,7 +110,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 					height: Math.min(height || 0, metadata.height || Infinity),
 					fit: sharp.fit.cover,
 				})
-				.pipe(sharp()
+				.pipe(sharp({ failOnError: false })
 					.resize({
 						height,
 						width: height,
@@ -182,7 +182,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 					});
 				break;
 			case 'IMAGE':
-				const s = sharp(tmpFile);
+				const s = sharp(tmpFile, { failOnError: false });
 				s.metadata(Meteor.bindEnvironment((err, metadata) => {
 					if (err != null) {
 						console.error(err);
