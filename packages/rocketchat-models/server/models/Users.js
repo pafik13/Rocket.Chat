@@ -1120,7 +1120,10 @@ Find users to send a message by email if:
 
 		let users = [];
 		const sort = { name: 1 };
+		let timeLabel_Strategy;
 		if (subscriptionsCount < allUsersCount / 10) {
+			timeLabel_Strategy = `${ timeLabel }::thru_subs`;
+			console.time(timeLabel_Strategy);
 			users = Promise.await(
 				Subscriptions.model.rawCollection().aggregate([
 					{ $match: { rid: roomId } },
@@ -1153,6 +1156,7 @@ Find users to send a message by email if:
 					},
 				]).next());
 		} else {
+			timeLabel_Strategy = `${ timeLabel }::thru_users`;
 			users = Promise.await(
 				this.model.rawCollection().aggregate([{
 					$match: {
@@ -1196,9 +1200,7 @@ Find users to send a message by email if:
 		}
 
 		console.timeEnd(timeLabel);
-		//     while (cursor.hasNext()) {
-
-		//     }
+		console.timeEnd(timeLabel_Strategy);
 		return users;
 	}
 }
