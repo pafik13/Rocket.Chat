@@ -92,7 +92,7 @@ Meteor.startup(function() {
 				if (message) {
 					publishMessage(clientAction, message);
 				} else {
-					console.warn('publishMessage', clientAction, id, data);
+					console.warn('Messages.on(change', clientAction, id, data);
 				}
 				break;
 		}

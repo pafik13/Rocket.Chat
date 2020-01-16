@@ -1157,6 +1157,7 @@ Find users to send a message by email if:
 				]).next());
 		} else {
 			timeLabel_Strategy = `${ timeLabel }::thru_users`;
+			console.time(timeLabel_Strategy);
 			users = Promise.await(
 				this.model.rawCollection().aggregate([{
 					$match: {
