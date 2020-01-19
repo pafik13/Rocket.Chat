@@ -8,7 +8,7 @@ export const spotlightRoomsBlackList = function() {
 		return;
 	}
 	return _.map(spotlightBlackList.split(','), function(item) {
-		return item.trim();
+		return item.trim().toLowerCase();
 	});
 };
 
@@ -18,9 +18,21 @@ export const spotlightRoomsIsValidText = function(text) {
 		return true;
 	}
 
+	if (!Array.isArray(list)) {
+		return true;
+	}
+
 	if (!text) {
 		return false;
 	}
 
-	return !_.contains(list, text);
+	const testText = text.toLowerCase();
+	for (let l = 0, len = list.length, item; l < len; l++) {
+		item = list[l];
+		if (testText.includes(item)) {
+			return false;
+		}
+	}
+
+	return true;
 };

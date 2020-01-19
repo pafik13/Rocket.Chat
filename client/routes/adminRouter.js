@@ -22,6 +22,13 @@ FlowRouter.route('/admin/complaints', {
 	},
 });
 
+FlowRouter.route('/admin/blacklistedRooms', {
+	name: 'admin-blacklistedRooms',
+	action() {
+		BlazeLayout.render('main', { center: 'adminBlacklistedRooms' });
+	},
+});
+
 FlowRouter.route('/admin/info', {
 	name: 'admin-info',
 	action() {

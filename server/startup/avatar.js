@@ -145,7 +145,7 @@ Meteor.startup(function() {
 
 				if (['png', 'jpg', 'jpeg'].includes(req.query.format)) {
 					res.setHeader('Content-Type', `image/${ req.query.format }`);
-					sharp(new Buffer(svg))
+					sharp(new Buffer(svg), { failOnError: false })
 						.toFormat(req.query.format)
 						.pipe(res);
 					return;

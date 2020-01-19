@@ -20,3 +20,5 @@ import './users/adminUserChannels';
 import './users/adminUsers';
 import './complaints/adminComplaints.html';
 import './complaints/adminComplaints';
+import './blacklistedRooms/adminBlacklistedRooms.html';
+import './blacklistedRooms/adminBlacklistedRooms';

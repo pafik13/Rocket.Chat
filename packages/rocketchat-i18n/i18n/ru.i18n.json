@@ -3110,5 +3110,11 @@
   "Channel_location": "Местонахождение",
   "Incorrect_location": "Некорректные координаты",
   "Channel_Location_Lng_Placeholder": "Долгота",
-  "Channel_Location_Lat_Placeholder": "Широта"
+  "Channel_Location_Lat_Placeholder": "Широта",
+  "Return_Room_To_Search_Warning": "Кто угодно будет иметь возможность найти комнату.",
+  "Yes_return_it": "Да, вернуть",
+  "Returned": "Вернулась",
+  "Room_has_been_returned_to_search": "Комната была возвращена в поиск",
+  "Return_to_seacrh": "Вернуть в поиск",
+  "Blacklisted Rooms": "Подозрительные комнаты"
 }

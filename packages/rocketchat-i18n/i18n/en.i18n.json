@@ -3191,5 +3191,11 @@
   "Channel_location": "Location",
   "Incorrect_location": "Incorrect location",
   "Channel_Location_Lng_Placeholder": "Longitude",
-  "Channel_Location_Lat_Placeholder": "Latitude"
+  "Channel_Location_Lat_Placeholder": "Latitude",
+  "Return_Room_To_Search_Warning": "Anyone will be able to find this room.",
+  "Yes_return_it": "Yes, return it",
+  "Returned": "Returned",
+  "Room_has_been_returned_to_search": "Room has been returned to search",
+  "Return_to_seacrh": "Return to seacrh",
+  "Blacklisted Rooms": "Blacklisted Rooms"
 }

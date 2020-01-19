@@ -72,6 +72,11 @@ Template.adminRoomInfo.helpers({
 		const roomType = room && room.t;
 		return (roomType != null) && hasAtLeastOnePermission(`delete-${ roomType }`);
 	},
+	canReturnToSearch() {
+		const room = AdminChatRoom.findOne(this.rid, { fields: { blacklisted: 1 } });
+		const blacklisted = room && room.blacklisted;
+		return blacklisted;
+	},
 	readOnly() {
 		const room = AdminChatRoom.findOne(this.rid, { fields: { ro: 1 } });
 		return room && room.ro;
@@ -108,6 +113,33 @@ Template.adminRoomInfo.events({
 					modal.open({
 						title: t('Deleted'),
 						text: t('Room_has_been_deleted'),
+						type: 'success',
+						timer: 2000,
+						showConfirmButton: false,
+					});
+				}
+			});
+		});
+	},
+	'click .return-to-search'() {
+		modal.open({
+			title: t('Are_you_sure'),
+			text: t('Return_Room_To_Search_Warning'),
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#DD6B55',
+			confirmButtonText: t('Yes_return_it'),
+			cancelButtonText: t('Cancel'),
+			closeOnConfirm: false,
+			html: false,
+		}, () => {
+			Meteor.call('returnRoomToSearch', this.rid, function(error) {
+				if (error) {
+					handleError(error);
+				} else {
+					modal.open({
+						title: t('Returned'),
+						text: t('Room_has_been_returned_to_search'),
 						type: 'success',
 						timer: 2000,
 						showConfirmButton: false,

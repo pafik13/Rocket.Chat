@@ -58,6 +58,7 @@ import './methods/removeUserFromRoom';
 import './methods/reportMessage';
 import './methods/requestDataDownload';
 import './methods/resetAvatar';
+import './methods/returnRoomToSearch';
 import './methods/roomNameExists';
 import './methods/saveUserPreferences';
 import './methods/saveUserProfile';

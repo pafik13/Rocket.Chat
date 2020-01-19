@@ -23,6 +23,10 @@
 				{{#if hasPermission 'view-room-administration'}}
 					{{> sidebarItem menuItem "Complaints" "hashtag" "admin-complaints" "" }}
 				{{/if}}
+ 
+				{{#if hasPermission 'view-room-administration'}}
+					{{> sidebarItem menuItem "Blacklisted Rooms" "hashtag" "admin-blacklistedRooms" "" }}
+				{{/if}}
         
 				{{#if hasPermission 'view-user-administration'}}
 					{{> sidebarItem menuItem "Users" "team" "admin-users" "" }}

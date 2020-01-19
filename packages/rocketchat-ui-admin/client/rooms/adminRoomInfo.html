@@ -91,11 +91,14 @@
 						{{/each}}
 					</ul>
 				</form>
-				{{#if canDeleteRoom}}
-					<nav>
-						<button class='button danger delete'><span><i class='icon-trash'></i> {{_ "Delete"}}</span></button>
-					</nav>
-				{{/if}}
+				<nav>
+          {{#if canDeleteRoom}}
+					  <button class='button danger delete'><span><i class='icon-trash'></i> {{_ "Delete"}}</span></button>
+          {{/if}}
+				  {{#if canReturnToSearch}}
+            <button class='button return-to-search'><span><i class='icon-search'></i> {{_ "Return_to_seacrh"}}</span></button>
+				  {{/if}}
+				</nav>
 			</div>
 		</div>
 	{{/with}}

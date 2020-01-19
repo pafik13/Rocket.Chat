@@ -517,7 +517,7 @@ WebApp.connectHandlers.use('/assets/', Meteor.bindEnvironment(function(req, res,
 
 	if (format && format !== file.extension && ['png', 'jpg', 'jpeg'].includes(format)) {
 		res.setHeader('Content-Type', `image/${ format }`);
-		sharp(file.content)
+		sharp(file.content, { failOnError: false })
 			.toFormat(format)
 			.pipe(res);
 		return;

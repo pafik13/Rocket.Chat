@@ -810,6 +810,7 @@ export class Rooms extends Base {
 				$in: types,
 			},
 			fname: name,
+			blacklisted: { $exists: false },
 		};
 
 		// do not use cache

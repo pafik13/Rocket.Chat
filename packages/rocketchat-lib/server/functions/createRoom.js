@@ -2,9 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
-import { getValidRoomName, validateGeoJSON } from 'meteor/rocketchat:utils';
+import { getValidRoomName, validateGeoJSON, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
 import _ from 'underscore';
 import s from 'underscore.string';
+
 
 function createDirectRoom(source, target, extraData, options) {
 	const rid = [source._id, target._id].sort().join('');
@@ -125,8 +126,9 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		isOtherFilesAllowed: true,
 	});
 
-	if (type === 'd') {
-		room.usernames = members;
+	const blacklisted = !spotlightRoomsIsValidText(name);
+	if (blacklisted) {
+		room.blacklisted = blacklisted;
 	}
 
 	if (type === 'c') {
