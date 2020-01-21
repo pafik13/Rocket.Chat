@@ -2,6 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { TAPi18n } from 'meteor/tap:i18n';
 import { Rooms, Messages } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
+import { settings } from 'meteor/rocketchat:settings';
+
+const jitsiRoomPrefix = settings.get('Jitsi_URL_Room_Prefix') + settings.get('uniqueID');
 
 Meteor.methods({
 	'jitsi:updateTimeout': (rid) => {
@@ -21,6 +24,7 @@ Meteor.methods({
 				actionLinks : [
 					{ icon: 'icon-videocam', label: TAPi18n.__('Click_to_join'), method_id: 'joinJitsiCall', params: '' },
 				],
+				jitsiRoom: jitsiRoomPrefix + rid,
 			});
 			const room = Rooms.findOneById(rid);
 			message.msg = TAPi18n.__('Started_a_video_call');
