@@ -1111,6 +1111,8 @@ Find users to send a message by email if:
 	findByNameAndRoomId(name, roomId, skip = 0, limit = 50) {
 		const timeLabel = `findByNameAndRoomId${ _.random(0, 1000) }`;
 		console.time(timeLabel);
+		console.log(timeLabel, name, roomId, skip, limit);
+
 		const query = {
 			rid: roomId,
 		};
