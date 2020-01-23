@@ -4,6 +4,7 @@ import { Rooms, Messages } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { settings } from 'meteor/rocketchat:settings';
 
+const jitsiServerlURL = `https://${ settings.get('Jitsi_Domain') }`;
 const jitsiRoomPrefix = settings.get('Jitsi_URL_Room_Prefix') + settings.get('uniqueID');
 
 Meteor.methods({
@@ -24,6 +25,7 @@ Meteor.methods({
 				actionLinks : [
 					{ icon: 'icon-videocam', label: TAPi18n.__('Click_to_join'), method_id: 'joinJitsiCall', params: '' },
 				],
+				jitsiServerlURL,
 				jitsiRoom: jitsiRoomPrefix + rid,
 			});
 			const room = Rooms.findOneById(rid);
