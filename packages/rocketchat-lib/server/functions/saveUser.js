@@ -9,6 +9,8 @@ import { settings } from 'meteor/rocketchat:settings';
 import PasswordPolicy from '../lib/PasswordPolicyClass';
 import { checkEmailAvailability, checkUsernameAvailability, setUserAvatar, setEmail, setRealName, setUsername } from '.';
 import { validateEmailDomain } from '../lib';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { Users } from 'meteor/rocketchat:models';
 
 const passwordPolicy = new PasswordPolicy();
 
@@ -274,5 +276,9 @@ export const saveUser = function(userId, userData) {
 
 	Meteor.users.update({ _id: userData._id }, updateUser);
 
+	const user = Users.findOneById(userData._id, { fields: { name: 1, username: 1 } });
+	Meteor.defer(function() {
+		callbacks.run('afterSaveUser', user);
+	});
 	return true;
 };

@@ -70,7 +70,7 @@ Meteor.methods({
 		});
 
 		Meteor.defer(function() {
-			callbacks.run('afterRemoveFromRoom', { removedUser, userWhoRemoved: fromUser }, room);
+			callbacks.run('afterRemoveFromRoom', { removedUser, userWhoRemoved: fromUser, subscription }, room);
 		});
 
 		return true;

@@ -8,7 +8,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 	const room = Rooms.findOneById(rid);
 
 	// Check if user is already in room
-	const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
+	let subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
 	if (subscription) {
 		return;
 	}
@@ -26,7 +26,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 		Rooms.muteUsernameByRoomId(rid, user.username);
 	}
 
-	Subscriptions.createWithRoomAndUser(room, user, {
+	subscription = Subscriptions.createWithRoomAndUser(room, user, {
 		ts: now,
 		open: true,
 		alert: true,
@@ -52,7 +52,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 	if (room.t === 'c' || room.t === 'p') {
 		Meteor.defer(function() {
 			// Add a new event, with an optional inviter
-			callbacks.run('afterAddedToRoom', { user, inviter }, room);
+			callbacks.run('afterAddedToRoom', { user, inviter, subscription }, room);
 
 			// Keep the current event
 			callbacks.run('afterJoinRoom', user, room);

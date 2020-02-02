@@ -858,6 +858,11 @@ settings.addGroup('General', function() {
 		public: true,
 		i18nDescription: 'Store_Last_Message_Sent_per_Room',
 	});
+	this.add('Use_elastic', false, {
+		type: 'boolean',
+		public: true,
+		i18nDescription: 'Use_elastic',
+	});
 	this.add('Robot_Instructions_File_Content', 'User-agent: *\nDisallow: /', {
 		type: 'string',
 		public: true,
@@ -889,6 +894,20 @@ settings.addGroup('General', function() {
 			type: 'int',
 			public: true,
 			i18nDescription: 'Rooms_Max_Group_Members',
+		});
+		this.add('Rooms_Members_Serch_Type', 'mongo', {
+			type: 'select',
+			values: [
+				{
+					key: 'mongo',
+					i18nLabel: 'Mongo',
+				}, {
+					key: 'elastic',
+					i18nLabel: 'Elasticsearch',
+				},
+			],
+			public: true,
+			i18nDescription: 'Rooms_Members_Serch_Type',
 		});
 	});
 	this.section('Notifications', function() {

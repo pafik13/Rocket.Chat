@@ -29,7 +29,7 @@ export const removeUserFromRoom = function(rid, user, options = {}) {
 
 		Meteor.defer(function() {
 			// TODO: CACHE: maybe a queue?
-			callbacks.run('afterLeaveRoom', user, room);
+			callbacks.run('afterLeaveRoom', { user, subscription }, room);
 		});
 	}
 };

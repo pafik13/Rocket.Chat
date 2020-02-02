@@ -10,6 +10,7 @@ import { Random } from 'meteor/random';
 import S3 from 'aws-sdk/clients/s3';
 import Path from 'path';
 import { settings } from 'meteor/rocketchat:settings';
+import { elastic } from 'meteor/rocketchat:lib';
 
 
 // Returns the private group subscription IF found otherwise it will return the failure of why it didn't. Check the `statusCode` property
@@ -656,13 +657,24 @@ API.v1.addRoute('groups.members', { authRequired: true }, {
 		let users = [];
 		let total = 0;
 		if (name) {
-			const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`, 'i');
-			const result = Users.findByNameAndRoomId(nameRE, findResult.rid, offset, count);
-			if (result.count && result.count[0]) {
-				total = result.count[0].total;
-			}
-			if (result.data && result.data.length) {
-				users = result.data;
+			const serchType = settings.get('Rooms_Members_Serch_Type');
+			if (serchType === 'elastic') {
+				const result = Promise.await(elastic.findUsersInRoom(name, findResult.rid, offset, count));
+				total = result.total.value;
+				const userIds = result.hits.map((it) => it._source.userId);
+				users = Users.find({ _id: { $in: userIds } }, {
+					fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields : 1 },
+					sort: { username: sort.username != null ? sort.username : 1 },
+				}).fetch();
+			} else {
+				const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`, 'i');
+				const result = Users.findByNameAndRoomId(nameRE, findResult.rid, offset, count);
+				if (result.count && result.count[0]) {
+					total = result.count[0].total;
+				}
+				if (result.data && result.data.length) {
+					users = result.data;
+				}
 			}
 		} else {
 			const subscriptions = Subscriptions.findByRoomId(findResult.rid, {

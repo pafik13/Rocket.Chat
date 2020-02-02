@@ -5,6 +5,18 @@ import { hasRole } from 'meteor/rocketchat:authorization';
 import { API } from '../api';
 import * as heapdump from 'heapdump';
 import { existsSync, mkdirSync } from 'fs';
+import { elastic } from 'meteor/rocketchat:utils';
+
+API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
+	get() {
+		elastic.indeces().then((indeces) => {
+			console.log(indeces);
+			return API.v1.success({
+				indeces,
+			});
+		});
+	},
+});
 
 API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 	post() {
