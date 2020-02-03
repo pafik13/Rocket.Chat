@@ -5,12 +5,26 @@ import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('elastic', {});
 
 let isUseElastic = settings.get('Use_elastic');
+const elasticHost = settings.get('Elastic_host') || 'http://localhost:9200';
 
 settings.get('Use_elastic', (key, value) => {
+	logger.debug(key, value);
 	isUseElastic = value;
 });
 
-const client = new Client({ node: 'http://localhost:9200' });
+let client = new Client({ node: elasticHost });
+
+settings.get('Elastic_host', (key, value) => {
+	logger.debug(key, value);
+	try {
+		client = new Client({ node: value });
+		isUseElastic = settings.get('Use_elastic');
+	} catch (err) {
+		client = null;
+		isUseElastic = false;
+		logger.error(err);
+	}
+});
 
 const indeces = async() => {
 	const result = await client.cat.indices({ format: 'json' });

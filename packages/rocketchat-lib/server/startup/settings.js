@@ -861,7 +861,10 @@ settings.addGroup('General', function() {
 	this.add('Use_elastic', false, {
 		type: 'boolean',
 		public: true,
-		i18nDescription: 'Use_elastic',
+	});
+	this.add('Elastic_host', 'http://localhost:9200/', {
+		type: 'string',
+		public: true,
 	});
 	this.add('Robot_Instructions_File_Content', 'User-agent: *\nDisallow: /', {
 		type: 'string',
