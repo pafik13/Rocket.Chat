@@ -181,12 +181,6 @@ Accounts.insertUserDoc = _.wrap(Accounts.insertUserDoc, function(insertUserDoc, 
 	});
 
 	if (user.username) {
-		if (options.joinDefaultChannels !== false && user.joinDefaultChannels !== false) {
-			Meteor.runAsUser(_id, function() {
-				return Meteor.call('joinDefaultChannels', options.joinDefaultChannelsSilenced);
-			});
-		}
-
 		if (user.type !== 'visitor') {
 			Meteor.defer(function() {
 				return callbacks.run('afterCreateUser', user);

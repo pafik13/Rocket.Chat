@@ -165,7 +165,6 @@ export const saveUser = function(userId, userData) {
 		const createUser = {
 			username: userData.username,
 			password: userData.password,
-			joinDefaultChannels: userData.joinDefaultChannels,
 		};
 		if (userData.email) {
 			createUser.email = userData.email;
@@ -214,6 +213,13 @@ export const saveUser = function(userId, userData) {
 					message: error.message,
 				});
 			}
+		}
+
+		const { joinDefaultChannels } = userData;
+		if (joinDefaultChannels !== false) {
+			Meteor.runAsUser(_id, function() {
+				return Meteor.call('joinDefaultChannels', false);
+			});
 		}
 
 		userData._id = _id;

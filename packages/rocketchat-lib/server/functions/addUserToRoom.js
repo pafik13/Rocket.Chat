@@ -3,12 +3,12 @@ import { Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
-export const addUserToRoom = function(rid, user, inviter, silenced) {
+export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 	const now = new Date();
-	const room = Rooms.findOneById(rid);
+	const room = (typeof roomOrId === 'string') ? Rooms.findOneById(roomOrId) : roomOrId;
 
 	// Check if user is already in room
-	let subscription = Subscriptions.findOneByRoomIdAndUserId(rid, user._id);
+	let subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, user._id);
 	if (subscription) {
 		return;
 	}
@@ -23,7 +23,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 
 	const muted = room.ro && !hasPermission(user._id, 'post-readonly');
 	if (muted) {
-		Rooms.muteUsernameByRoomId(rid, user.username);
+		Rooms.muteUsernameByRoomId(room._id, user.username);
 	}
 
 	subscription = Subscriptions.createWithRoomAndUser(room, user, {
@@ -37,7 +37,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 
 	if (!silenced) {
 		if (inviter) {
-			Messages.createUserAddedWithRoomIdAndUser(rid, user, {
+			Messages.createUserAddedWithRoomIdAndUser(room._id, user, {
 				ts: now,
 				u: {
 					_id: inviter._id,
@@ -45,7 +45,7 @@ export const addUserToRoom = function(rid, user, inviter, silenced) {
 				},
 			});
 		} else {
-			Messages.createUserJoinWithRoomIdAndUser(rid, user, { ts: now });
+			Messages.createUserJoinWithRoomIdAndUser(room._id, user, { ts: now });
 		}
 	}
 
