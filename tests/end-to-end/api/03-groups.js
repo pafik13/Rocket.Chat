@@ -643,7 +643,7 @@ describe('[Groups]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.nested.property('group.customFields.field0', 'value0');
-					expect(res.body).to.have.nested.property('group.customFields.anonym_id', -1);
+					expect(res.body).to.have.nested.property('group.customFields.anonym_id', '');
 					expect(res.body).to.have.nested.property('group.customFields.photoUrl', '');
 					expect(res.body).to.have.nested.property('group.customFields.registeredAt', cfchannel.customFields.registeredAt);
 				})

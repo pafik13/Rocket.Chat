@@ -1188,12 +1188,12 @@ export class Rooms extends Base {
 	}
 
 	findByAnonymId(anonymId) {
-		if (!_.isNumber(anonymId) || isNaN(anonymId)) {
-			throw new Error('findByAnonymId: anonymId must be a valid number!');
+		if (typeof anonymId !== 'string') {
+			throw new Error('findByAnonymId: anonymId must be a string!');
 		}
 
 		const query = {
-			'customFields.anonym_id': Number(anonymId),
+			'customFields.anonym_id': anonymId,
 		};
 
 		return this.find(query);
