@@ -447,15 +447,11 @@ API.v1.addRoute('rooms.getByAnonymId', { authRequired: true }, {
 	get() {
 		const { anonym_id } = this.queryParams;
 
-		const anonymId = parseInt(anonym_id, 10);
-
-		if (anonymId === -1) {
-			return API.v1.success({
-				rooms: [],
-			});
+		if (!anonym_id) {
+			return API.v1.failure('The \'anonym_id\' query param is required');
 		}
 
-		const result = Rooms.findByAnonymId(anonymId).fetch();
+		const result = Rooms.findByAnonymId(anonym_id).fetch();
 
 		return API.v1.success({
 			rooms: result.map((room) => this.composeRoomWithLastMessage(room, this.userId)),

@@ -660,7 +660,7 @@ describe('[Channels]', function() {
 	describe('/channels.setCustomFields:', () => {
 		let cfchannel;
 		it('create channel with customFields', (done) => {
-			const customFields = { field0:'value0' };
+			const customFields = { field0:'value0', anonym_id: 'xxx' };
 			request.post(api('channels.create'))
 				.set(credentials)
 				.send({
@@ -683,7 +683,7 @@ describe('[Channels]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.nested.property('channel.customFields.field0', 'value0');
-					expect(res.body).to.have.nested.property('channel.customFields.anonym_id', '');
+					expect(res.body).to.have.nested.property('channel.customFields.anonym_id', 'xxx');
 					expect(res.body).to.have.nested.property('channel.customFields.photoUrl', '');
 					expect(res.body).to.have.nested.property('channel.customFields.registeredAt', cfchannel.customFields.registeredAt);
 				})

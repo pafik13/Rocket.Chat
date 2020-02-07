@@ -18,7 +18,7 @@ Meteor.methods({
 		}
 
 		customFields = {
-			anonym_id: '',
+			// 			anonym_id: '',
 			photoUrl: '',
 			registeredAt: new Date().toISOString(),
 			...customFields,

@@ -18,6 +18,7 @@ export class Rooms extends Base {
 		this.tryEnsureIndex({ open: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ departmentId: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ location : '2dsphere' });
+		this.tryEnsureIndex({ 'customFields.anonym_id': 1 }, { sparse: 1 });
 	}
 
 	findOneByIdOrName(_idOrName, options) {
@@ -1188,12 +1189,8 @@ export class Rooms extends Base {
 	}
 
 	findByAnonymId(anonymId) {
-		if (typeof anonymId !== 'string') {
-			throw new Error('findByAnonymId: anonymId must be a string!');
-		}
-
 		const query = {
-			'customFields.anonym_id': anonymId,
+			'customFields.anonym_id': `${ anonymId }`,
 		};
 
 		return this.find(query);
