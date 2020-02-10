@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
-import { Users } from 'meteor/rocketchat:models';
+import { Users, Rooms } from 'meteor/rocketchat:models';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { API } from '../api';
 import * as heapdump from 'heapdump';
@@ -14,6 +14,31 @@ API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 			return API.v1.success({
 				indeces,
 			});
+		});
+	},
+});
+
+API.v1.addRoute('admin.setCustomFieldsForGroup', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { roomId, userId, customFields } = this.requestParams();
+
+		if (!roomId || !userId || !customFields) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `roomId` and `userId` and `customFields`!');
+		}
+
+		const room = Rooms.findOneById(roomId);
+		if (!room || room.t !== 'p') { return API.v1.notFound(); }
+
+		Meteor.runAsUser(userId, () => {
+			Meteor.call('saveRoomSettings', room._id, 'roomCustomFields', customFields);
+		});
+
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(room._id, { fields: API.v1.defaultFieldsToExclude }), userId),
 		});
 	},
 });
