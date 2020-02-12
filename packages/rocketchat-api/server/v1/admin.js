@@ -18,7 +18,7 @@ API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 	},
 });
 
-API.v1.addRoute('admin.setCustomFieldsForGroup', { authRequired: true }, {
+API.v1.addRoute('admin.setCustomFieldsForRoom', { authRequired: true }, {
 	post() {
 		if (!hasRole(this.userId, 'admin')) {
 			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
@@ -31,15 +31,61 @@ API.v1.addRoute('admin.setCustomFieldsForGroup', { authRequired: true }, {
 		}
 
 		const room = Rooms.findOneById(roomId);
-		if (!room || room.t !== 'p') { return API.v1.notFound(); }
+		if (!room) { return API.v1.notFound(); }
 
 		Meteor.runAsUser(userId, () => {
 			Meteor.call('saveRoomSettings', room._id, 'roomCustomFields', customFields);
 		});
 
 		return API.v1.success({
-			group: this.composeRoomWithLastMessage(Rooms.findOneById(room._id, { fields: API.v1.defaultFieldsToExclude }), userId),
+			room: this.composeRoomWithLastMessage(Rooms.findOneById(room._id, { fields: API.v1.defaultFieldsToExclude }), userId),
 		});
+	},
+});
+
+API.v1.addRoute('admin.getRoomInfo', { authRequired: true }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { roomId } = this.requestParams();
+
+		if (!roomId) {
+			throw new Meteor.Error('error-invalid-params', 'Query must contains `roomId`!');
+		}
+
+		const room = Rooms.findOneById(roomId);
+		if (!room) { return API.v1.notFound(); }
+
+		if (room.u && room.u._id) {
+			room.u = Users.findOneByIdWithCustomFields(room.u._id);
+		}
+
+		return API.v1.success({
+			room,
+		});
+	},
+});
+
+API.v1.addRoute('admin.deleteRoom', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { roomId } = this.requestParams();
+
+		if (!roomId) {
+			throw new Meteor.Error('error-invalid-params', 'Query must contains `roomId`!');
+		}
+
+		const room = Rooms.findOneById(roomId);
+		if (!room) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('eraseRoom', room._id));
+
+		return API.v1.success();
 	},
 });
 
