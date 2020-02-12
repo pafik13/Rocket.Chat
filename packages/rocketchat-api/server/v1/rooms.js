@@ -418,7 +418,9 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 			},
 		};
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
-		delete subscription._id;
+		if (subscription) {
+			delete subscription._id;
+		}
 
 		const result = Rooms.findOneByIdOrName(room._id, {
 			...fields,
