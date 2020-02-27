@@ -110,7 +110,7 @@ describe('[Settings]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.property('_id', 'Site_Url');
+					expect(res.body).to.have.property('_id', 'Use_elastic');
 					expect(res.body).to.have.property('value', true);
 				})
 				.end(done);
