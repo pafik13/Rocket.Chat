@@ -555,6 +555,39 @@ describe('[Channels]', function() {
 			})
 			.end(done);
 	});
+
+	it('/channels.members:mongo', (done) => {
+		request.get(api('channels.members'))
+			.set(credentials)
+			.query({
+				roomId: channel._id,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('members').and.to.be.an('array');
+				expect(res.body).to.have.property('count');
+				expect(res.body).to.have.property('total');
+				expect(res.body).to.have.property('offset');
+			})
+			.end(done);
+	});
+
+	it('change Rooms_Members_Serch_Type to elastic', (done) => {
+		request.post(api('settings/Use_elastic'))
+			.set(credentials)
+			.send({
+				value: 'elastic',
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done);
+	});
+
 	it('/channels.members', (done) => {
 		request.get(api('channels.members'))
 			.set(credentials)
@@ -569,6 +602,20 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.property('count');
 				expect(res.body).to.have.property('total');
 				expect(res.body).to.have.property('offset');
+			})
+			.end(done);
+	});
+
+	it('change Rooms_Members_Serch_Type to mongo', (done) => {
+		request.post(api('settings/Rooms_Members_Serch_Type'))
+			.set(credentials)
+			.send({
+				value: 'mongo',
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
 			})
 			.end(done);
 	});

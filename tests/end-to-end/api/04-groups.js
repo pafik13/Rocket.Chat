@@ -503,6 +503,70 @@ describe('[Groups]', function() {
 			.end(done);
 	});
 
+	it('/groups.members:mongo', (done) => {
+		request.get(api('channels.members'))
+			.set(credentials)
+			.query({
+				roomId: group._id,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('members').and.to.be.an('array');
+				expect(res.body).to.have.property('count');
+				expect(res.body).to.have.property('total');
+				expect(res.body).to.have.property('offset');
+			})
+			.end(done);
+	});
+
+	it('change Rooms_Members_Serch_Type to elastic', (done) => {
+		request.post(api('settings/Use_elastic'))
+			.set(credentials)
+			.send({
+				value: 'elastic',
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done);
+	});
+
+	it('/groups.members:elastic', (done) => {
+		request.get(api('channels.members'))
+			.set(credentials)
+			.query({
+				roomId: group._id,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('members').and.to.be.an('array');
+				expect(res.body).to.have.property('count');
+				expect(res.body).to.have.property('total');
+				expect(res.body).to.have.property('offset');
+			})
+			.end(done);
+	});
+
+	it('change Rooms_Members_Serch_Type to mongo', (done) => {
+		request.post(api('settings/Use_elastic'))
+			.set(credentials)
+			.send({
+				value: 'mongo',
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done);
+	});
+
 	it('/groups.rename', async(done) => {
 		const roomInfo = await getRoomInfo(group._id);
 
