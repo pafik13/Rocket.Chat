@@ -38,7 +38,13 @@ test-configure-elastic-index: &test-configure-elastic-index
   command: |
     bash .circleci/queries.sh check
     bash .circleci/queries.sh create
-
+    
+test-info-elastic-index: &test-info-elastic-index
+  name: Info Elasctic Index
+  command: |
+    bash .circleci/queries.sh check
+    bash .circleci/queries.sh indeces
+    
 test-docker-image: &test-docker-image
   circleci/node:8.17-stretch-browsers
 
@@ -63,6 +69,7 @@ test-with-oplog: &test-with-oplog
     - run: *test-configure-elastic-index
     - run: *test-npm-install
     - run: *test-run
+    - run: *test-info-elastic-index
     - store_artifacts: *test-store_artifacts
 
 
