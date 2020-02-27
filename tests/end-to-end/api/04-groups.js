@@ -504,7 +504,7 @@ describe('[Groups]', function() {
 	});
 
 	it('/groups.members:mongo', (done) => {
-		request.get(api('channels.members'))
+		request.get(api('groups.members'))
 			.set(credentials)
 			.query({
 				roomId: group._id,
@@ -536,7 +536,7 @@ describe('[Groups]', function() {
 	});
 
 	it('/groups.members:elastic', (done) => {
-		request.get(api('channels.members'))
+		request.get(api('groups.members'))
 			.set(credentials)
 			.query({
 				roomId: group._id,
