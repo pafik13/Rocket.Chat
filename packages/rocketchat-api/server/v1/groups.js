@@ -327,7 +327,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		const options = {
 			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
 			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
-			region: settings.get('FileUpload_S3_Region'),
+			region: 'eu-central-1',
 			sslEnabled: true,
 		};
 
