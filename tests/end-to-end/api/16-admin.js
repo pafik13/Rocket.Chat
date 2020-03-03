@@ -101,7 +101,6 @@ describe('[Admin]', function() {
 					expect(res.body).to.have.nested.property('channel._id');
 					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
 					expect(res.body).to.have.nested.property('channel.t', 'c');
-					expect(res.body).to.have.nested.property('channel.msgs', 0);
 					testChannel = res.body;
 				})
 				.end(done);
@@ -135,7 +134,6 @@ describe('[Admin]', function() {
 					expect(res.body).to.have.nested.property('group._id');
 					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 					expect(res.body).to.have.nested.property('group.t', 'p');
-					expect(res.body).to.have.nested.property('group.msgs', 0);
 					testGroup = res.body;
 				})
 				.end(done);
