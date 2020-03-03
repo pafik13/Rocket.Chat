@@ -445,22 +445,6 @@ API.v1.addRoute('rooms.leave', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('rooms.getByAnonymId', { authRequired: true }, {
-	get() {
-		const { anonym_id } = this.queryParams;
-
-		if (!anonym_id) {
-			return API.v1.failure('The \'anonym_id\' query param is required');
-		}
-
-		const result = Rooms.findByAnonymId(anonym_id).fetch();
-
-		return API.v1.success({
-			rooms: result.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
-		});
-	},
-});
-
 API.v1.addRoute('rooms.delete', { authRequired: true }, {
 	post() {
 		const room = findRoomByIdOrName({ params: this.bodyParams });

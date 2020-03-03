@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
-import { Users, Rooms } from 'meteor/rocketchat:models';
+import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { API } from '../api';
 import * as heapdump from 'heapdump';
@@ -14,6 +14,55 @@ API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 			return API.v1.success({
 				indeces,
 			});
+		});
+	},
+});
+
+
+API.v1.addRoute('admin.getRoomsByAnonymId', { authRequired: true }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { anonym_id, rocket_id } = this.queryParams;
+
+		if (!anonym_id) {
+			return API.v1.failure('The \'anonym_id\' query param is required');
+		}
+
+		if (!rocket_id) {
+			return API.v1.failure('The \'rocket_id\' query param is required');
+		}
+
+		const user = Users.findOneById(rocket_id);
+		if (!user) {
+			return API.v1.failure('User not found');
+		}
+
+		const roomsOpts = {
+			fields: {
+				name: 1,
+				fname: 1,
+				t: 1,
+				msgs: 1,
+				usersCount: 1,
+				customFields: 1,
+				broadcast: 1,
+				encrypted: 1,
+				ro: 1,
+			},
+		};
+		const rooms = Rooms.findByAnonymId(anonym_id, roomsOpts).fetch();
+		const subs = Subscriptions.findByUserIdAndRoomIds(user._id, rooms.map((r) => r._id), { fields: { rid: 1, roles: 1 } });
+		for (let i = 0; i < subs.length; i++) {
+			const sub = subs[i];
+			const room = rooms.find((r) => r._id === sub.rid);
+			room.roles = sub.roles ? sub.roles : [];
+		}
+
+		return API.v1.success({
+			rooms: rooms.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
 		});
 	},
 });

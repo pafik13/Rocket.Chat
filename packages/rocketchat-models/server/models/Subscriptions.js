@@ -621,6 +621,17 @@ export class Subscriptions extends Base {
 		return this.find(query, options);
 	}
 
+	findByUserIdAndRoomIds(userId, roomIds, options) {
+		const query = {
+			'u._id': userId,
+			rid: {
+				$in: roomIds,
+			},
+		};
+
+		return this.find(query, options);
+	}
+
 	findByRoomIdAndUserIdsOrAllMessages(roomId, userIds) {
 		const query = {
 			rid: roomId,

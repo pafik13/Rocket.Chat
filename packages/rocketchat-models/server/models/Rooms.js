@@ -1188,12 +1188,12 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
-	findByAnonymId(anonymId) {
+	findByAnonymId(anonymId, options) {
 		const query = {
 			'customFields.anonym_id': `${ anonymId }`,
 		};
 
-		return this.find(query);
+		return this.find(query, options);
 	}
 
 	muteUsernameByRoomId(_id, username) {
