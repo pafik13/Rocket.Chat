@@ -54,7 +54,7 @@ API.v1.addRoute('admin.getRoomsByAnonymId', { authRequired: true }, {
 			},
 		};
 		const rooms = Rooms.findByAnonymId(anonym_id, roomsOpts).fetch();
-		const subs = Subscriptions.findByUserIdAndRoomIds(user._id, rooms.map((r) => r._id), { fields: { rid: 1, roles: 1 } });
+		const subs = Subscriptions.findByUserIdAndRoomIds(user._id, rooms.map((r) => r._id), { fields: { rid: 1, roles: 1, 'u._id': 1 } }).fetch();
 		for (let i = 0; i < subs.length; i++) {
 			const sub = subs[i];
 			const room = rooms.find((r) => r._id === sub.rid);
