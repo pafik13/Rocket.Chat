@@ -205,7 +205,7 @@ API.v1.addRoute('rooms.uploadAvatar/:rid', { authRequired: true }, {
 		const options = {
 			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
 			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
-			region: settings.get('FileUpload_S3_Region'),
+			region: 'eu-central-1',
 			sslEnabled: true,
 		};
 
