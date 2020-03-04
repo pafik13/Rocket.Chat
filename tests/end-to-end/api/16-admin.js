@@ -153,9 +153,41 @@ describe('[Admin]', function() {
 	});
 
 	describe('setCustomFieldsForRoom', () => {
-		it('should set customFields.anonym_id to channel', async(done) => {
-			const testChannel = await getChannelInfo(apiPublicChannelName);
+		let testChannel;
+		it('/channels.invite', async(done) => {
+			testChannel = await getChannelInfo(apiPublicChannelName);
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomId: testChannel._id,
+					userId: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.nested.property('channel._id');
+					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
+					expect(res.body).to.have.nested.property('channel.t', 'c');
+				})
+				.end(done);
+		});
 
+		it('/channels.addModerator', (done) => {
+			request.post(api('channels.addModerator'))
+				.set(credentials)
+				.send({
+					roomId: testChannel._id,
+					userId: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should set customFields.anonym_id to channel', (done) => {
 			request.post(api('admin.setCustomFieldsForRoom'))
 				.set(credentials)
 				.send({
@@ -173,6 +205,7 @@ describe('[Admin]', function() {
 				})
 				.end(done);
 		});
+
 		it('should set customFields.anonym_id to group', async(done) => {
 			const testGroup = await getGroupInfo(apiPrivateChannelName);
 
