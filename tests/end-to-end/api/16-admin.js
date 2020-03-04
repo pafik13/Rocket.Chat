@@ -152,7 +152,7 @@ describe('[Admin]', function() {
 		});
 	});
 
-	describe('setCustomFieldsForRoom', () => {
+	describe('setCustomFieldsForRoom - channel', () => {
 		let testChannel;
 		it('/channels.invite', async(done) => {
 			testChannel = await getChannelInfo(apiPublicChannelName);
@@ -164,12 +164,6 @@ describe('[Admin]', function() {
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('channel._id');
-					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
-					expect(res.body).to.have.nested.property('channel.t', 'c');
-				})
 				.end(done);
 		});
 
@@ -182,11 +176,9 @@ describe('[Admin]', function() {
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-				})
 				.end(done);
 		});
+
 		it('should set customFields.anonym_id to channel', (done) => {
 			request.post(api('admin.setCustomFieldsForRoom'))
 				.set(credentials)
@@ -205,10 +197,35 @@ describe('[Admin]', function() {
 				})
 				.end(done);
 		});
+	});
 
+	describe('setCustomFieldsForRoom - group', () => {
+		let testGroup;
+		it('/groups.invite', async(done) => {
+			testGroup = await getGroupInfo(apiPrivateChannelName);
+
+			request.post(api('groups.invite'))
+				.set(credentials)
+				.send({
+					roomId: testGroup._id,
+					userId: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+		it('/groups.addModerator', (done) => {
+			request.post(api('groups.addModerator'))
+				.set(credentials)
+				.send({
+					roomId: testGroup._id,
+					userId: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
 		it('should set customFields.anonym_id to group', async(done) => {
-			const testGroup = await getGroupInfo(apiPrivateChannelName);
-
 			request.post(api('admin.setCustomFieldsForRoom'))
 				.set(credentials)
 				.send({
