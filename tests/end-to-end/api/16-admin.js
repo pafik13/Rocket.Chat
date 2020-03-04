@@ -248,9 +248,9 @@ describe('[Admin]', function() {
 
 	describe('getRoomsByAnonymId', () => {
 		it('should return the channel and the group for anonym_id', (done) => {
-			request.post(api('admin.getRoomsByAnonymId'))
+			request.get(api('admin.getRoomsByAnonymId'))
 				.set(credentials)
-				.send({
+				.query({
 					anonym_id: 'xxx',
 					rocket_id: 'rocket.cat',
 				})
