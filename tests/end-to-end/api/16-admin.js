@@ -10,6 +10,33 @@ import {
 } from '../../data/api-data.js';
 import { password } from '../../data/user.js';
 
+function getChannelInfo(roomName) {
+	return new Promise((resolve/* , reject*/) => {
+		request.get(api('channels.info'))
+			.set(credentials)
+			.query({
+				roomName,
+			})
+			.end((err, req) => {
+				resolve(req.body.channel);
+			});
+	});
+}
+
+function getGroupInfo(roomName) {
+	return new Promise((resolve/* , reject*/) => {
+		request.get(api('groups.info'))
+			.set(credentials)
+			.query({
+				roomName,
+			})
+			.end((err, req) => {
+				resolve(req.body.group);
+			});
+	});
+}
+
+
 describe('[Admin]', function() {
 	this.retries(0);
 
@@ -87,25 +114,9 @@ describe('[Admin]', function() {
 	});
 
 	describe('getRoomInfo', () => {
-		let testChannel = {};
-		it('should return channel basic structure - channels.info', (done) => {
-			request.get(api('channels.info'))
-				.set(credentials)
-				.query({
-					roomName: apiPublicChannelName,
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('channel._id');
-					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
-					expect(res.body).to.have.nested.property('channel.t', 'c');
-					testChannel = res.body.channel;
-				})
-				.end(done);
-		});
-		it('should return channel basic structure - admin.getRoomInfo', (done) => {
+		it('should return channel basic structure - admin.getRoomInfo', async(done) => {
+			const testChannel = await getChannelInfo(apiPublicChannelName);
+
 			request.get(api('admin.getRoomInfo'))
 				.set(credentials)
 				.query({
@@ -121,25 +132,9 @@ describe('[Admin]', function() {
 				})
 				.end(done);
 		});
-		let testGroup = {};
-		it('should return group basic structure - groups.info', (done) => {
-			request.get(api('groups.info'))
-				.set(credentials)
-				.query({
-					roomName: apiPrivateChannelName,
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('group._id');
-					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
-					expect(res.body).to.have.nested.property('group.t', 'p');
-					testGroup = res.body.group;
-				})
-				.end(done);
-		});
-		it('should return group basic structure - admin.getRoomInfo', (done) => {
+		it('should return group basic structure - admin.getRoomInfo', async(done) => {
+			const testGroup = await getGroupInfo(apiPrivateChannelName);
+
 			request.get(api('admin.getRoomInfo'))
 				.set(credentials)
 				.query({
@@ -158,25 +153,9 @@ describe('[Admin]', function() {
 	});
 
 	describe('setCustomFieldsForRoom', () => {
-		let testChannel = {};
-		it('should return channel basic structure - channels.info', (done) => {
-			request.get(api('channels.info'))
-				.set(credentials)
-				.query({
-					roomName: apiPublicChannelName,
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('channel._id');
-					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
-					expect(res.body).to.have.nested.property('channel.t', 'c');
-					testChannel = res.body.channel;
-				})
-				.end(done);
-		});
-		it('should set customFields.anonym_id to channel', (done) => {
+		it('should set customFields.anonym_id to channel', async(done) => {
+			const testChannel = await getChannelInfo(apiPublicChannelName);
+
 			request.post(api('admin.setCustomFieldsForRoom'))
 				.set(credentials)
 				.send({
@@ -194,25 +173,9 @@ describe('[Admin]', function() {
 				})
 				.end(done);
 		});
-		let testGroup = {};
-		it('should return group basic structure - groups.info', (done) => {
-			request.get(api('groups.info'))
-				.set(credentials)
-				.query({
-					roomName: apiPrivateChannelName,
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('group._id');
-					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
-					expect(res.body).to.have.nested.property('group.t', 'p');
-					testGroup = res.body.group;
-				})
-				.end(done);
-		});
-		it('should set customFields.anonym_id to group', (done) => {
+		it('should set customFields.anonym_id to group', async(done) => {
+			const testGroup = await getGroupInfo(apiPrivateChannelName);
+
 			request.post(api('admin.setCustomFieldsForRoom'))
 				.set(credentials)
 				.send({
