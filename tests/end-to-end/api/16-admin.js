@@ -115,9 +115,9 @@ describe('[Admin]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('channel._id');
-					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
-					expect(res.body).to.have.nested.property('channel.t', 'c');
+					expect(res.body).to.have.nested.property('room._id');
+					expect(res.body).to.have.nested.property('room.name', apiPublicChannelName);
+					expect(res.body).to.have.nested.property('room.t', 'c');
 				})
 				.end(done);
 		});
@@ -148,9 +148,9 @@ describe('[Admin]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('group._id');
-					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
-					expect(res.body).to.have.nested.property('group.t', 'p');
+					expect(res.body).to.have.nested.property('room._id');
+					expect(res.body).to.have.nested.property('room.name', apiPrivateChannelName);
+					expect(res.body).to.have.nested.property('room.t', 'p');
 				})
 				.end(done);
 		});
