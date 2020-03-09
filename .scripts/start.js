@@ -34,8 +34,8 @@ const appOptions = {
 	env: {
 		PORT: 3000,
 		ROOT_URL: 'http://localhost:3000',
-		MONGO_URL: 'mongodb://localhost:27017/test',
-		MONGO_OPLOG_URL: 'mongodb://localhost:27017/local',
+		// 		MONGO_URL: 'mongodb://localhost:27017/test',
+		// 		MONGO_OPLOG_URL: 'mongodb://localhost:27017/local',
 	},
 };
 
@@ -96,10 +96,10 @@ function startProcess(opts, callback) {
 function startApp(callback) {
 	startProcess({
 		name: 'Meteor App',
-		// 		command: 'node',
-		// 		params: ['/tmp/build-test/bundle/main.js'],
 		command: 'node',
-		params: ['.meteor/local/build/main.js'],
+		params: ['/tmp/build-test/bundle/main.js'],
+		// 		command: 'node',
+		// 		params: ['.meteor/local/build/main.js'],
 		waitForMessage: appOptions.waitForMessage,
 		options: {
 			cwd: srcDir,
