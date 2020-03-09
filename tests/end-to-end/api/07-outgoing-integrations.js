@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import { api, request, credentials, integration } from '../../data/api-data.js';
 
 describe('Outgoing Integrations', function() {

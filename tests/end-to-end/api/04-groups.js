@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import { getCredentials, api, request, credentials, group, apiPrivateChannelName } from '../../data/api-data.js';
 import { adminUsername } from '../../data/user';
 
@@ -170,10 +172,10 @@ describe('[Groups]', function() {
 		});
 	});
 
-	it('/groups.invite', async(done) => {
+	it('/groups.invite', async() => {
 		const roomInfo = await getRoomInfo(group._id);
 
-		request.post(api('groups.invite'))
+		return request.post(api('groups.invite'))
 			.set(credentials)
 			.send({
 				roomId: group._id,
@@ -187,8 +189,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 				expect(res.body).to.have.nested.property('group.t', 'p');
 				expect(res.body).to.have.nested.property('group.msgs', roomInfo.group.msgs + 1);
-			})
-			.end(done);
+			});
 	});
 
 	it('/groups.addModerator', (done) => {
@@ -296,10 +297,10 @@ describe('[Groups]', function() {
 			.end(done);
 	});
 
-	it('/groups.invite', async(done) => {
+	it('/groups.invite', async() => {
 		const roomInfo = await getRoomInfo(group._id);
 
-		request.post(api('groups.invite'))
+		return request.post(api('groups.invite'))
 			.set(credentials)
 			.send({
 				roomId: group._id,
@@ -313,8 +314,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 				expect(res.body).to.have.nested.property('group.t', 'p');
 				expect(res.body).to.have.nested.property('group.msgs', roomInfo.group.msgs + 1);
-			})
-			.end(done);
+			});
 	});
 
 	it('/groups.addOwner', (done) => {
@@ -567,10 +567,10 @@ describe('[Groups]', function() {
 			.end(done);
 	});
 
-	it('/groups.rename', async(done) => {
+	it('/groups.rename', async() => {
 		const roomInfo = await getRoomInfo(group._id);
 
-		request.post(api('groups.rename'))
+		return request.post(api('groups.rename'))
 			.set(credentials)
 			.send({
 				roomId: group._id,
@@ -584,8 +584,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.name', `EDITED${ apiPrivateChannelName }`);
 				expect(res.body).to.have.nested.property('group.t', 'p');
 				expect(res.body).to.have.nested.property('group.msgs', roomInfo.group.msgs + 1);
-			})
-			.end(done);
+			});
 	});
 
 	it('/groups.getIntegrations', (done) => {
@@ -713,7 +712,7 @@ describe('[Groups]', function() {
 				})
 				.end(done);
 		});
-		it('change customFields', async(done) => {
+		it('change customFields', (done) => {
 			const customFields = { field9:'value9' };
 			request.post(api('groups.setCustomFields'))
 				.set(credentials)
@@ -771,7 +770,7 @@ describe('[Groups]', function() {
 					done();
 				});
 		});
-		it('set customFields with one nested field', async(done) => {
+		it('set customFields with one nested field', (done) => {
 			const customFields = { field1:'value1' };
 			request.post(api('groups.setCustomFields'))
 				.set(credentials)
@@ -790,7 +789,7 @@ describe('[Groups]', function() {
 				})
 				.end(done);
 		});
-		it('set customFields with multiple nested fields', async(done) => {
+		it('set customFields with multiple nested fields', (done) => {
 			const customFields = { field2:'value2', field3:'value3', field4:'value4' };
 
 			request.post(api('groups.setCustomFields'))
@@ -813,7 +812,7 @@ describe('[Groups]', function() {
 				})
 				.end(done);
 		});
-		it('set customFields to empty object', async(done) => {
+		it('set customFields to empty object', (done) => {
 			const customFields = {};
 
 			request.post(api('groups.setCustomFields'))
@@ -835,7 +834,7 @@ describe('[Groups]', function() {
 				})
 				.end(done);
 		});
-		it('set customFields as a string -> should return 400', async(done) => {
+		it('set customFields as a string -> should return 400', (done) => {
 			const customFields = '';
 
 			request.post(api('groups.setCustomFields'))
@@ -921,7 +920,7 @@ describe('[Groups]', function() {
 					done();
 				});
 		});
-		it('/groups.invite', async(done) => {
+		it('/groups.invite', (done) => {
 			request.post(api('groups.invite'))
 				.set(credentials)
 				.send({
@@ -991,7 +990,7 @@ describe('[Groups]', function() {
 					done();
 				});
 		});
-		it('/groups.invite', async(done) => {
+		it('/groups.invite', (done) => {
 			request.post(api('groups.invite'))
 				.set(credentials)
 				.send({

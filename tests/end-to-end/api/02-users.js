@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import crypto from 'crypto';
 import {
 	getCredentials,
@@ -962,20 +964,21 @@ describe('[Users]', function() {
 		});
 
 		describe('Testing if the returned token is valid:', () => {
-			it('should return 200', (done) => request.post(api('users.createToken'))
-				.set(credentials)
-				.send({ username: user.username })
-				.expect('Content-Type', 'application/json')
-				.end((err, res) => (err ? done() :
-					request.get(api('me'))
-						.set({ 'X-Auth-Token': `${ res.body.data.authToken }`, 'X-User-Id': res.body.data.userId })
-						.expect(200)
-						.expect((res) => {
-							expect(res.body).to.have.property('success', true);
-						})
-						.end(done))
-				)
-			);
+			it('should return 200', (done) => {
+				request.post(api('users.createToken'))
+					.set(credentials)
+					.send({ username: user.username })
+					.expect('Content-Type', 'application/json')
+					.end((err, res) => (err ? done() :
+						request.get(api('me'))
+							.set({ 'X-Auth-Token': `${ res.body.data.authToken }`, 'X-User-Id': res.body.data.userId })
+							.expect(200)
+							.expect((res) => {
+								expect(res.body).to.have.property('success', true);
+							})
+							.end(done))
+					);
+			});
 		});
 	});
 
@@ -1260,7 +1263,7 @@ describe('[Users]', function() {
 						.end(done);
 				});
 			});
-			it('Grant necessary permission "create-personal-accss-tokens" to user', (done) => updatePermission('create-personal-access-tokens', ['admin']).then(done));
+			it('Grant necessary permission "create-personal-accss-tokens" to user', () => updatePermission('create-personal-access-tokens', ['admin']));
 			describe('[/users.generatePersonalAccessToken]', () => {
 				it('should return a personal access token to user', (done) => {
 					request.post(api('users.generatePersonalAccessToken'))
@@ -1362,7 +1365,7 @@ describe('[Users]', function() {
 			});
 		});
 		describe('unsuccessful cases', () => {
-			it('Remove necessary permission "create-personal-accss-tokens" to user', (done) => updatePermission('create-personal-access-tokens', []).then(done));
+			it('Remove necessary permission "create-personal-accss-tokens" to user', () => updatePermission('create-personal-access-tokens', []));
 			describe('should return an error when the user dont have the necessary permission "create-personal-access-tokens"', () => {
 				it('/users.generatePersonalAccessToken', (done) => {
 					request.post(api('users.generatePersonalAccessToken'))
