@@ -50,6 +50,8 @@ class FlexTab extends Page {
 
 	get membersTabContent() { return browser.element('.members-list'); }
 
+	get membersStatusSelect() { return browser.element('select#status-type'); }
+
 	get userSearchBar() { return browser.element('#user-add-search'); }
 
 	get removeUserBtn() { return browser.element('.remove-user'); }
@@ -65,8 +67,6 @@ class FlexTab extends Page {
 	get startVideoCall() { return browser.element('.start-video-call'); }
 
 	get startAudioCall() { return browser.element('.start-audio-call'); }
-
-	get showAll() { return browser.element('.see-all'); }
 
 	get membersUserInfo() { return browser.element('.flex-tab-container .info'); }
 
@@ -183,9 +183,9 @@ class FlexTab extends Page {
 	}
 
 	addPeopleToChannel(user) {
-		this.userSearchBar.waitForVisible();
-		this.userSearchBar.setValue(user);
-		browser.waitForVisible('.-autocomplete-item', 5000);
+		// this.userSearchBar.waitForVisible();
+		this.userSearchBar.type(user);
+		// browser.waitForVisible('.-autocomplete-item', 5000);
 		browser.click('.-autocomplete-item');
 	}
 

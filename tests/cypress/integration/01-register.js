@@ -72,13 +72,6 @@ describe('[Register]', () => {
 			loginPage.emailField.should('have.class', 'error');
 			loginPage.emailInvalidText.get('text').should('not.be.empty');
 		});
-
-		it.skip('it should be invalid for email space', () => {
-			loginPage.emailField.type('invalid email@mail.com');
-			loginPage.submit();
-			loginPage.emailField.should('have.class', 'error');
-			loginPage.emailInvalidText.get('text').should('not.be.empty');
-		});
 	});
 
 	describe('password:', () => {

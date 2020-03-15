@@ -36,7 +36,7 @@ describe('[Main Elements Render]', function() {
 				sideNav.spotlightSearchPopUp.should('be.visible');
 			});
 
-			it.skip('it should remove the list when the spotlight loses focus', () => {
+			it('it should remove the list when the spotlight loses focus', () => {
 				sideNav.spotlightSearchPopUp.should('be.visible');
 				mainContent.messageInput.click();
 				mainContent.lastMessage.click();
@@ -44,14 +44,21 @@ describe('[Main Elements Render]', function() {
 			});
 
 			it('it should add text to the spotlight and show the channel list', () => {
+				sideNav.spotlightSearchIcon.click();
+				sideNav.spotlightSearch.should('be.visible');
+				sideNav.spotlightSearch.click('center');
+				sideNav.spotlightSearchPopUp.should('be.visible');
 				sideNav.spotlightSearch.type('rocket.cat');
 				sideNav.spotlightSearchPopUp.should('be.visible');
 			});
 
-			it.skip('it should remove the text on the spotlight and the list when lost focus', () => {
+			it('it should remove the text on the spotlight and the list when lost focus', () => {
 				sideNav.spotlightSearchPopUp.should('be.visible');
 				mainContent.messageInput.click();
 				sideNav.spotlightSearchPopUp.should('not.be.visible');
+				sideNav.spotlightSearchIcon.click();
+				sideNav.spotlightSearch.should('be.visible');
+				sideNav.spotlightSearch.click('center');
 				sideNav.spotlightSearch.should('have.text', '');
 			});
 		});
@@ -107,15 +114,15 @@ describe('[Main Elements Render]', function() {
 				mainContent.emptyFavoriteStar.should('be.visible');
 			});
 
-			it.skip('it should click the star', () => {
+			it('it should click the star', () => {
 				mainContent.emptyFavoriteStar.click();
 			});
 
-			it.skip('it should not show the empty favorite star', () => {
+			it('it should not show the empty favorite star', () => {
 				mainContent.favoriteStar.should('be.visible');
 			});
 
-			it.skip('it should click the star', () => {
+			it('it should click the star', () => {
 				mainContent.favoriteStar.click();
 			});
 
@@ -133,8 +140,10 @@ describe('[Main Elements Render]', function() {
 				mainContent.recordBtn.should('be.visible');
 			});
 
-			it.skip('it should show the video call button', () => {
-				mainContent.videoCamBtn.should('be.visible');
+			it('it should show the video call button', () => {
+				mainContent.messageBoxActions.last().click();
+				mainContent.videoCamItem.should('be.visible');
+				mainContent.popoverWrapper.click();
 			});
 
 			it('it should show the emoji button', () => {
@@ -218,8 +227,9 @@ describe('[Main Elements Render]', function() {
 					flexTab.membersTabContent.should('be.visible');
 				});
 
-				it.skip('it should show the show all link', () => {
-					flexTab.showAll.should('be.visible');
+				it('it should show the show all link', () => {
+					flexTab.membersStatusSelect.should('be.visible');
+					flexTab.membersStatusSelect.select('all');
 				});
 			});
 
