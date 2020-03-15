@@ -1,0 +1,583 @@
+accounts-facebook@1.3.2
+  accounts-base@1.4.3
+  accounts-oauth@1.1.16
+  accounts-ui@1.3.1 (weak dependency)
+  ecmascript@0.12.0
+  facebook-config-ui@1.0.2 (weak dependency)
+  facebook-oauth@1.5.0
+  isobuild:isopack-2@1.0.0
+
+accounts-github@1.4.3
+  accounts-base@1.4.3
+  accounts-oauth@1.1.16
+  accounts-ui@1.3.1 (weak dependency)
+  ecmascript@0.12.0
+  github-config-ui@1.0.1 (weak dependency)
+  github-oauth@1.2.3
+  isobuild:isopack-2@1.0.0
+
+accounts-google@1.3.3
+  accounts-base@1.4.3
+  accounts-oauth@1.1.16
+  accounts-ui@1.3.1 (weak dependency)
+  ecmascript@0.12.0
+  google-config-ui@1.0.1 (weak dependency)
+  google-oauth@1.2.6
+  isobuild:isopack-2@1.0.0
+
+accounts-meteor-developer@1.4.2
+  accounts-base@1.4.3
+  accounts-oauth@1.1.16
+  accounts-ui@1.3.1 (weak dependency)
+  ecmascript@0.12.0
+  isobuild:isopack-2@1.0.0
+  meteor-developer-config-ui@1.0.1 (weak dependency)
+  meteor-developer-oauth@1.2.1
+
+accounts-password@1.5.3
+  accounts-base@1.4.5
+  check@1.3.1
+  ddp@1.4.0
+  ecmascript@0.13.2
+  ejson@1.1.0
+  email@1.2.3
+  isobuild:isopack-2@1.0.0
+  npm-bcrypt@0.9.3
+  random@1.1.0
+  sha@1.0.9
+  srp@1.0.12
+
+accounts-twitter@1.4.2
+  accounts-base@1.4.3
+  accounts-oauth@1.1.16
+  accounts-ui@1.3.1 (weak dependency)
+  ecmascript@0.12.0
+  http@1.4.1
+  isobuild:isopack-2@1.0.0
+  twitter-config-ui@1.0.0 (weak dependency)
+  twitter-oauth@1.2.0
+
+blaze-html-templates@1.1.2
+  blaze@2.3.2
+  spacebars@1.0.15
+  templating@1.3.2
+  ui@1.0.12
+
+check@1.3.1
+  ecmascript@0.10.0
+  ejson@1.1.0
+  isobuild:isopack-2@1.0.0
+
+ddp-common@1.4.0
+  check@1.3.0
+  ecmascript@0.10.0
+  ejson@1.1.0
+  isobuild:isopack-2@1.0.0
+  random@1.1.0
+  retry@1.1.0
+  tracker@1.1.3
+
+ddp-rate-limiter@1.0.7
+  rate-limit@1.0.7
+
+deepwell:bootstrap-datepicker2@1.3.0
+  jquery@1.0.0
+
+dispatch:run-as-user@1.1.1
+  check@1.0.5
+  ddp@1.1.0
+  mongo@1.1.0
+  underscore@1.0.3
+
+dynamic-import@0.5.1
+  fetch@0.1.0
+  inter-process-messaging@0.1.0
+  isobuild:dynamic-import@1.5.0
+  modern-browsers@0.1.2
+  modules@0.13.0
+  promise@0.11.1
+
+ecmascript@0.14.2
+  babel-compiler@7.5.2
+  babel-runtime@1.5.0
+  dynamic-import@0.5.1
+  ecmascript-runtime@0.7.0
+  isobuild:compiler-plugin@1.0.0
+  isobuild:isopack-2@1.0.0
+  modules@0.15.0
+  promise@0.11.2
+
+ejson@1.1.1
+  base64@1.0.11
+  ecmascript@0.12.4
+  isobuild:isopack-2@1.0.0
+
+email@1.2.3
+
+fastclick@1.0.13
+
+francocatena:status@1.5.3
+  deps@1.0.5
+  isobuild:isopack-2@1.0.0
+  reactive-var@1.0.3
+  tap:i18n@1.7.0
+  templating@1.0.9
+  underscore@1.0.1
+
+http@1.4.2
+  modules@0.12.0
+  url@1.2.0
+
+jalik:ufs@1.0.0*
+
+jalik:ufs-gridfs@1.0.0*
+
+jparker:gravatar@0.5.1
+  jparker:crypto-md5@0.1.1
+  underscore@1.0.3
+
+jquery@1.11.11*
+
+juliancwirko:postcss@2.0.3
+  ecmascript@0.10.4
+  isobuild:minifier-plugin@1.0.0
+  minifier-css@1.3.1
+  tmeasday:check-npm-versions@0.3.2
+
+kadira:blaze-layout@2.3.0
+  blaze@2.0.3
+  jquery@1.0.1
+  reactive-dict@1.0.4
+  templating@1.0.9
+  tracker@1.0.3
+  underscore@1.0.1
+
+kadira:flow-router@2.12.1
+  ejson@1.0.9-rc.1
+  meteorhacks:fast-render@2.14.0 (weak dependency)
+  modules@0.5.1-rc.1
+  reactive-dict@1.1.5-rc.1
+  reactive-var@1.0.7-rc.1
+  tracker@1.0.11-rc.1
+  underscore@1.0.6-rc.1
+
+keepnox:perfect-scrollbar@0.6.8
+  ecmascript@0.1.6
+  isobuild:isopack-2@1.0.0
+
+kenton:accounts-sandstorm@0.7.0
+  accounts-base@1.3.1 (weak dependency)
+  check@1.2.5
+  ddp-server@2.0.0
+  http@1.2.12
+  random@1.0.10
+  reactive-var@1.0.11
+  tracker@1.1.3
+  webapp@1.3.17
+
+konecty:change-case@2.3.0
+
+konecty:delayed-task@1.0.0
+  coffeescript@1.0.5
+
+konecty:mongo-counter@0.0.5_3
+  coffeescript@1.0.2
+  mongo-livedata@1.0.3
+
+konecty:multiple-instances-status@1.1.0
+  nooitaf:colors@1.1.2_1
+  random@1.0.2
+
+konecty:user-presence@2.6.3
+  check@1.0.3
+  ecmascript@0.12.2
+  isobuild:isopack-2@1.0.0
+  tracker@1.0.4
+
+littledata:synced-cron@1.5.1
+  check@1.1.2
+  logging@1.0.10
+  mongo@1.1.5
+  underscore@1.0.6
+
+logging@1.1.20
+  ecmascript@0.10.0
+  ecmascript-runtime-client@0.6.2
+  ejson@1.1.0
+  isobuild:isopack-2@1.0.0
+
+meteor-base@1.4.0
+  ddp@1.4.0
+  es5-shim@4.8.0
+  hot-code-push@1.0.4
+  livedata@1.0.18
+  webapp@1.6.0
+
+minifier-js@2.6.0
+  babel-compiler@7.5.0
+
+mizzao:autocomplete@0.5.1+
+
+mizzao:timesync@0.3.4+
+
+mobile-experience@1.0.5
+  launch-screen@1.1.1
+  mobile-status-bar@1.0.14
+
+mongo@1.8.1
+  allow-deny@1.1.0
+  autopublish@1.0.7 (weak dependency)
+  binary-heap@1.0.11
+  callback-hook@1.3.0
+  check@1.3.1
+  ddp@1.4.0
+  diff-sequence@1.1.1
+  disable-oplog@1.0.7 (weak dependency)
+  ecmascript@0.14.0
+  ejson@1.1.1
+  facts-base@1.0.1 (weak dependency)
+  insecure@1.0.7 (weak dependency)
+  isobuild:isopack-2@1.0.0
+  minimongo@1.4.5
+  mongo-decimal@0.1.1
+  mongo-dev-server@1.1.0
+  mongo-id@1.0.7
+  npm-mongo@3.3.0
+  random@1.1.0
+  tracker@1.2.0
+  underscore@1.0.10
+  webapp@1.8.0 (weak dependency)
+
+mrt:reactive-store@0.0.1
+  deps@1.0.0
+
+mystor:device-detection@0.2.0
+  deps@1.0.1
+  session@1.0.0
+  templating@1.0.4
+  ui@1.0.0
+  underscore@1.0.0
+
+nimble:restivus@0.8.12
+  accounts-password@1.3.3
+  check@1.0.0
+  coffeescript@1.0.2
+  isobuild:isopack-2@1.0.0
+  simple:json-routes@2.1.0
+  underscore@1.0.0
+
+nooitaf:colors@1.1.2_1
+
+ostrio:cookies@2.6.0
+  ecmascript@0.5.7
+  http@1.2.8
+  isobuild:isopack-2@1.0.0
+  webapp@1.3.10
+
+pauli:accounts-linkedin@5.0.0
+  accounts-base@1.4.2
+  accounts-oauth@1.1.15
+  accounts-ui@1.3.0 (weak dependency)
+  ecmascript@0.10.0
+  http@1.4.0
+  isobuild:isopack-2@1.0.0
+  pauli:linkedin-config-ui@5.0.0 (weak dependency)
+  pauli:linkedin-oauth@5.0.0
+
+raix:handlebar-helpers@0.2.5
+  deps@1.0.5
+  session@1.0.4
+  ui@1.0.4
+  underscore@1.0.1
+
+raix:ui-dropped-event@0.0.7
+  templating@1.0.0
+  ui@1.0.0
+
+random@1.1.0
+  ecmascript@0.10.0
+  isobuild:isopack-2@1.0.0
+
+rate-limit@1.0.9
+  ecmascript@0.10.0
+  isobuild:isopack-2@1.0.0
+  random@1.1.0
+
+reactive-dict@1.3.0
+  ecmascript@0.12.4
+  ejson@1.1.0
+  isobuild:isopack-2@1.0.0
+  mongo@1.6.2 (weak dependency)
+  reload@1.3.0 (weak dependency)
+  tracker@1.2.0
+
+reactive-var@1.0.11
+  tracker@1.1.1
+
+reload@1.3.0
+  ecmascript@0.12.4
+  isobuild:isopack-2@1.0.0
+
+rocketchat:accounts@0.0.1+
+
+rocketchat:action-links@0.0.1+
+
+rocketchat:api@0.0.1+
+
+rocketchat:assets@0.0.1+
+
+rocketchat:authorization@0.0.1+
+
+rocketchat:autolinker@0.0.1+
+
+rocketchat:autotranslate@0.0.1+
+
+rocketchat:bigbluebutton@0.0.1+
+
+rocketchat:bot-helpers@0.0.1+
+
+rocketchat:callbacks@0.0.1+
+
+rocketchat:cas@1.0.0+
+
+rocketchat:channel-settings@0.0.1+
+
+rocketchat:channel-settings-mail-messages@0.0.1+
+
+rocketchat:colors@0.0.1+
+
+rocketchat:cors@0.0.1+
+
+rocketchat:custom-oauth@1.0.0+
+
+rocketchat:custom-sounds@1.0.0+
+
+rocketchat:e2e@0.0.1+
+
+rocketchat:emoji@1.0.0+
+
+rocketchat:emoji-custom@1.0.0+
+
+rocketchat:emoji-emojione@0.0.1+
+
+rocketchat:error-handler@1.0.0+
+
+rocketchat:favico@0.0.1+
+
+rocketchat:federation@0.0.1+
+
+rocketchat:file@0.0.1+
+
+rocketchat:file-upload@0.0.1+
+
+rocketchat:highlight-words@0.0.1+
+
+rocketchat:iframe-login@1.0.0+
+
+rocketchat:importer@0.0.1+
+
+rocketchat:importer-csv@1.0.0+
+
+rocketchat:integrations@0.0.1+
+
+rocketchat:issuelinks@0.0.1+
+
+rocketchat:lazy-load@0.0.1+
+
+rocketchat:lib@0.0.1+
+
+rocketchat:livestream@0.0.5+
+
+rocketchat:logger@0.0.1+
+
+rocketchat:login-token@1.0.0+
+
+rocketchat:mailer@0.0.1+
+
+rocketchat:mailmessages@0.0.1+
+
+rocketchat:mapview@0.0.1+
+
+rocketchat:markdown@0.0.2+
+
+rocketchat:mentions@0.0.1+
+
+rocketchat:mentions-flextab@0.0.1+
+
+rocketchat:message-action@0.0.1+
+
+rocketchat:message-attachments@0.0.1+
+
+rocketchat:message-mark-as-unread@0.0.1+
+
+rocketchat:message-pin@0.0.1+
+
+rocketchat:message-snippet@0.0.1+
+
+rocketchat:message-star@0.0.1+
+
+rocketchat:metrics@0.0.1+
+
+rocketchat:migrations@0.0.1+
+
+rocketchat:models@1.0.0+
+
+rocketchat:mongo-config@0.0.1+
+
+rocketchat:notifications@0.0.1+
+
+rocketchat:nrr@1.0.0+
+
+rocketchat:oauth2-server-config@1.0.0+
+
+rocketchat:oembed@0.0.1+
+
+rocketchat:otr@0.0.1+
+
+rocketchat:promises@0.0.1+
+
+rocketchat:push@3.3.2+
+
+rocketchat:push-notifications@0.0.1+
+
+rocketchat:reactions@0.0.1+
+
+rocketchat:retention-policy@0.0.1+
+
+rocketchat:search@0.0.1+
+
+rocketchat:settings@0.0.1+
+
+rocketchat:setup-wizard@0.0.1+
+
+rocketchat:slashcommands-archive@0.0.1+
+
+rocketchat:slashcommands-asciiarts@0.0.1+
+
+rocketchat:slashcommands-create@0.0.1+
+
+rocketchat:slashcommands-help@0.0.1+
+
+rocketchat:slashcommands-hide@0.0.1+
+
+rocketchat:slashcommands-invite@0.0.1+
+
+rocketchat:slashcommands-invite-all@0.0.1+
+
+rocketchat:slashcommands-join@0.0.1+
+
+rocketchat:slashcommands-kick@0.0.1+
+
+rocketchat:slashcommands-leave@0.0.1+
+
+rocketchat:slashcommands-me@0.0.1+
+
+rocketchat:slashcommands-msg@0.0.1+
+
+rocketchat:slashcommands-mute@0.0.1+
+
+rocketchat:slashcommands-open@0.0.1+
+
+rocketchat:slashcommands-topic@0.0.1+
+
+rocketchat:slashcommands-unarchive@0.0.1+
+
+rocketchat:slider@0.0.1+
+
+rocketchat:statistics@0.0.1+
+
+rocketchat:streamer@1.1.0
+  check@1.1.0
+  ddp-common@1.2.2
+  ecmascript@0.1.6
+  isobuild:isopack-2@1.0.0
+  tracker@1.0.9
+
+rocketchat:theme@0.0.1+
+
+rocketchat:tokenpass@0.0.1+
+
+rocketchat:tooltip@0.0.1+
+
+rocketchat:ui@0.1.0+
+
+rocketchat:ui-account@0.1.0+
+
+rocketchat:ui-admin@0.1.0+
+
+rocketchat:ui-cached-collection@0.0.1+
+
+rocketchat:ui-clean-history@0.0.1+
+
+rocketchat:ui-flextab@0.1.0+
+
+rocketchat:ui-login@0.1.0+
+
+rocketchat:ui-master@0.1.0+
+
+rocketchat:ui-message@0.1.0+
+
+rocketchat:ui-sidenav@0.1.0+
+
+rocketchat:ui-utils@0.0.1+
+
+rocketchat:ui-vrecord@0.0.1+
+
+rocketchat:utils@0.0.1+
+
+rocketchat:version@1.0.0+
+
+rocketchat:videobridge@0.2.0+
+
+rocketchat:webrtc@0.0.1+
+
+service-configuration@1.0.11
+  accounts-base@1.2.14
+  mongo@1.1.14
+
+session@1.2.0
+  ecmascript@0.12.3
+  ejson@1.1.0
+  isobuild:isopack-2@1.0.0
+  reactive-dict@1.2.1
+  reload@1.2.0 (weak dependency)
+
+shell-server@0.4.0
+  ecmascript@0.12.0
+  isobuild:isopack-2@1.0.0
+
+spacebars@1.0.15
+  blaze@2.3.2
+  htmljs@1.0.11
+  observe-sequence@1.0.12
+  tracker@1.1.0
+  underscore@1.0.9
+
+standard-minifier-js@2.6.0
+  babel-compiler@7.5.0
+  ecmascript@0.14.0
+  isobuild:minifier-plugin@1.0.0
+  minifier-js@2.6.0
+
+tap:i18n@1.8.2+
+
+todda00:friendly-slugs@0.6.0
+  check@1.0.2
+  coffeescript@1.0.4
+  isobuild:isopack-2@1.0.0
+  matb33:collection-hooks@0.7.6
+  underscore@1.0.1
+
+tracker@1.2.0
+  ecmascript@0.11.0
+  isobuild:isopack-2@1.0.0
+
+underscore@1.0.10
+
+yasinuslu:blaze-meta@0.3.3
+  reactive-dict@1.0.1
+  templating@1.0.5
+  tracker@1.0.2
+  ui@1.0.1
+  underscore@1.0.0
+

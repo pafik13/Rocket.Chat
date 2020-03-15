@@ -733,7 +733,7 @@ settings.addGroup('OAuth', function() {
 });
 
 settings.addGroup('General', function() {
-	this.add('Show_Setup_Wizard', 'pending', {
+	this.add('Show_Setup_Wizard', 'completed', {
 		type: 'select',
 		public: true,
 		values: [
@@ -749,6 +749,21 @@ settings.addGroup('General', function() {
 			},
 		],
 	});
+
+	this.add('Apps_Framework_enabled', true, {
+		type: 'boolean',
+		public: true,
+	});
+
+	this.add('Apps_Framework_Development_Mode', false, {
+		type: 'boolean',
+		enableQuery: {
+			_id: 'Apps_Framework_enabled',
+			value: true,
+		},
+		public: true,
+	});
+
 	this.add('Site_Url', typeof __meteor_runtime_config__ !== 'undefined' && __meteor_runtime_config__ !== null ? __meteor_runtime_config__.ROOT_URL : null, {
 		type: 'string',
 		i18nDescription: 'Site_Url_Description',

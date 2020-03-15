@@ -12,7 +12,7 @@ Package.onUse(function(api) {
 		'rocketchat:file',
 		'jalik:ufs',
 		'jalik:ufs-gridfs',
-		'jalik:ufs-local@0.2.5',
+		'jalik:ufs-local',
 		'edgee:slingshot',
 		'ostrio:cookies',
 		'rocketchat:models',

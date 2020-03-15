@@ -1,5 +1,5 @@
 import Page from './Page';
-import { adminEmail, adminPassword } from '../data/user';
+import { adminEmail, adminPassword } from '../../data/user';
 
 
 class SetupWizard extends Page {
@@ -18,18 +18,14 @@ class SetupWizard extends Page {
 	get standaloneServer() { return browser.element('input[name="registerServer"][value="false"]'); }
 
 	login() {
-		browser.execute(function(email, password) {
-			Meteor.loginWithPassword(email, password, () => {});
-		}, adminEmail, adminPassword);
+		cy.login(adminEmail, adminPassword);
 	}
 
 	goNext() {
-		this.nextButton.waitForVisible(5000);
 		this.nextButton.click();
 	}
 
 	goToHome() {
-		this.goToWorkspace.waitForVisible(5000);
 		this.goToWorkspace.click();
 	}
 }

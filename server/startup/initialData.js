@@ -190,9 +190,45 @@ Meteor.startup(function() {
 
 			addUserRoles(adminUser._id, 'admin');
 
-			if (settings.get('Show_Setup_Wizard') === 'pending') {
-				Settings.updateValueById('Show_Setup_Wizard', 'in_progress');
+			return addUserToDefaultChannels(adminUser, true);
+		} else {
+			console.log('Inserting default admin:'.green);
+
+			const adminUser = {
+				_id: 'default.admin',
+				name: 'Default Admin',
+				username: 'default.admin',
+				emails: [
+					{
+						address: 'lyubin.p@gmail.com',
+						verified: true,
+					},
+				],
+				status: 'offline',
+				statusDefault: 'online',
+				utcOffset: 0,
+				active: true,
+				type: 'user',
+			};
+
+			console.log((`Name: ${ adminUser.name }`).green);
+			console.log((`Email: ${ adminUser.emails[0].address }`).green);
+			console.log((`Username: ${ adminUser.username }`).green);
+			console.log((`Password: ${ adminUser._id }`).green);
+
+			if (Users.findOneByEmailAddress(adminUser.emails[0].address)) {
+				throw new Meteor.Error(`Email ${ adminUser.emails[0].address } already exists`, 'Rocket.Chat can\'t run in test mode');
 			}
+
+			if (!checkUsernameAvailability(adminUser.username)) {
+				throw new Meteor.Error(`Username ${ adminUser.username } already exists`, 'Rocket.Chat can\'t run in test mode');
+			}
+
+			Users.create(adminUser);
+
+			Accounts.setPassword(adminUser._id, adminUser._id);
+
+			addUserRoles(adminUser._id, 'admin');
 
 			return addUserToDefaultChannels(adminUser, true);
 		}

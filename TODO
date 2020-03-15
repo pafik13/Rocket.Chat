@@ -1,0 +1,9 @@
+Tasks:
+    [] Delete code related to LiveChat
+    [] Clear permissions (LiveChat, Anonymous)
+    [] Change Logo and Avatar to ANONYM (Test, Prod). Copy from CORP.
+    Tests:
+        [] Fix messaging
+        [] Fix emojis
+        [] Fix admin (Accounts)
+        [] Split messaging tests by room types

@@ -31,7 +31,9 @@ class Administration extends Page {
 	get roomsPrivateCheckbox() { return browser.element('label:nth-of-type(3) input[name="room-type"]'); }
 	get roomsGeneralChannel() { return browser.element('td=general'); }
 	get usersRocketCat() { return browser.element('td=Rocket.Cat'); }
-	get usersInternalAdmin() { return browser.element('td=rocketchat.internal.admin.test'); }
+
+	get usersInternalAdmin() { return browser.element('tr[data-id="rocketchat.internal.admin.test"]') }
+
 	get usersFilter() { return browser.element('#users-filter'); }
 	get rolesNewRolesButton() { return browser.element('.rc-button.new-role'); }
 	get rolesPermissionGrid() { return browser.element('.permission-grid'); }
@@ -58,6 +60,7 @@ class Administration extends Page {
 	get rolesUserHistory() { return browser.element('[name="perm[user][view-history]"]'); }
 	get rolesOwnerDeleteMessage() { return browser.element('[name="perm[owner][delete-message]"]'); }
 	get rolesOwnerEditMessage() { return browser.element('[name="perm[owner][edit-message]"]'); }
+	get rolesManageSettingsPermissions() { return browser.element('[name="perm[user][manage-selected-settings]"]'); }
 
 
 	get emojiFilter() { return browser.element('#emoji-filter'); }
@@ -98,6 +101,9 @@ class Administration extends Page {
 	get generalGoogleTagIdReset() { return browser.element('.reset-setting[data-setting="GoogleTagManager_id"]'); }
 	get generalBugsnagKey() { return browser.element('[name="Bugsnag_api_key"]'); }
 	get generalBugsnagKeyReset() { return browser.element('.reset-setting[data-setting="Bugsnag_api_key"]'); }
+
+	get generalSectionIframeIntegration() { return browser.element('div.section-title-text:eq(0)'); }
+
 	get generalIframeSendTrue() { return browser.element('label:nth-of-type(1) [name="Iframe_Integration_send_enable"]'); }
 	get generalIframeSendFalse() { return browser.element('label:nth-of-type(2) [name="Iframe_Integration_send_enable"]'); }
 	get generalIframeSendReset() { return browser.element('.reset-setting[data-setting="Iframe_Integration_send_enable"]'); }
@@ -108,17 +114,35 @@ class Administration extends Page {
 	get generalIframeRecieveFalseReset() { return browser.element('.reset-setting[data-setting="Iframe_Integration_receive_enable"]'); }
 	get generalIframeRecieveOrigin() { return browser.element('[name="Iframe_Integration_receive_origin"]'); }
 	get generalIframeRecieveOriginReset() { return browser.element('.reset-setting[data-setting="Iframe_Integration_receive_origin"]'); }
+
+	get generalSectionNotifications() { return browser.element('div.section-title-text:eq(1)'); }
+
 	get generalNotificationsMaxRoomMembers() { return browser.element('[name="Notifications_Max_Room_Members"]'); }
 	get generalNotificationsMaxRoomMembersReset() { return browser.element('.reset-setting[data-setting="Notifications_Max_Room_Members"]'); }
+
+	get generalSectionRestApi() { return browser.element('div.section-title-text:eq(2)'); }
+
 	get generalRestApiUserLimit() { return browser.element('[name="API_User_Limit"]'); }
 	get generalRestApiUserLimitReset() { return browser.element('.reset-setting[data-setting="API_User_Limit"]'); }
+
+	get generalSectionReporting() { return browser.element('div.section-title-text:eq(3)'); }
+
 	get generalReportingTrue() { return browser.element('label:nth-of-type(1) [name="Statistics_reporting"]'); }
 	get generalReportingFalse() { return browser.element('label:nth-of-type(2) [name="Statistics_reporting"]'); }
 	get generalReportingReset() { return browser.element('.reset-setting[data-setting="Statistics_reporting"]'); }
+
+	get generalSectionRooms() { return browser.element('div.section-title-text:eq(4)'); }
+
 	get generalRoomsMaxGroupMembers() { return browser.element('[name="Rooms_Max_Group_Members"]'); }
 	get generalRoomsMaxGroupMembersReset() { return browser.element('.reset-setting[data-setting="Rooms_Max_Group_Members"]'); }
+
+	get generalSectionStreamCast() { return browser.element('div.section-title-text:eq(5)'); }
+
 	get generalStreamCastAdress() { return browser.element('[name="Stream_Cast_Address"]'); }
 	get generalStreamCastAdressReset() { return browser.element('.reset-setting[data-setting="Stream_Cast_Address"]'); }
+
+	get generalSectionUTF8() { return browser.element('div.section-title-text:eq(7)'); }
+
 	get generalUTF8Regex() { return browser.element('[name="UTF8_Names_Validation"]'); }
 	get generalUTF8RegexReset() { return browser.element('.reset-setting[data-setting="UTF8_Names_Validation"]'); }
 	get generalUTF8NamesSlugTrue() { return browser.element('label:nth-of-type(1) [name="UTF8_Names_Slugify"]'); }
@@ -126,8 +150,7 @@ class Administration extends Page {
 	get generalUTF8NamesSlugReset() { return browser.element('.reset-setting[data-setting="UTF8_Names_Slugify"]'); }
 
 	// accounts
-	get accountsButtonExpandDefaultUserPreferences() { return browser.element('.section:nth-of-type(2) .expand'); }
-	get accountsButtonCollapseDefaultUserPreferences() { return browser.element('.section:nth-of-type(2) .collapse'); }
+	get accountsSectionDefaultUserPreferences() { return browser.element('div.section-title-text:eq(0)'); }
 
 	get accountsEnableAutoAwayTrue() { return browser.element('label:nth-of-type(1) [name="Accounts_Default_User_Preferences_enableAutoAway"]'); }
 	get accountsEnableAutoAwayFalse() { return browser.element('label:nth-of-type(2) [name="Accounts_Default_User_Preferences_enableAutoAway"]'); }
@@ -225,21 +248,19 @@ class Administration extends Page {
 	get accountsUsernameChangeFalse() { return browser.element('label:nth-of-type(2) [name="Accounts_AllowUsernameChange"]'); }
 
 	checkUserList(user) {
-		const element = browser.element(`td=adminCreated${ user }`);
-		element.waitForVisible(5000);
-		browser.pause(500);
-		const result = element.isVisible();
-		if (Array.isArray(result)) {
-			return result[0];
-		}
+		const username = `adminCreated${ user }`
 
-		return result;
+		usersFilter.click();
+		usersFilter.type(username);
+		// browser.element('.user-info').should('be.visible');
+		// const userRow = browser.element('td').contains(username);
+		// console.log(userRow);
+		return false;
 	}
 
 	getUserFromList(user) {
-		const element = browser.element(`td=${ user }`);
-		element.waitForVisible(5000);
-		return element;
+		browser.element('.user-info').should('be.visible');
+		return browser.element('td').contains(user);
 	}
 
 	adminSaveChanges() {
