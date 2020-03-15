@@ -81,3 +81,4 @@ packages/rocketchat-i18n/i18n/livechat.*
 cypress.json
 /tests/cypress/videos
 /tests/cypress/screenshots
+!/tests/cypress.json
