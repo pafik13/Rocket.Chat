@@ -25,7 +25,7 @@ test-npm-install: &test-npm-install
     npm install
 
 test-store_artifacts: &test-store_artifacts
-  path: .screenshots/
+  path: tests/cypress/screenshots/
 
 test-configure-replicaset: &test-configure-replicaset
   name: Configure Replica Set
@@ -38,13 +38,13 @@ test-configure-elastic-index: &test-configure-elastic-index
   command: |
     bash .circleci/queries.sh check
     bash .circleci/queries.sh create
-    
+
 test-info-elastic-index: &test-info-elastic-index
   name: Info Elasctic Index
   command: |
     bash .circleci/queries.sh check
     bash .circleci/queries.sh indeces
-    
+
 test-docker-image: &test-docker-image
   circleci/node:12.16.1-browsers
 
