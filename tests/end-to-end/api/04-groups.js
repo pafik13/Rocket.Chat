@@ -2,6 +2,7 @@ import { expect } from 'chai';
 
 import { getCredentials, api, request, credentials, group, apiPrivateChannelName } from '../../data/api-data.js';
 import { adminUsername } from '../../data/user';
+import { imgURL } from '../../data/interactions';
 
 function getRoomInfo(roomId) {
 	return new Promise((resolve/* , reject*/) => {
@@ -37,6 +38,22 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.msgs', 0);
 				expect(res.body).to.have.nested.property('group.membersHidden', false);
 				group._id = res.body.group._id;
+			})
+			.end(done);
+	});
+
+	it('/groups.createWithAvatar', (done) => {
+		request.post(api('groups.createWithAvatar'))
+			.set(credentials)
+			.attach('file', imgURL)
+			.field({
+				name: `group-createWithAvatar-${ Date.now() }`,
+				readOnly: false,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
 			})
 			.end(done);
 	});

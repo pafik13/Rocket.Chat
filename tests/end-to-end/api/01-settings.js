@@ -118,4 +118,76 @@ describe('[Settings]', function() {
 				.end(done);
 		});
 	});
+
+	describe('[/settings/FileUpload_S3]', () => {
+		it('should set FileUpload_S3_Bucket', (done) => {
+			request.post(api('settings/FileUpload_S3_Bucket'))
+				.set(credentials)
+				.send({
+					value: 'r-chat-apianon',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should set FileUpload_S3_Acl', (done) => {
+			request.post(api('settings/FileUpload_S3_Acl'))
+				.set(credentials)
+				.send({
+					value: 'private',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should set FileUpload_S3_AWSAccessKeyId', (done) => {
+			request.post(api('settings/FileUpload_S3_AWSAccessKeyId'))
+				.set(credentials)
+				.send({
+					value: process.env.AWS_ACCESS_KEY_ID,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should set FileUpload_S3_AWSSecretAccessKey', (done) => {
+			request.post(api('settings/FileUpload_S3_AWSSecretAccessKey'))
+				.set(credentials)
+				.send({
+					value: process.env.AWS_SECRET_ACCESS_KEY,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should set FileUpload_S3_Region', (done) => {
+			request.post(api('settings/FileUpload_S3_Region'))
+				.set(credentials)
+				.send({
+					value: 'us-east-1',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
 });

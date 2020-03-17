@@ -482,6 +482,7 @@ describe('[Chat]', function() {
 				.end(done);
 		});
 	});
+
 	describe('[/chat.react]', () => {
 		it('should return statusCode: 200 and success when try unreact a message that\'s no reacted yet', (done) => {
 			request.post(api('chat.react'))

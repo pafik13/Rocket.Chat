@@ -9,6 +9,7 @@ import {
 	channel,
 } from '../../data/api-data.js';
 import { adminUsername } from '../../data/user.js';
+import { imgURL } from '../../data/interactions';
 
 function getRoomInfo(roomId) {
 	return new Promise((resolve/* , reject*/) => {
@@ -47,6 +48,22 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.t', 'c');
 				expect(res.body).to.have.nested.property('channel.msgs', 0);
 				channel._id = res.body.channel._id;
+			})
+			.end(done);
+	});
+
+	it('/channels.createWithAvatar', (done) => {
+		request.post(api('channels.createWithAvatar'))
+			.set(credentials)
+			.attach('file', imgURL)
+			.field({
+				name: `channel-createWithAvatar-${ Date.now() }`,
+				readOnly: false,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
 			})
 			.end(done);
 	});
@@ -684,6 +701,7 @@ describe('[Channels]', function() {
 			})
 			.end(done);
 	});
+
 	it('/channels.removeLeader', (done) => {
 		request.post(api('channels.removeLeader'))
 			.set(credentials)

@@ -4,6 +4,21 @@ import { getCredentials, api, request, credentials } from '../../data/api-data.j
 import { password } from '../../data/user';
 import { closeRoom, createRoom } from '../../data/rooms.helper';
 import { updatePermission } from '../../data/permissions.helper';
+import { imgURL } from '../../data/interactions';
+
+
+function getMessages(roomId, roomType) {
+	return new Promise((resolve/* , reject*/) => {
+		request.get(api(`${ roomType }.messages`))
+			.set(credentials)
+			.query({
+				roomId,
+			})
+			.end((err, req) => {
+				resolve(req.body);
+			});
+	});
+}
 
 describe('[Rooms]', function() {
 	this.retries(0);
@@ -556,4 +571,131 @@ describe('[Rooms]', function() {
 			});
 		});
 	});
+
+	describe('[/rooms.uploadAvatar (channel/group)]', () => {
+		let testChannel;
+		let testGroup;
+		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
+		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+		it('create an channel', (done) => {
+			createRoom({ type: 'c', name: testChannelName })
+				.end((err, res) => {
+					testChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a group', (done) => {
+			createRoom(({ type: 'p', name: testGroupName }))
+				.end((err, res) => {
+					testGroup = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.uploadAvatar - channel', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.uploadAvatar - group', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
+
+	describe('[/rooms.uploads (channel/group)]', () => {
+		let testChannel;
+		let testGroup;
+		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
+		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+		it('create an channel', (done) => {
+			createRoom({ type: 'c', name: testChannelName })
+				.end((err, res) => {
+					testChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a group', (done) => {
+			createRoom(({ type: 'p', name: testGroupName }))
+				.end((err, res) => {
+					testGroup = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.upload - channel', (done) => {
+			request.post(api(`rooms.upload/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					msg: 'This is a message with a file',
+					description: 'Simple text file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.upload - group', (done) => {
+			request.post(api(`rooms.upload/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					msg: 'This is a message with a file',
+					description: 'Simple text file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.deleteFileMessage - channel', async() => {
+			const { messages } = await getMessages(testChannel._id, 'channels');
+			const message = messages[0];
+			return request.post(api('rooms.deleteFileMessage'))
+				.set(credentials)
+				.send({
+					fileId: message.file._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				});
+		});
+
+		it('/rooms.deleteFileMessage - group', async() => {
+			const { messages } = await getMessages(testGroup._id, 'groups');
+			const message = messages[0];
+			return request.post(api('rooms.deleteFileMessage'))
+				.set(credentials)
+				.send({
+					fileId: message.file._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				});
+		});
+	});
+
 });
