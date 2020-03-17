@@ -454,3 +454,16 @@ API.v1.addRoute('rooms.delete', { authRequired: true }, {
 		return API.v1.success();
 	},
 });
+
+API.v1.addRoute('rooms.deleteFileMessage', { authRequired: true }, {
+	post() {
+		const { fileId } = this.bodyParams;
+
+		if (!this.bodyParams.hasOwnProperty('fileId')) {
+			return API.v1.failure('The \'fileId\' param is required');
+		}
+		Meteor.runAsUser(this.userId, () => Meteor.call('deleteFileMessage', fileId));
+
+		return API.v1.success();
+	},
+});
