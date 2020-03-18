@@ -324,7 +324,7 @@ jobs:
             fi;
 
             if [[ $CIRCLE_BRANCH == 'develop' ]]; then
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
 
               echo "Build official Docker image"
               cp ~/repo/.docker/Dockerfile .
