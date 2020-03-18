@@ -577,6 +577,13 @@ describe('[Rooms]', function() {
 		let testGroup;
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+
+
+		const channelNewName = `channel-name-${ Date.now() }`;
+		const channelNewDesc = `channel-desc-${ Date.now() }`;
+		const groupNewName = `group-name-${ Date.now() }`;
+		const groupNewDesc = `group-desc-${ Date.now() }`;
+
 		it('create an channel', (done) => {
 			createRoom({ type: 'c', name: testChannelName })
 				.end((err, res) => {
@@ -611,6 +618,104 @@ describe('[Rooms]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should return channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					testChannel = res.body.room;
+				})
+				.end(done);
+		});
+		it('should update channel by roomId', (done) => {
+			request.post(api(`rooms.update/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					name: channelNewName,
+					description: channelNewDesc,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should return new channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', channelNewName);
+					expect(res.body.room).to.have.property('description', channelNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					expect(res.body.room.customFields.photoUrl).is.not.equal(testChannel.customFields.photoUrl);
+				})
+				.end(done);
+		});
+
+		it('should return group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					testGroup = res.body.room;
+				})
+				.end(done);
+		});
+		it('should update group by roomId', (done) => {
+			request.post(api(`rooms.update/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					name: groupNewName,
+					description: groupNewDesc,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should return new group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', groupNewName);
+					expect(res.body.room).to.have.property('description', groupNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					expect(res.body.room.customFields.photoUrl).is.not.equal(testGroup.customFields.photoUrl);
 				})
 				.end(done);
 		});
