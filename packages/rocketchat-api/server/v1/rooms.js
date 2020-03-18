@@ -238,6 +238,99 @@ API.v1.addRoute('rooms.uploadAvatar/:rid', { authRequired: true }, {
 	},
 });
 
+
+API.v1.addRoute('rooms.update/:rid', { authRequired: true }, {
+	post() {
+		const { rid } = this.urlParams;
+
+		const room = Meteor.call('canAccessRoom', rid, this.userId);
+
+		if (!room) {
+			return API.v1.unauthorized();
+		}
+
+		const busboy = new Busboy({ headers: this.request.headers });
+		const files = [];
+		const fields = {};
+
+		Meteor.wrapAsync((callback) => {
+			busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+				if (fieldname !== 'file') {
+					return files.push(new Meteor.Error('invalid-field'));
+				}
+
+				const fileData = [];
+				file.on('data', (data) => fileData.push(data));
+
+				file.on('end', () => {
+					files.push({ fieldname, file, filename, encoding, mimetype, fileBuffer: Buffer.concat(fileData) });
+				});
+			});
+
+			busboy.on('field', (fieldname, value) => fields[fieldname] = value);
+
+			busboy.on('finish', Meteor.bindEnvironment(() => callback()));
+
+			this.request.pipe(busboy);
+		})();
+
+		if (files.length === 0) {
+			return API.v1.failure('File required');
+		}
+
+		if (files.length > 1) {
+			return API.v1.failure('Just 1 file is allowed');
+		}
+
+		const file = files[0];
+
+		if (!fields.name || !fields.name.trim()) {
+			return API.v1.failure('The "name" is required');
+		}
+		if (room.name === fields.name) {
+			return API.v1.failure('The name is the same as what it would be renamed to.');
+		}
+		if (!fields.description || !fields.description.trim()) {
+			return API.v1.failure('The "description" is required');
+		}
+
+		const options = {
+			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
+			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
+			region: 'eu-central-1',
+			sslEnabled: true,
+		};
+
+		const s3 = new S3(options);
+
+		const { userId } = this;
+		const { filename, mimetype } = file;
+		const prefix = 'images/rocket_room_avatars';
+		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
+		const params = {
+			Body: file.fileBuffer,
+			Bucket: 'fotoanon',
+			Key: key,
+			Tagging: `rid=${ rid }&userId=${ userId }&filename=${ filename }&mimetype=${ mimetype }`,
+			ACL: 'public-read',
+		};
+
+		const customFields = {
+			photoUrl: `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`,
+		};
+
+		Meteor.runAsUser(this.userId, () => {
+			const data = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
+
+			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
+			Meteor.call('saveRoomSettings', rid, 'roomName', fields.name);
+			Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
+
+			return API.v1.success(data);
+		});
+	},
+});
+
 API.v1.addRoute('rooms.saveNotification', { authRequired: true }, {
 	post() {
 		const saveNotifications = (notifications, roomId) => {
