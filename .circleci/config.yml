@@ -408,7 +408,7 @@ workflows:
       - image-build:
           requires:
             - deploy
-          #filters:
+          filters:
           #  branches:
           #    ignore: develop
             tags:
