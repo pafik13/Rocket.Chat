@@ -408,9 +408,9 @@ workflows:
       - image-build:
           requires:
             - deploy
-          filters:
-            branches:
-              ignore: develop
+          #filters:
+          #  branches:
+          #    ignore: develop
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
       - hold:
