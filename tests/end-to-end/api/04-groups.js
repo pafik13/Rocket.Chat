@@ -35,7 +35,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group._id');
 				expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 				expect(res.body).to.have.nested.property('group.t', 'p');
-				expect(res.body).to.have.nested.property('group.msgs', 0);
+				expect(res.body).to.have.nested.property('group.msgs', 1);
 				expect(res.body).to.have.nested.property('group.membersHidden', false);
 				group._id = res.body.group._id;
 			})
@@ -87,7 +87,7 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group._id');
 					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 					expect(res.body).to.have.nested.property('group.t', 'p');
-					expect(res.body).to.have.nested.property('group.msgs', 0);
+					expect(res.body).to.have.nested.property('group.msgs', 1);
 				})
 				.end(done);
 		});

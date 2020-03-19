@@ -46,7 +46,7 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel._id');
 				expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
 				expect(res.body).to.have.nested.property('channel.t', 'c');
-				expect(res.body).to.have.nested.property('channel.msgs', 0);
+				expect(res.body).to.have.nested.property('channel.msgs', 1);
 				channel._id = res.body.channel._id;
 			})
 			.end(done);
@@ -97,7 +97,7 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.nested.property('channel._id');
 					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
 					expect(res.body).to.have.nested.property('channel.t', 'c');
-					expect(res.body).to.have.nested.property('channel.msgs', 0);
+					expect(res.body).to.have.nested.property('channel.msgs', 1);
 				})
 				.end(done);
 		});
