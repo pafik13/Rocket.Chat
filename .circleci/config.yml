@@ -298,7 +298,7 @@ jobs:
               docker build -t anonym/rocket:develop .
 
               docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
-              docker push anonym/rocket:develop
+              docker push gitlab.apianon.ru:5555 anonym/rocket:develop
 
               echo "Build preview Docker image"
               cp ~/repo/.docker-mongo/Dockerfile .
@@ -306,7 +306,7 @@ jobs:
               docker build -t anonym/rocket.preview:develop .
 
               docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
-              docker push anonym/rocket.preview:develop
+              docker push gitlab.apianon.ru:5555 anonym/rocket.preview:develop
 
               exit 0
             fi;
