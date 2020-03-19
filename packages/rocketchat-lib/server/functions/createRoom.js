@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
+import { Users, Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
 import { getValidRoomName, validateGeoJSON, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
@@ -163,10 +163,12 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 	addUserRoles(owner._id, ['owner'], room._id);
 
 	if (type === 'c') {
+		Messages.createChannelCreatedByRoomIdAndUser(room._id, owner);
 		Meteor.defer(() => {
 			callbacks.run('afterCreateChannel', owner, room);
 		});
 	} else if (type === 'p') {
+		Messages.createGroupCreatedByRoomIdAndUser(room._id, owner);
 		Meteor.defer(() => {
 			callbacks.run('afterCreatePrivateGroup', owner, room);
 		});
