@@ -292,21 +292,22 @@ jobs:
             rm Rocket.Chat.tar.gz
 
             if [[ $CIRCLE_BRANCH == 'develop' ]]; then
+              docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
 
               echo "Build official Docker image"
               cp ~/repo/.docker/Dockerfile .
               docker build -t anonym/rocket:develop .
 
-              docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
-              docker push gitlab.apianon.ru:5555 anonym/rocket:develop
+              sudo docker tag anonym/rocket:develop gitlab.apianon.ru:5555/backend/rocket:develop
+              docker push gitlab.apianon.ru:5555/backend/rocket:develop
 
               echo "Build preview Docker image"
               cp ~/repo/.docker-mongo/Dockerfile .
               cp ~/repo/.docker-mongo/entrypoint.sh .
               docker build -t anonym/rocket.preview:develop .
 
-              docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
-              docker push gitlab.apianon.ru:5555 anonym/rocket.preview:develop
+              sudo docker tag anonym/rocket.preview:develop gitlab.apianon.ru:5555/backend/rocket.preview:develop
+              docker push gitlab.apianon.ru:5555/backend/rocket.preview:develop
 
               exit 0
             fi;
