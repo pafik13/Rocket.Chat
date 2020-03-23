@@ -2344,6 +2344,8 @@
   "Role_Editing": "Редактировать роль",
   "Role_removed": "Роль удалена",
   "Room": "Комната",
+  "Channel_created_by__username_": "Канал создан __username__",
+  "Group_created_by__username_": "Группа создана __username__",
   "Room_announcement_changed_successfully": "Объявление комнаты успешно изменено",
   "Room_archivation_state": "Статус",
   "Room_archivation_state_false": "В сети",

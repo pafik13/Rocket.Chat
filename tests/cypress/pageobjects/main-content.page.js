@@ -40,6 +40,10 @@ class MainContent extends Page {
 
 	get lastMessage() { return browser.element('.message:last-child .body'); }
 
+	get messageChannelCreated() { return browser.element('.message.channel-created'); }
+
+	get messageGroupCreated() { return browser.element('.message.group-created'); }
+
 	get lastMessageDesc() { return browser.element('.message:last-child .body .attachment-description'); }
 
 	get lastMessageRoleAdded() { return browser.element('.message:last-child.subscription-role-added .body'); }

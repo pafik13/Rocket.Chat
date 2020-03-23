@@ -148,4 +148,24 @@ Meteor.startup(function() {
 			};
 		},
 	});
+	MessageTypes.registerType({
+		id: 'channel-created',
+		system: true,
+		message: 'Channel_created_by__username_',
+		data(message) {
+			return {
+				username: message.u.username,
+			};
+		},
+	});
+	MessageTypes.registerType({
+		id: 'group-created',
+		system: true,
+		message: 'Group_created_by__username_',
+		data(message) {
+			return {
+				username: message.u.username,
+			};
+		},
+	});
 });

@@ -2411,6 +2411,8 @@
   "Role_Editing": "Role Editing",
   "Role_removed": "Role removed",
   "Room": "Room",
+  "Channel_created_by__username_": "Channel created by __username__",
+  "Group_created_by__username_": "Group created by __username__",
   "Room_announcement_changed_successfully": "Room announcement changed successfully",
   "Room_archivation_state": "State",
   "Room_archivation_state_false": "Active",

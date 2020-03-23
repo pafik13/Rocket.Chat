@@ -1,11 +1,12 @@
 import sideNav from '../pageobjects/side-nav.page';
+import mainContent from '../pageobjects/main-content.page';
 import { publicChannelName, privateChannelName } from '../../data/channel.js';
 import { targetUser } from '../../data/interactions.js';
 import { checkIfUserIsValid, setPublicChannelCreated, setPrivateChannelCreated, setDirectMessageCreated } from '../../data/checks';
 import { username, email, password } from '../../data/user.js';
 
 // Basic usage test start
-describe('[Channel creation]', function() {
+describe('[Room creation]', function() {
 	before(() => {
 		checkIfUserIsValid(username, email, password);
 	});
@@ -15,6 +16,7 @@ describe('[Channel creation]', function() {
 			sideNav.createChannel(publicChannelName, false, false);
 			setPublicChannelCreated(true);
 			cy.wait(500)
+      mainContent.messageChannelCreated.should('be.visible');
 		});
 	});
 
@@ -23,6 +25,7 @@ describe('[Channel creation]', function() {
 			sideNav.createChannel(privateChannelName, true, false);
 			setPrivateChannelCreated(true);
 			cy.wait(500)
+      mainContent.messageGroupCreated.should('be.visible');
 		});
 	});
 
