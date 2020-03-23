@@ -214,7 +214,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields, { membersHidden });
 			rid = result.rid;
 
-			const { customFields, description, topic, location } = this.bodyParams;
+			const { customFields, description, topic, location, filesHidden = false } = this.bodyParams;
 			if (customFields) {
 				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
 			}
@@ -227,6 +227,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			if (location) {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
+			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
 		});
 
 		return API.v1.success({
@@ -248,6 +249,7 @@ function validateGroup(params) {
 function createGroup(userId, params) {
 	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
 	const membersHidden = typeof params.membersHidden !== 'undefined' ? params.membersHidden : false;
+
 	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields, { membersHidden }));
 
 	console.log('createGroup', id, userId);
@@ -299,13 +301,15 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 
 		let customFields = {};
 		let location;
-
+		let filesHidden = false;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
 			fields.membersHidden = stringToBoolean(fields.membersHidden);
+			filesHidden = stringToBoolean(fields.filesHidden);
+
 			validateGroup(fields);
 			if (fields.customFields) {
 				customFields = JSON.parse(fields.customFields);
@@ -360,6 +364,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			if (location) {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
+			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
 
 			return API.v1.success({
 				group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
@@ -385,12 +390,17 @@ API.v1.addRoute('groups.delete', { authRequired: true }, {
 API.v1.addRoute('groups.files', { authRequired: true }, {
 	get() {
 		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId, checkedArchived: false });
+
 		const addUserObjectToEveryObject = (file) => {
 			if (file.userId) {
 				file = this.insertUserObject({ object: file, userId: file.userId });
 			}
 			return file;
 		};
+
+		if (findResult.filesHidden && !hasPermission(this.userId, 'view-p-file-list')) {
+			return API.v1.unauthorized();
+		}
 
 		const { offset, count } = this.getPaginationItems();
 		const { sort, fields, query } = this.parseJsonQuery();
@@ -940,6 +950,7 @@ API.v1.addRoute('groups.setReadOnly', { authRequired: true }, {
 API.v1.addRoute('groups.setMembersHidden', { authRequired: true }, {
 	post() {
 		const { membersHidden } = this.bodyParams;
+
 		if (typeof membersHidden === 'undefined') {
 			return API.v1.failure('The bodyParam "membersHidden" is required');
 		}
@@ -951,11 +962,38 @@ API.v1.addRoute('groups.setMembersHidden', { authRequired: true }, {
 		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
 
 		if (findResult.membersHidden === membersHidden) {
-			return API.v1.failure('The private group read only setting is the same as what it would be changed to.');
+			return API.v1.failure('The private group members hidden setting is the same as what it would be changed to.');
 		}
 
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('saveRoomSettings', findResult.rid, 'membersHidden', membersHidden);
+		});
+
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(findResult.rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+		});
+	},
+});
+
+API.v1.addRoute('groups.setFilesHidden', { authRequired: true }, {
+	post() {
+		const { filesHidden } = this.bodyParams;
+		if (typeof filesHidden === 'undefined') {
+			return API.v1.failure('The bodyParam "filesHidden" is required');
+		}
+
+		if (typeof filesHidden !== 'boolean') {
+			return API.v1.failure('The bodyParam "filesHidden" must be a boolean');
+		}
+
+		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+
+		if (findResult.filesHidden === filesHidden) {
+			return API.v1.failure('The private group files hidden setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult.rid, 'filesHidden', filesHidden);
 		});
 
 		return API.v1.success({

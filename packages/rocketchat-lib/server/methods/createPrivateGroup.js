@@ -39,6 +39,6 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', { method: 'createPrivateGroup' });
 		}
 
-		return createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, membersHidden: false, ...extraData });
+		return createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, membersHidden: false, filesHidden: false, ...extraData });
 	},
 });

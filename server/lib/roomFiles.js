@@ -1,13 +1,19 @@
 import { Meteor } from 'meteor/meteor';
 import { Users, Uploads } from 'meteor/rocketchat:models';
+import { hasPermission } from 'meteor/rocketchat:authorization';
 
 export const roomFiles = (pub, { rid, searchText, limit = 50 }) => {
 	if (!pub.userId) {
 		return pub.ready();
 	}
 
-	if (!Meteor.call('canAccessRoom', rid, pub.userId)) {
-		return this.ready();
+	const room = Meteor.call('canAccessRoom', rid, pub.userId);
+	if (!room) {
+		return pub.ready();
+	}
+
+	if (room.filesHidden && !hasPermission(pub.userId, 'view-p-file-list')) {
+		return pub.ready();
 	}
 
 	const cursorFileListHandle = Uploads.findNotHiddenFilesOfRoom(rid, searchText, limit).observeChanges({

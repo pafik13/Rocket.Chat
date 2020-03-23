@@ -236,7 +236,7 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 
 		const rid = API.channels.create.execute(userId, bodyParams);
 
-		const { customFields, description, topic, location } = bodyParams;
+		const { customFields, description, topic, location, filesHidden = false } = bodyParams;
 
 		Meteor.runAsUser(this.userId, () => {
 			if (customFields) {
@@ -251,6 +251,7 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 			if (location) {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
+			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
 		});
 
 		return API.v1.success({
@@ -300,11 +301,13 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 		let customFields = {};
 		let location;
 		let errorResponse;
+		let filesHidden = false;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
+			filesHidden = stringToBoolean(fields.filesHidden);
 
 			API.channels.create.validate({
 				user: {
@@ -380,6 +383,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			if (location) {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
+			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
 
 			return API.v1.success({
 				channel: this.composeRoomWithLastMessage(findChannelByIdOrName({ params: { roomId: rid }, userId: this.userId }), this.userId),
@@ -415,6 +419,10 @@ API.v1.addRoute('channels.files', { authRequired: true }, {
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('canAccessRoom', findResult._id, this.userId);
 		});
+
+		if (findResult.filesHidden && !hasPermission(this.userId, 'view-p-file-list')) {
+			return API.v1.unauthorized();
+		}
 
 		const { offset, count } = this.getPaginationItems();
 		const { sort, fields, query } = this.parseJsonQuery();
@@ -1112,6 +1120,31 @@ API.v1.addRoute('channels.setReadOnly', { authRequired: true }, {
 		});
 	},
 });
+
+API.v1.addRoute('channels.setFilesHidden', { authRequired: true }, {
+	post() {
+		const { filesHidden } = this.bodyParams;
+
+		if (typeof filesHidden === 'undefined') {
+			return API.v1.failure('The bodyParam "filesHidden" is required');
+		}
+
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		if (findResult.filesHidden === filesHidden) {
+			return API.v1.failure('The channel files hidden setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult._id, 'filesHidden', filesHidden);
+		});
+
+		return API.v1.success({
+			channel: findChannelByIdOrName({ params: this.requestParams(), userId: this.userId }),
+		});
+	},
+});
+
 
 API.v1.addRoute('channels.setTopic', { authRequired: true }, {
 	post() {

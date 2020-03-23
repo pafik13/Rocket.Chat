@@ -1244,6 +1244,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	setFilesHiddenById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				filesHidden: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	setLocationById(_id, val) {
 		const query = { _id };
 

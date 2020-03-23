@@ -47,6 +47,7 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
 				expect(res.body).to.have.nested.property('channel.t', 'c');
 				expect(res.body).to.have.nested.property('channel.msgs', 1);
+				expect(res.body).to.have.nested.property('channel.filesHidden', false);
 				channel._id = res.body.channel._id;
 			})
 			.end(done);
@@ -59,6 +60,7 @@ describe('[Channels]', function() {
 			.field({
 				name: `channel-createWithAvatar-${ Date.now() }`,
 				readOnly: false,
+				filesHidden: true,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
@@ -98,6 +100,7 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.nested.property('channel.name', apiPublicChannelName);
 					expect(res.body).to.have.nested.property('channel.t', 'c');
 					expect(res.body).to.have.nested.property('channel.msgs', 1);
+					expect(res.body).to.have.nested.property('channel.filesHidden', false);
 				})
 				.end(done);
 		});
@@ -941,6 +944,28 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.name', `EDITED${ apiPublicChannelName }`);
 				expect(res.body).to.have.nested.property('channel.t', 'c');
 				expect(res.body).to.have.nested.property('channel.msgs', roomInfo.channel.msgs);
+				expect(res.body).to.have.nested.property('channel.ro', !roomInfo.channel.ro);
+			});
+	});
+
+	it('/channels.setFilesHidden', async() => {
+		const roomInfo = await getRoomInfo(channel._id);
+
+		return request.post(api('channels.setFilesHidden'))
+			.set(credentials)
+			.send({
+				roomId: channel._id,
+				filesHidden: true,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.nested.property('channel._id');
+				expect(res.body).to.have.nested.property('channel.name', `EDITED${ apiPublicChannelName }`);
+				expect(res.body).to.have.nested.property('channel.t', 'c');
+				expect(res.body).to.have.nested.property('channel.msgs', roomInfo.channel.msgs);
+				expect(res.body).to.have.nested.property('channel.filesHidden', !roomInfo.channel.filesHidden);
 			});
 	});
 

@@ -37,6 +37,7 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.nested.property('group.t', 'p');
 				expect(res.body).to.have.nested.property('group.msgs', 1);
 				expect(res.body).to.have.nested.property('group.membersHidden', false);
+				expect(res.body).to.have.nested.property('group.filesHidden', false);
 				group._id = res.body.group._id;
 			})
 			.end(done);
@@ -49,6 +50,7 @@ describe('[Groups]', function() {
 			.field({
 				name: `group-createWithAvatar-${ Date.now() }`,
 				readOnly: false,
+				filesHidden: true,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
@@ -88,6 +90,8 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group.name', apiPrivateChannelName);
 					expect(res.body).to.have.nested.property('group.t', 'p');
 					expect(res.body).to.have.nested.property('group.msgs', 1);
+					expect(res.body).to.have.nested.property('group.membersHidden', false);
+					expect(res.body).to.have.nested.property('group.filesHidden', false);
 				})
 				.end(done);
 		});
@@ -631,6 +635,8 @@ describe('[Groups]', function() {
 			.expect(200)
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
+				const { group } = res.body;
+				expect(group).to.have.property('ro', true);
 			})
 			.end(done);
 	});
@@ -648,6 +654,23 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.property('success', true);
 				const { group } = res.body;
 				expect(group).to.have.property('membersHidden', true);
+			})
+			.end(done);
+	});
+
+	it('/groups.setFilesHidden', (done) => {
+		request.post(api('groups.setFilesHidden'))
+			.set(credentials)
+			.send({
+				roomId: group._id,
+				filesHidden: true,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				const { group } = res.body;
+				expect(group).to.have.property('filesHidden', true);
 			})
 			.end(done);
 	});

@@ -455,6 +455,30 @@ Template.channelSettingsEditing.onCreated(function() {
 				);
 			},
 		},
+		filesHidden: {
+			type: 'boolean',
+			label: 'Hide_files',
+			isToggle: true,
+			processing: new ReactiveVar(false),
+			canView() {
+				return room.t !== 'd';
+			},
+			getValue() {
+				return room.filesHidden;
+			},
+			canEdit() {
+				return hasAllPermission('edit-room', room._id);
+			},
+			save(value) {
+				return call('saveRoomSettings', room._id, 'filesHidden', value).then(
+					() => {
+						toastr.success(
+							t('Files_hidden_setting_changed_successfully')
+						);
+					}
+				);
+			},
+		},
 		archived: {
 			type: 'boolean',
 			label: 'Room_archivation_state_true',
