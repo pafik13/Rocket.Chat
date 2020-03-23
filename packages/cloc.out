@@ -3,7 +3,7 @@
 classified 9 files       9 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.06 s (142.8 files/s, 10726.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (245.5 files/s, 18436.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ SUM:                             9             83             74            519
 classified 11 files      11 unique files.                              
        2 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (244.5 files/s, 12901.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (277.8 files/s, 14664.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -28,26 +28,12 @@ YAML                             1              0              0              5
 -------------------------------------------------------------------------------
 SUM:                             9            126             45            304
 -------------------------------------------------------------------------------
-./rocketchat-2fa/
-      14 text files.
-classified 14 files      14 unique files.                              
-       1 file ignored.
-
-github.com/AlDanial/cloc v 1.85  T=0.04 s (369.6 files/s, 15152.4 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-JavaScript                      13             78              3            446
-HTML                             1              4              0             43
--------------------------------------------------------------------------------
-SUM:                            14             82              3            489
--------------------------------------------------------------------------------
 ./rocketchat-accounts/
        4 text files.
 classified 4 files       4 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (118.6 files/s, 1541.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (135.7 files/s, 1764.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -61,7 +47,7 @@ SUM:                             4             10              0             42
 classified 9 files       9 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (252.2 files/s, 5576.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (284.3 files/s, 6285.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -76,37 +62,21 @@ SUM:                             9             42              5            152
 classified 37 files      37 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.06 s (577.2 files/s, 101606.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.06 s (623.4 files/s, 113589.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JavaScript                      36           1168             94           5247
+JavaScript                      36           1205             94           5439
 Markdown                         1              1              0              3
 -------------------------------------------------------------------------------
-SUM:                            37           1169             94           5250
--------------------------------------------------------------------------------
-./rocketchat-apps/
-      48 text files.
-classified 48 files      48 unique files.                              
-       1 file ignored.
-
-github.com/AlDanial/cloc v 1.85  T=0.06 s (786.7 files/s, 77562.9 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-JavaScript                      40            641             65           3013
-HTML                             5             14             44            670
-CSS                              1             45              4            127
-Markdown                         1              3              0              8
--------------------------------------------------------------------------------
-SUM:                            47            703            113           3818
+SUM:                            37           1206             94           5442
 -------------------------------------------------------------------------------
 ./rocketchat-assets/
        3 text files.
 classified 3 files       3 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (84.1 files/s, 15511.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (99.5 files/s, 18348.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -119,7 +89,7 @@ SUM:                             3             62              0            491
 classified 33 files      32 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (711.8 files/s, 30027.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (803.7 files/s, 33905.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -135,7 +105,7 @@ SUM:                            32            175              8           1167
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (147.7 files/s, 3278.2 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (163.1 files/s, 3620.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -148,7 +118,7 @@ SUM:                             5             16              0             95
 classified 16 files      16 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (404.3 files/s, 21426.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (465.1 files/s, 24650.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -164,7 +134,7 @@ SUM:                            16             95              2            751
 classified 2 files       2 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (57.8 files/s, 6014.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (68.7 files/s, 7141.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -177,7 +147,7 @@ SUM:                             2             16              1            191
 classified 4 files       4 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (113.1 files/s, 7128.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (133.0 files/s, 8378.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -191,7 +161,7 @@ SUM:                             4             33             12            207
 classified 4 files       3 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (86.8 files/s, 4482.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (104.6 files/s, 5403.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -204,7 +174,7 @@ SUM:                             3             28             30             97
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (164.8 files/s, 12169.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (195.5 files/s, 14432.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -217,7 +187,7 @@ SUM:                             6             62             56            325
 classified 23 files      23 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (502.5 files/s, 46620.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (553.9 files/s, 51390.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -232,7 +202,7 @@ SUM:                            23            147             13           1974
 classified 9 files       9 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (240.1 files/s, 15550.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (280.3 files/s, 18159.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -246,7 +216,7 @@ SUM:                             9             35              2            546
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (173.7 files/s, 2026.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (191.3 files/s, 2231.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -260,7 +230,7 @@ SUM:                             6             10              4             56
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (146.8 files/s, 4051.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (165.1 files/s, 4557.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -273,7 +243,7 @@ SUM:                             5             22              0            116
 classified 7 files       6 unique files.                              
        2 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (137.6 files/s, 13428.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (159.4 files/s, 15553.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -287,7 +257,7 @@ SUM:                             5             93             23            372
 classified 25 files      25 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (585.6 files/s, 25531.2 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (667.9 files/s, 29121.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -302,7 +272,7 @@ SUM:                            25            141              8            941
 classified 17 files      17 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (410.1 files/s, 31554.6 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (461.7 files/s, 35520.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -317,7 +287,7 @@ SUM:                            17            219             30           1059
 classified 10 files      10 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (264.0 files/s, 16710.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (304.9 files/s, 19300.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -331,7 +301,7 @@ SUM:                            10             74             29            530
 classified 26 files      26 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (583.5 files/s, 29444.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (678.6 files/s, 34241.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -346,7 +316,7 @@ SUM:                            26            179             13           1120
 classified 11 files      11 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.06 s (166.4 files/s, 150553.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.06 s (161.2 files/s, 145899.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -362,7 +332,7 @@ SUM:                            10           1862             13           7174
 classified 4 files       4 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (118.1 files/s, 3042.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (133.3 files/s, 3433.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -375,7 +345,7 @@ SUM:                             4             15              0             88
 classified 3 files       3 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (78.6 files/s, 22545.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (94.4 files/s, 27059.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -388,7 +358,7 @@ SUM:                             3             28            120            712
 classified 23 files      23 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (490.7 files/s, 54299.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (559.3 files/s, 61889.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -402,7 +372,7 @@ SUM:                            23            679            295           1571
 classified 3 files       3 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (86.5 files/s, 7241.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (101.0 files/s, 8450.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -415,7 +385,7 @@ SUM:                             3             28              2            221
 classified 31 files      31 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (587.5 files/s, 58121.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.05 s (649.7 files/s, 64278.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -429,7 +399,7 @@ SUM:                            31            404            163           2500
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (145.2 files/s, 3717.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (173.2 files/s, 4434.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -442,22 +412,22 @@ SUM:                             5             25              9             94
 classified 5 files       5 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (75.8 files/s, 120404.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.05 s (82.2 files/s, 130360.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JSON                             2              0              0           6309
-JavaScript                       1              7              0             29
+JSON                             2              0              0           6327
+JavaScript                       1              1              0             10
 Markdown                         1              2              0              4
 -------------------------------------------------------------------------------
-SUM:                             4              9              0           6342
+SUM:                             4              3              0           6341
 -------------------------------------------------------------------------------
 ./rocketchat-iframe-login/
        6 text files.
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (173.4 files/s, 3382.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (199.1 files/s, 3882.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -470,7 +440,7 @@ SUM:                             6             15              0            102
 classified 35 files      35 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (732.8 files/s, 45410.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (798.1 files/s, 49458.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -484,7 +454,7 @@ SUM:                            35            282            208           1679
 classified 7 files       6 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (160.5 files/s, 15464.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (194.3 files/s, 18717.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -497,40 +467,26 @@ SUM:                             6             75             49            454
 classified 34 files      34 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.05 s (630.0 files/s, 67279.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.05 s (706.3 files/s, 75363.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JavaScript                      27            401             32           2475
+JavaScript                      27            401             32           2472
 HTML                             6              6              0            642
 CSS                              1             17              0             58
 -------------------------------------------------------------------------------
-SUM:                            34            424             32           3175
+SUM:                            34            424             32           3172
 -------------------------------------------------------------------------------
 ./rocketchat-internal-hubot/
        1 text file.
        1 unique file.                              
        1 file ignored.
-./rocketchat-irc/
-      28 text files.
-classified 28 files      28 unique files.                              
-       0 files ignored.
-
-github.com/AlDanial/cloc v 1.85  T=0.04 s (635.8 files/s, 38445.1 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-JavaScript                      27            184            110           1330
-Markdown                         1             32              0             37
--------------------------------------------------------------------------------
-SUM:                            28            216            110           1367
--------------------------------------------------------------------------------
 ./rocketchat-issuelinks/
        5 text files.
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (143.7 files/s, 1637.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (167.4 files/s, 1908.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -538,27 +494,12 @@ JavaScript                       5              6              4             47
 -------------------------------------------------------------------------------
 SUM:                             5              6              4             47
 -------------------------------------------------------------------------------
-./rocketchat-katex/
-       9 text files.
-classified 9 files       9 unique files.                              
-       1 file ignored.
-
-github.com/AlDanial/cloc v 1.85  T=0.04 s (226.2 files/s, 8934.1 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-JavaScript                       5             39             14            208
-JSON                             2              0              0             39
-CSS                              1              5              0             11
--------------------------------------------------------------------------------
-SUM:                             8             44             14            258
--------------------------------------------------------------------------------
 ./rocketchat-lazy-load/
        4 text files.
 classified 4 files       4 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (116.2 files/s, 2876.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (135.7 files/s, 3359.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -568,44 +509,26 @@ HTML                             1              0              0              4
 SUM:                             4             18              0             81
 -------------------------------------------------------------------------------
 ./rocketchat-lib/
-     150 text files.
-classified 150 filesDuplicate file check 150 files (148 known unique)Unique:      100 files                                               150 unique files.                              
+     151 text files.
+classified 151 filesDuplicate file check 151 files (149 known unique)Unique:      100 files                                               151 unique files.                              
 Counting:  100       0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.11 s (1397.5 files/s, 111531.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.11 s (1401.4 files/s, 115809.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JavaScript                     148           1163            327          10249
+JavaScript                     149           1178            334          10734
 Markdown                         1             26              0            133
 HTML                             1              0              0             73
 -------------------------------------------------------------------------------
-SUM:                           150           1189            327          10455
--------------------------------------------------------------------------------
-./rocketchat-livechat/
-     314 text files.
-classified 314 filesDuplicate file check 314 files (289 known unique)Unique:      100 files                                          Unique:      200 files                                               314 unique files.                              
-Counting:  100Counting:  200Counting:  300      10 files ignored.
-
-github.com/AlDanial/cloc v 1.85  T=0.18 s (1699.5 files/s, 130354.7 lines/s)
--------------------------------------------------------------------------------
-Language                     files          blank        comment           code
--------------------------------------------------------------------------------
-JavaScript                     190           2043            630          12244
-JSON                            58              0              0           3991
-LESS                             6            343             32           1995
-HTML                            47             69             14           1912
-Bourne Shell                     2              5              0             19
-DOS Batch                        1              6              0             15
--------------------------------------------------------------------------------
-SUM:                           304           2466            676          20176
+SUM:                           151           1204            334          10940
 -------------------------------------------------------------------------------
 ./rocketchat-livestream/
       18 text files.
 classified 18 files      18 unique files.                              
        2 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (421.1 files/s, 27219.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (472.9 files/s, 30571.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -620,7 +543,7 @@ SUM:                            17            109              7            983
 classified 10 files      10 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (266.0 files/s, 21390.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (304.5 files/s, 24483.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -635,7 +558,7 @@ SUM:                            10             74             21            709
 classified 2 files       2 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (58.6 files/s, 3836.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (70.8 files/s, 4638.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -648,7 +571,7 @@ SUM:                             2             17              2            112
 classified 15 files      15 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (406.7 files/s, 8676.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (455.1 files/s, 9709.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -662,7 +585,7 @@ SUM:                            15             22              6            292
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (149.2 files/s, 1640.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (172.8 files/s, 1900.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -675,7 +598,7 @@ SUM:                             5              9              7             39
 classified 11 files      11 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (289.0 files/s, 22909.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (330.7 files/s, 26216.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -688,7 +611,7 @@ SUM:                            11            128             67            677
 classified 10 files      10 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (265.1 files/s, 22669.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (300.8 files/s, 25715.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -701,7 +624,7 @@ SUM:                            10             43             16            796
 classified 10 files      10 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (274.4 files/s, 5131.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (323.2 files/s, 6044.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -716,7 +639,7 @@ SUM:                            10              9              0            178
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (146.4 files/s, 3572.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (172.2 files/s, 4200.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -731,7 +654,7 @@ SUM:                             5             24              0             98
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (139.3 files/s, 12367.6 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (166.4 files/s, 14777.8 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -746,7 +669,7 @@ SUM:                             5             53              1            390
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (176.6 files/s, 2707.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (209.1 files/s, 3205.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -759,7 +682,7 @@ SUM:                             6              9              0             83
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (174.7 files/s, 3261.6 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (204.4 files/s, 3814.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -772,7 +695,7 @@ SUM:                             6              8              0            104
 classified 15 files      15 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (401.6 files/s, 14378.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (459.0 files/s, 16432.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -787,7 +710,7 @@ SUM:                            15             50              2            485
 classified 19 files      19 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (485.1 files/s, 15650.5 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (560.0 files/s, 18067.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -802,7 +725,7 @@ SUM:                            19             76              4            533
 classified 14 files      14 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (379.0 files/s, 9718.2 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (452.6 files/s, 11605.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -817,20 +740,20 @@ SUM:                            14             25              0            334
 classified 5 files       5 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (139.9 files/s, 9067.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (172.9 files/s, 11310.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JavaScript                       5             58              8            258
+JavaScript                       5             58              8            261
 -------------------------------------------------------------------------------
-SUM:                             5             58              8            258
+SUM:                             5             58              8            261
 -------------------------------------------------------------------------------
 ./rocketchat-migrations/
        3 text files.
 classified 3 files       3 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (83.5 files/s, 12080.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (98.8 files/s, 14287.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -843,20 +766,20 @@ SUM:                             3             57             76            301
 classified 67 files      67 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.08 s (855.1 files/s, 110923.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.07 s (949.8 files/s, 123511.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-JavaScript                      67           1603            191           6897
+JavaScript                      67           1606            189           6918
 -------------------------------------------------------------------------------
-SUM:                            67           1603            191           6897
+SUM:                            67           1606            189           6918
 -------------------------------------------------------------------------------
 ./rocketchat-mongo-config/
        2 text files.
 classified 2 files       2 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (59.1 files/s, 680.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (70.3 files/s, 808.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -869,7 +792,7 @@ SUM:                             2              4              0             19
 classified 5 files       4 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (112.5 files/s, 8888.1 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (126.9 files/s, 10026.9 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -882,7 +805,7 @@ SUM:                             4             26             12            278
 classified 4 files       4 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (118.2 files/s, 2748.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (137.4 files/s, 3195.3 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -896,7 +819,7 @@ SUM:                             4             19              1             73
 classified 20 files      20 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (485.5 files/s, 18219.4 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (526.1 files/s, 19742.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -911,7 +834,7 @@ SUM:                            19             44              0            669
 classified 22 files      22 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (536.8 files/s, 21911.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.04 s (598.9 files/s, 24444.7 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -925,7 +848,7 @@ SUM:                            22             57              4            837
 classified 12 files      12 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (315.6 files/s, 16726.7 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (371.3 files/s, 19679.4 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -940,7 +863,7 @@ SUM:                            12             60              5            571
 classified 4 files       3 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.03 s (86.4 files/s, 2966.9 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (102.9 files/s, 3534.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -953,7 +876,7 @@ SUM:                             3             19             30             54
 classified 23 files      23 unique files.                              
        6 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.06 s (316.9 files/s, 118552.0 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.05 s (355.5 files/s, 132991.5 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -969,7 +892,7 @@ SUM:                            19            652            400           6056
 classified 9 files       9 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (238.9 files/s, 22160.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (273.7 files/s, 25394.6 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -984,7 +907,7 @@ SUM:                             9             63             25            747
 classified 7 files       7 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (193.8 files/s, 10077.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (229.7 files/s, 11946.2 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -998,7 +921,7 @@ SUM:                             7             57              1            306
 classified 4 files       4 unique files.                              
        1 file ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (111.3 files/s, 7372.3 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (141.1 files/s, 9346.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -1011,7 +934,7 @@ SUM:                             4             28              5            232
 classified 16 files      16 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (395.9 files/s, 27810.8 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.06 s (268.8 files/s, 18883.1 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -1027,7 +950,7 @@ SUM:                            16            191             97            836
 classified 6 files       6 unique files.                              
        0 files ignored.
 
-github.com/AlDanial/cloc v 1.85  T=0.04 s (165.9 files/s, 12804.2 lines/s)
+github.com/AlDanial/cloc v 1.85  T=0.03 s (196.4 files/s, 15156.0 lines/s)
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
@@ -1036,3 +959,553 @@ JavaScript                       6             41             34            388
 SUM:                             6             41             34            388
 -------------------------------------------------------------------------------
 ./rocketchat-setup-wizard/
+       8 text files.
+classified 8 files       8 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (251.5 files/s, 22605.8 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       6             56              4            427
+HTML                             2              9              0            223
+-------------------------------------------------------------------------------
+SUM:                             8             65              4            650
+-------------------------------------------------------------------------------
+./rocketchat-slashcommand-asciiarts/
+       8 text files.
+classified 8 files       7 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (236.6 files/s, 4055.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       7             16             20             84
+-------------------------------------------------------------------------------
+SUM:                             7             16             20             84
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-archiveroom/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (175.3 files/s, 3575.4 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5             12              1             89
+-------------------------------------------------------------------------------
+SUM:                             5             12              1             89
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-create/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (163.9 files/s, 2885.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5              9              0             79
+-------------------------------------------------------------------------------
+SUM:                             5              9              0             79
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-help/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (107.7 files/s, 2584.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              5              4             63
+-------------------------------------------------------------------------------
+SUM:                             3              5              4             63
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-hide/
+       5 text files.
+classified 5 files       4 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (139.7 files/s, 3212.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       4              8              5             79
+-------------------------------------------------------------------------------
+SUM:                             4              8              5             79
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-invite/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (174.6 files/s, 4121.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5             10              4            104
+-------------------------------------------------------------------------------
+SUM:                             5             10              4            104
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-inviteall/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (175.1 files/s, 4483.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5             10              4            114
+-------------------------------------------------------------------------------
+SUM:                             5             10              4            114
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-join/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (173.5 files/s, 2811.4 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5              6              4             71
+-------------------------------------------------------------------------------
+SUM:                             5              6              4             71
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-kick/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (170.1 files/s, 2960.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5              7              1             79
+-------------------------------------------------------------------------------
+SUM:                             5              7              1             79
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-leave/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (104.6 files/s, 1569.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              4              4             37
+-------------------------------------------------------------------------------
+SUM:                             3              4              4             37
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-me/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (108.5 files/s, 1338.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              3              4             30
+-------------------------------------------------------------------------------
+SUM:                             3              3              4             30
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-msg/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (105.2 files/s, 2630.8 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              4              3             68
+-------------------------------------------------------------------------------
+SUM:                             3              4              3             68
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-mute/
+       4 text files.
+classified 4 files       4 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (138.3 files/s, 4529.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       4              8              6            117
+-------------------------------------------------------------------------------
+SUM:                             4              8              6            117
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-open/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (85.3 files/s, 2075.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3             11              0             62
+-------------------------------------------------------------------------------
+SUM:                             3             11              0             62
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-topic/
+       4 text files.
+classified 4 files       3 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (105.4 files/s, 1861.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              4              4             45
+-------------------------------------------------------------------------------
+SUM:                             3              4              4             45
+-------------------------------------------------------------------------------
+./rocketchat-slashcommands-unarchiveroom/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (162.8 files/s, 3352.7 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5             13              1             89
+-------------------------------------------------------------------------------
+SUM:                             5             13              1             89
+-------------------------------------------------------------------------------
+./rocketchat-slider/
+       4 text files.
+classified 4 files       4 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (136.4 files/s, 1466.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3              7              0             30
+HTML                             1              0              0              6
+-------------------------------------------------------------------------------
+SUM:                             4              7              0             36
+-------------------------------------------------------------------------------
+./rocketchat-statistics/
+      10 text files.
+classified 10 files      10 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (296.9 files/s, 20839.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      10            109             13            580
+-------------------------------------------------------------------------------
+SUM:                            10            109             13            580
+-------------------------------------------------------------------------------
+./rocketchat_theme/
+      61 text files.
+classified 61 files      61 unique files.                              
+       4 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.11 s (542.8 files/s, 224684.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+CSS                             50           3660            197          10420
+JSON                             1              0              0           5306
+HTML                             2             11              0           1616
+JavaScript                       6            360            184           1606
+LESS                             1            185            123            600
+SVG                              1            485              0            497
+-------------------------------------------------------------------------------
+SUM:                            61           4701            504          20045
+-------------------------------------------------------------------------------
+./rocketchat-token-login/
+       5 text files.
+classified 5 files       5 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (167.6 files/s, 2178.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5              7              0             58
+-------------------------------------------------------------------------------
+SUM:                             5              7              0             58
+-------------------------------------------------------------------------------
+./rocketchat-tokenpass/
+      23 text files.
+classified 23 files      23 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (630.2 files/s, 17399.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      17             67              0            439
+CSS                              3             16              0             57
+HTML                             2              2              0             51
+Markdown                         1              1              0              2
+-------------------------------------------------------------------------------
+SUM:                            23             86              0            549
+-------------------------------------------------------------------------------
+./rocketchat-tooltip/
+       5 text files.
+classified 5 files       5 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (163.0 files/s, 5313.8 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3             22              0             86
+CSS                              1             12              0             36
+HTML                             1              0              0              7
+-------------------------------------------------------------------------------
+SUM:                             5             34              0            129
+-------------------------------------------------------------------------------
+./rocketchat-ui/
+      78 text files.
+classified 78 files      78 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.07 s (1082.1 files/s, 87355.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      48            694            121           4316
+HTML                            30             45              1           1120
+-------------------------------------------------------------------------------
+SUM:                            78            739            122           5436
+-------------------------------------------------------------------------------
+./rocketchat-ui-account/
+      16 text files.
+classified 16 files      16 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (390.7 files/s, 48100.4 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       9             78             12           1118
+HTML                             7             20              4            738
+-------------------------------------------------------------------------------
+SUM:                            16             98             16           1856
+-------------------------------------------------------------------------------
+./rocketchat-ui-admin/
+      30 text files.
+classified 30 files      30 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.05 s (618.2 files/s, 67363.2 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      17            101             29           2079
+HTML                            13             34              0           1026
+-------------------------------------------------------------------------------
+SUM:                            30            135             29           3105
+-------------------------------------------------------------------------------
+./rocketchat-ui-cached-collection/
+       3 text files.
+classified 3 files       3 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (97.6 files/s, 14150.1 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       3             69              8            358
+-------------------------------------------------------------------------------
+SUM:                             3             69              8            358
+-------------------------------------------------------------------------------
+./rocketchat-ui-clean-history/
+       6 text files.
+classified 6 files       6 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (182.4 files/s, 18478.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       4             35              4            368
+HTML                             1              0              0            142
+CSS                              1             17              0             42
+-------------------------------------------------------------------------------
+SUM:                             6             52              4            552
+-------------------------------------------------------------------------------
+./rocketchat-ui-flextab/
+      16 text files.
+classified 16 files      16 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (374.1 files/s, 62599.5 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       9            181             15           1942
+HTML                             7             26             17            496
+-------------------------------------------------------------------------------
+SUM:                            16            207             32           2438
+-------------------------------------------------------------------------------
+./rocketchat-ui-login/
+      20 text files.
+classified 20 files      20 unique files.                              
+       2 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (541.1 files/s, 26190.4 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      11             40              4            644
+HTML                             9              5              0            275
+-------------------------------------------------------------------------------
+SUM:                            20             45              4            919
+-------------------------------------------------------------------------------
+./rocketchat-ui-master/
+     132 text files.
+classified 132 filesDuplicate file check 132 files (131 known unique)Unique:      100 files                                               132 unique files.                              
+Counting:  100       2 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.07 s (1912.5 files/s, 28965.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+SVG                            117              0              0            710
+JavaScript                       8             86             12            695
+HTML                             5              3              0            465
+Markdown                         1              4              0              9
+-------------------------------------------------------------------------------
+SUM:                           131             93             12           1879
+-------------------------------------------------------------------------------
+./rocketchat-ui-message/
+      30 text files.
+classified 30 files      30 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.05 s (648.3 files/s, 63294.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      16            226             29           2245
+HTML                            14             10              0            419
+-------------------------------------------------------------------------------
+SUM:                            30            236             29           2664
+-------------------------------------------------------------------------------
+./rocketchat-ui-sidenav/
+      17 text files.
+classified 17 files      17 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (447.1 files/s, 39028.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       9            148             23           1044
+HTML                             8              7              0            262
+-------------------------------------------------------------------------------
+SUM:                            17            155             23           1306
+-------------------------------------------------------------------------------
+./rocketchat-ui-utils/
+      36 text files.
+classified 36 files      36 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.05 s (724.3 files/s, 71642.7 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      32            402             67           2896
+HTML                             4              4              0            192
+-------------------------------------------------------------------------------
+SUM:                            36            406             67           3088
+-------------------------------------------------------------------------------
+./rocketchat-ui-vrecord/
+       8 text files.
+classified 8 files       8 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (268.2 files/s, 8950.4 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       6             23              0            148
+CSS                              1             22              0             58
+HTML                             1              0              0             16
+-------------------------------------------------------------------------------
+SUM:                             8             45              0            222
+-------------------------------------------------------------------------------
+./rocketchat-utils/
+      35 text files.
+classified 35 files      35 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (763.3 files/s, 32531.7 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      34            188            105           1156
+-------------------------------------------------------------------------------
+SUM:                            34            188            105           1156
+-------------------------------------------------------------------------------
+./rocketchat-version/
+       2 text files.
+classified 2 files       2 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (69.5 files/s, 3301.6 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       2             11              0             84
+-------------------------------------------------------------------------------
+SUM:                             2             11              0             84
+-------------------------------------------------------------------------------
+./rocketchat-videobridge/
+      18 text files.
+classified 18 files      18 unique files.                              
+       1 file ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.04 s (457.4 files/s, 32934.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                      13            149            222            800
+HTML                             3              0              0             35
+LESS                             1              1              0             17
+-------------------------------------------------------------------------------
+SUM:                            17            150            222            852
+-------------------------------------------------------------------------------
+./rocketchat-webrtc/
+       7 text files.
+classified 7 files       7 unique files.                              
+       0 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.03 s (207.1 files/s, 32690.3 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       7            111             69            925
+-------------------------------------------------------------------------------
+SUM:                             7            111             69            925
+-------------------------------------------------------------------------------
+./tap-i18n/
+      27 text files.
+classified 26 files      25 unique files.                              
+       5 files ignored.
+
+github.com/AlDanial/cloc v 1.85  T=0.05 s (438.4 files/s, 93236.9 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+JavaScript                       5            265            290           2425
+Markdown                         1            220              0            588
+CoffeeScript                    16            199            108            584
+-------------------------------------------------------------------------------
+SUM:                            22            684            398           3597
+-------------------------------------------------------------------------------
