@@ -191,7 +191,7 @@ Meteor.startup(function() {
 			addUserRoles(adminUser._id, 'admin');
 
 			return addUserToDefaultChannels(adminUser, true);
-		} else {
+		} else if (_.isEmpty(getUsersInRole('admin').fetch())) {
 			console.log('Inserting default admin:'.green);
 
 			const adminUser = {
