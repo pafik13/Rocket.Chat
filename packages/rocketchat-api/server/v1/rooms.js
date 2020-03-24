@@ -488,7 +488,9 @@ API.v1.addRoute('rooms.delete', { authRequired: true }, {
 	post() {
 		const room = findRoomByIdOrName({ params: this.bodyParams });
 
-		Meteor.runAsUser(this.userId, () => Meteor.call('eraseRoom', room._id));
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('eraseRoom', room._id);
+		});
 
 		return API.v1.success();
 	},
@@ -501,7 +503,9 @@ API.v1.addRoute('rooms.deleteFileMessage', { authRequired: true }, {
 		if (!this.bodyParams.hasOwnProperty('fileId')) {
 			return API.v1.failure('The \'fileId\' param is required');
 		}
-		Meteor.runAsUser(this.userId, () => Meteor.call('deleteFileMessage', fileId));
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('deleteFileMessage', fileId);
+		});
 
 		return API.v1.success();
 	},
