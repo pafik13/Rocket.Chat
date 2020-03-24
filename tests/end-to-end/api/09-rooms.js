@@ -52,7 +52,7 @@ describe('[Rooms]', function() {
 			.end(done);
 	});
 
-	describe('/rooms.saveNotification:', () => {
+	describe('/rooms.saveNotification', () => {
 		let testChannel;
 		it('create an channel', (done) => {
 			createRoom({ type: 'c', name: `channel.test.${ Date.now() }` })
@@ -61,7 +61,7 @@ describe('[Rooms]', function() {
 					done();
 				});
 		});
-		it('/rooms.saveNotification:', (done) => {
+		it('/rooms.saveNotification', (done) => {
 			request.post(api('rooms.saveNotification'))
 				.set(credentials)
 				.send({
