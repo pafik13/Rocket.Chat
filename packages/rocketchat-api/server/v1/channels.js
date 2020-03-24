@@ -420,7 +420,7 @@ API.v1.addRoute('channels.files', { authRequired: true }, {
 			Meteor.call('canAccessRoom', findResult._id, this.userId);
 		});
 
-		if (findResult.filesHidden && !hasPermission(this.userId, 'view-p-file-list')) {
+		if (findResult.filesHidden && !hasPermission(this.userId, 'view-file-list')) {
 			return API.v1.unauthorized();
 		}
 

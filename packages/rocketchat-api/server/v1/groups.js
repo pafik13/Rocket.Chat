@@ -398,7 +398,7 @@ API.v1.addRoute('groups.files', { authRequired: true }, {
 			return file;
 		};
 
-		if (findResult.filesHidden && !hasPermission(this.userId, 'view-p-file-list')) {
+		if (findResult.filesHidden && !hasPermission(this.userId, 'view-file-list')) {
 			return API.v1.unauthorized();
 		}
 

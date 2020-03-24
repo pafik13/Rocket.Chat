@@ -12,7 +12,7 @@ export const roomFiles = (pub, { rid, searchText, limit = 50 }) => {
 		return pub.ready();
 	}
 
-	if (room.filesHidden && !hasPermission(pub.userId, 'view-p-file-list')) {
+	if (room.filesHidden && !hasPermission(pub.userId, 'view-file-list')) {
 		return pub.ready();
 	}
 
