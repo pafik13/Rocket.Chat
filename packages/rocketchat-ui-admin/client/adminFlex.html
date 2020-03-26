@@ -19,7 +19,7 @@
 				{{#if hasPermission 'view-room-administration'}}
 					{{> sidebarItem menuItem "Rooms" "hashtag" "admin-rooms" "" }}
 				{{/if}}
-
+        
 				{{#if hasPermission 'view-room-administration'}}
 					{{> sidebarItem menuItem "Complaints" "hashtag" "admin-complaints" "" }}
 				{{/if}}
@@ -30,6 +30,10 @@
         
 				{{#if hasPermission 'view-user-administration'}}
 					{{> sidebarItem menuItem "Users" "team" "admin-users" "" }}
+				{{/if}}        
+        
+				{{#if hasPermission 'view-user-administration'}}
+					{{> sidebarItem menuItem "Subscriptions" "team" "admin-subscriptions" "" }}
 				{{/if}}
 
 				{{#each adminBoxOptions}}

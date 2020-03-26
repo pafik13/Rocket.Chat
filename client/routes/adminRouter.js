@@ -8,6 +8,13 @@ FlowRouter.route('/admin/users', {
 	},
 });
 
+FlowRouter.route('/admin/subscriptions', {
+	name: 'admin-subscriptions',
+	action() {
+		BlazeLayout.render('main', { center: 'adminSubscriptions' });
+	},
+});
+
 FlowRouter.route('/admin/rooms', {
 	name: 'admin-rooms',
 	action() {

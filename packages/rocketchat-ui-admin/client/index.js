@@ -22,3 +22,5 @@ import './complaints/adminComplaints.html';
 import './complaints/adminComplaints';
 import './blacklistedRooms/adminBlacklistedRooms.html';
 import './blacklistedRooms/adminBlacklistedRooms';
+import './subscriptions/adminSubscriptions.html';
+import './subscriptions/adminSubscriptions';
