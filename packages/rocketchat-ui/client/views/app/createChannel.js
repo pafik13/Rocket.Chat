@@ -103,7 +103,7 @@ Template.createChannel.helpers({
 		return invalid || inUse;
 	},
 	typeLabel() {
-		return t(Template.instance().type.get() === 'p' ? t('Private_Channel') : t('Public_Channel'));
+		return t(Template.instance().type.get() === 'p' ? t('Private_Group') : t('Public_Channel'));
 	},
 	typeDescription() {
 		return t(Template.instance().type.get() === 'p' ? t('Just_invited_people_can_access_this_channel') : t('Everyone_can_access_this_channel'));

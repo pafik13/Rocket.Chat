@@ -944,6 +944,7 @@
   "Desktop_Notifications_Enabled": "Уведомления на компьютере включены",
   "Details": "Подробности",
   "Different_Style_For_User_Mentions": "Другой стиль для упоминаний пользователей",
+  "Direct": "Личка",
   "Direct_message_someone": "Личная переписка с кем-нибудь",
   "Direct_Messages": "Личная переписка",
   "Direct_Reply": "Прямой ответ",
@@ -2174,8 +2175,7 @@
   "Previous_month": "Предыдущий месяц",
   "Previous_week": "Предыдущая неделя",
   "Privacy": "Приватность",
-  "Private": "Закрытый канал",
-  "Private_Channel": "Закрытый канал",
+  "Private": "Группа",
   "Private_Group": "Приватная группа",
   "Private_Groups": "Приватные группы",
   "Private_Groups_list": "Список приватных групп",
@@ -3124,5 +3124,8 @@
   "Returned": "Вернулась",
   "Room_has_been_returned_to_search": "Комната была возвращена в поиск",
   "Return_to_seacrh": "Вернуть в поиск",
-  "Blacklisted Rooms": "Подозрительные комнаты"
+  "Blacklisted Rooms": "Подозрительные комнаты",
+  "Subscriptions": "Подписки",
+  "Roles": "Роли",
+  "Total": "Всего"
 }

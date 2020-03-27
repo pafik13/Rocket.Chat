@@ -981,6 +981,7 @@
   "Desktop_Notifications_Not_Enabled": "Desktop Notifications are Not Enabled",
   "Details": "Details",
   "Different_Style_For_User_Mentions": "Different style for user mentions",
+  "Direct": "Direct",
   "Direct_message_someone": "Direct message someone",
   "Direct_Messages": "Direct Messages",
   "Direct_Reply": "Direct Reply",
@@ -2240,8 +2241,7 @@
   "Previous_month": "Previous Month",
   "Previous_week": "Previous Week",
   "Privacy": "Privacy",
-  "Private": "Private",
-  "Private_Channel": "Private Channel",
+  "Private": "Group",
   "Private_Group": "Private Group",
   "Private_Groups": "Private Groups",
   "Private_Groups_list": "List of Private Groups",
@@ -3205,5 +3205,8 @@
   "Returned": "Returned",
   "Room_has_been_returned_to_search": "Room has been returned to search",
   "Return_to_seacrh": "Return to seacrh",
-  "Blacklisted Rooms": "Blacklisted Rooms"
+  "Blacklisted Rooms": "Blacklisted Rooms",
+  "Subscriptions": "Subscriptions",
+  "Roles": "Roles",
+  "Total": "Total"
 }
