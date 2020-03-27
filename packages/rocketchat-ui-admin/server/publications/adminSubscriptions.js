@@ -99,7 +99,7 @@ Meteor.publish('adminSubscriptions', function(search, limit) {
 
 		removed: (id) => {
 			this.removed('admin_subscriptions', id);
-			this.added('users', id);
+			this.removed('users', id);
 		},
 	});
 
