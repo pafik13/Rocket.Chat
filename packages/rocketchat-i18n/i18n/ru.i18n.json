@@ -3127,5 +3127,6 @@
   "Blacklisted Rooms": "Подозрительные комнаты",
   "Subscriptions": "Подписки",
   "Roles": "Роли",
-  "Total": "Всего"
+  "Total": "Всего",
+  "Search_by_username": "Поиск по username"
 }
