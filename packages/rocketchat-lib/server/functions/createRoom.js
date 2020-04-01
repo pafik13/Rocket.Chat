@@ -137,6 +137,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 	room = Rooms.createWithFullRoomData(room);
 
+	const subs = [];
 	for (const username of members) {
 		const member = Users.findOneByUsername(username, { fields: { username: 1, 'settings.preferences': 1 } });
 		const isTheOwner = username === owner.username;
@@ -157,7 +158,11 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 			extra.ls = now;
 		}
 
-		Subscriptions.createWithRoomAndUser(room, member, extra);
+		const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
+		subs.push({
+			user: member,
+			subscription: { _id: subId },
+		});
 	}
 
 	addUserRoles(owner._id, ['owner'], room._id);
@@ -174,7 +179,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		});
 	}
 	Meteor.defer(() => {
-		callbacks.run('afterCreateRoom', owner, room);
+		callbacks.run('afterCreateRoom', { owner, room }, subs);
 	});
 
 	return {

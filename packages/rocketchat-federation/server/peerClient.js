@@ -320,7 +320,7 @@ class PeerClient {
 		FederationEvents.directRoomCreated(federatedRoom, { skipPeers: [localPeerDomain] });
 	}
 
-	afterCreateRoom(roomOwner, room) {
+	afterCreateRoom({ owner: roomOwner, room }) {
 		this.log('afterCreateRoom');
 
 		const { _id: ownerId } = roomOwner;

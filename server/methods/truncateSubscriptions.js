@@ -2,7 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
-import { Subscriptions, LongTasks } from 'meteor/rocketchat:models';
+import { Users, Rooms, Subscriptions, LongTasks } from 'meteor/rocketchat:models';
+import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('truncateSubscriptions', {});
 
@@ -31,12 +32,29 @@ Meteor.methods({
 			const oldest = Subscriptions.findNOldestForUser(userId, toLeaves).fetch();
 			logger.debug(all, oldest.length, maxLeaves);
 
-			for (let i = 0, oldSub; i < oldest.length; i++) {
+			const user = Users.findOneById(userId);
+			for (let i = 0, oldSub, result; i < oldest.length; i = i + result) {
 				oldSub = oldest[i];
+				result = 1;
 				try {
-					Meteor.runAsUser(userId, () => {
-						Meteor.call('leaveRoom', oldSub.rid);
-					});
+					// 					Meteor.runAsUser(userId, () => {
+					// 						Meteor.call('leaveRoom', oldSub.rid);
+					// 					});
+					// 					const sub = Subscriptions.findOneById(oldSub._id);
+					const room = Rooms.findOneById(oldSub.rid);
+					logger.debug(user, oldSub, room);
+
+					if (room.t === 'd') {
+						result = Subscriptions.removeByRoomId(oldSub.rid);
+						// 						Rooms.removeById(room._id);
+					} else {
+						result = Subscriptions.removeByRoomIdAndUserId(oldSub.rid, user._id);
+						Meteor.defer(function() {
+						// TODO: CACHE: maybe a queue?
+							callbacks.run('afterLeaveRoom', { user, subscription: oldSub }, room);
+						});
+					}
+
 				} catch (err) {
 					logger.error(err);
 				}

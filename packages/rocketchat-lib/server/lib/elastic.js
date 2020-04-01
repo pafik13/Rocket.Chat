@@ -155,6 +155,34 @@ const findUsersInRoom = async(text, roomId, skip = 0, limit = 50) => {
 };
 
 
+callbacks.add('afterCreateRoom', async({ owner, room }, subs) => {
+	logger.debug('afterCreateRoom', owner, room, subs);
+	if (subs && subs.length) {
+		for (let i = 0; i < subs.length; i++) {
+			const { user, subscription } = subs[i];
+			let subId;
+			if (subscription._id instanceof Promise) {
+				subId = await subscription._id;
+			} else {
+				subId = subscription._id;
+			}
+			if (!subId) {
+				logger.warn('afterCreateRoom without subId');
+			}
+			if (!user) {
+				logger.warn('afterCreateRoom without user');
+			}
+			if (subId && user) {
+				try {
+					await addSubscription({ _id: subId, rid: room._id }, user);
+				} catch (err) {
+					logger.error(err);
+				}
+			}
+		}
+	}
+});
+
 callbacks.add('afterAddedToRoom', async(obj, room) => {
 	logger.debug('afterAddedToRoom', obj, room);
 	const { subscription, user } = obj;
