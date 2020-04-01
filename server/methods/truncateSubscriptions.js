@@ -33,9 +33,9 @@ Meteor.methods({
 			logger.debug(all, oldest.length, maxLeaves);
 
 			const user = Users.findOneById(userId);
-			for (let i = 0, oldSub, result; i < oldest.length; i = i + result) {
+			let deleted = 0; let deletedAll = 0;
+			for (let i = 0, oldSub; (i < oldest.length) && (deletedAll < toLeaves); i++) {
 				oldSub = oldest[i];
-				result = 1;
 				try {
 					// 					Meteor.runAsUser(userId, () => {
 					// 						Meteor.call('leaveRoom', oldSub.rid);
@@ -45,16 +45,17 @@ Meteor.methods({
 					logger.debug(user, oldSub, room);
 
 					if (room.t === 'd') {
-						result = Subscriptions.removeByRoomId(oldSub.rid);
-						// 						Rooms.removeById(room._id);
+						deletedAll = deletedAll + Subscriptions.removeByRoomId(oldSub.rid);
+						Rooms.removeById(room._id);
 					} else {
-						result = Subscriptions.removeByRoomIdAndUserId(oldSub.rid, user._id);
+						deletedAll = deletedAll + Subscriptions.removeByRoomIdAndUserId(oldSub.rid, user._id);
 						Meteor.defer(function() {
 						// TODO: CACHE: maybe a queue?
 							callbacks.run('afterLeaveRoom', { user, subscription: oldSub }, room);
 						});
 					}
 
+					deleted++;
 				} catch (err) {
 					logger.error(err);
 				}
@@ -62,7 +63,7 @@ Meteor.methods({
 			}
 
 			if (longTaskId) {
-				LongTasks.setExec(longTaskId, count === all - toLeaves);
+				LongTasks.setExec(longTaskId, count === (all - deleted));
 			} else {
 				LongTasks.create({
 					callerId: this.userId,
