@@ -443,19 +443,6 @@ describe('[Rooms]', function() {
 					done();
 				});
 		});
-		it('should return an Error when trying leave a DM room', (done) => {
-			request.post(api('rooms.leave'))
-				.set(credentials)
-				.send({
-					roomId: testDM._id,
-				})
-				.expect(400)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', false);
-					expect(res.body).to.have.property('errorType', 'error-not-allowed');
-				})
-				.end(done);
-		});
 		it('should return an Error when trying to leave a public channel and you are the last owner', (done) => {
 			request.post(api('rooms.leave'))
 				.set(credentials)
@@ -511,6 +498,18 @@ describe('[Rooms]', function() {
 					})
 					.end(done);
 			});
+		});
+		it('should leave the DM room', (done) => {
+			request.post(api('rooms.leave'))
+				.set(credentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
 		});
 		it('should leave the public channel when the room has at least another owner and the user has the necessary permission(leave-c)', (done) => {
 			updatePermission('leave-c', ['admin']).then(() => {
