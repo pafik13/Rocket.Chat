@@ -7,7 +7,7 @@ Meteor.publish('adminSubscriptions', function(search, limit) {
 	if (!this.userId) {
 		return this.ready();
 	}
-	if (hasPermission(this.userId, 'view-room-administration') !== true) {
+	if (hasPermission(this.userId, 'view-user-administration') !== true) {
 		return this.ready();
 	}
 	const steps = [

@@ -8,6 +8,13 @@ FlowRouter.route('/admin/users', {
 	},
 });
 
+FlowRouter.route('/admin/longTasks', {
+	name: 'admin-longTasks',
+	action() {
+		BlazeLayout.render('main', { center: 'adminLongTasks' });
+	},
+});
+
 FlowRouter.route('/admin/subscriptions', {
 	name: 'admin-subscriptions',
 	action() {

@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Base } from './models/_Base';
 import Avatars from './models/Avatars';
 import BannedUsers from './models/BannedUsers';
+import LongTasks from './models/LongTasks';
 import Uploads from './models/Uploads';
 import UserDataFiles from './models/UserDataFiles';
 import { Roles } from './models/Roles';
@@ -55,4 +56,5 @@ export {
 	EmojiCustom,
 	WebdavAccounts,
 	BannedUsers,
+	LongTasks,
 };

@@ -927,6 +927,11 @@ settings.addGroup('General', function() {
 			public: true,
 			i18nDescription: 'Rooms_Members_Serch_Type',
 		});
+		this.add('Rooms_Max_Leaves_At_Once', 100, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Max_Leaves_At_Once',
+		});
 	});
 	this.section('Notifications', function() {
 		this.add('Notifications_Max_Room_Members', 100, {

@@ -21,15 +21,13 @@ export const removeUserFromRoom = function(rid, user, options = {}) {
 			}
 		}
 
-		if (room.t === 'l') {
-			Messages.createCommandWithRoomIdAndUser('survey', rid, user);
-		}
-
 		Subscriptions.removeByRoomIdAndUserId(rid, user._id);
 
-		Meteor.defer(function() {
-			// TODO: CACHE: maybe a queue?
-			callbacks.run('afterLeaveRoom', { user, subscription }, room);
-		});
+		if (room.t !== 'd') {
+			Meteor.defer(function() {
+				// TODO: CACHE: maybe a queue?
+				callbacks.run('afterLeaveRoom', { user, subscription }, room);
+			});
+		}
 	}
 };

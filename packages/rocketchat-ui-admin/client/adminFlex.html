@@ -17,6 +17,10 @@
 				{{/if}}
 
 				{{#if hasPermission 'view-room-administration'}}
+					{{> sidebarItem menuItem "LongTasks" "clock" "admin-longTasks" "" }}
+				{{/if}}
+        
+				{{#if hasPermission 'view-room-administration'}}
 					{{> sidebarItem menuItem "Rooms" "hashtag" "admin-rooms" "" }}
 				{{/if}}
         

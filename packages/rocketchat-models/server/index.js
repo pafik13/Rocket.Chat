@@ -34,6 +34,8 @@ import ReadReceipts from './models/ReadReceipts';
 import BannedUsers from './models/BannedUsers';
 import Complaints from './models/Complaints';
 import BlockedUsers from './models/BlockedUsers';
+import LongTasks from './models/LongTasks';
+
 
 export { AppsLogsModel } from './models/apps-logs-model';
 export { AppsPersistenceModel } from './models/apps-persistence-model';
@@ -79,4 +81,5 @@ export {
 	BannedUsers,
 	Complaints,
 	BlockedUsers,
+	LongTasks,
 };

@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms } from 'meteor/rocketchat:models';
-import _ from 'underscore';
 import s from 'underscore.string';
 
 Meteor.publish('adminRooms', function(filter, types, limit) {
@@ -11,7 +10,7 @@ Meteor.publish('adminRooms', function(filter, types, limit) {
 	if (hasPermission(this.userId, 'view-room-administration') !== true) {
 		return this.ready();
 	}
-	if (!_.isArray(types)) {
+	if (!Array.isArray(types)) {
 		types = [];
 	}
 

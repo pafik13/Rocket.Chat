@@ -18,7 +18,7 @@ Meteor.methods({
 		const room = Rooms.findOneById(rid);
 		const user = Meteor.user();
 
-		if (room.t === 'd' || (room.t === 'c' && !hasPermission(user._id, 'leave-c')) || (room.t === 'p' && !hasPermission(user._id, 'leave-p'))) {
+		if ((room.t === 'c' && !hasPermission(user._id, 'leave-c')) || (room.t === 'p' && !hasPermission(user._id, 'leave-p'))) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'leaveRoom' });
 		}
 

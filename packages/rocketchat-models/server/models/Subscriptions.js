@@ -610,6 +610,20 @@ export class Subscriptions extends Base {
 		return subscription && subscription.ls;
 	}
 
+	findNOldestForUser(userId, count) {
+		const options = {
+			fields: {
+				rid: 1,
+				t: 1,
+				_updatedAt: 1,
+			},
+			sort: { _updatedAt: 1 },
+			limit: count,
+		};
+		const query = { 'u._id': userId };
+		return this.find(query, options);
+	}
+
 	findByRoomIdAndUserIds(roomId, userIds, options) {
 		const query = {
 			rid: roomId,

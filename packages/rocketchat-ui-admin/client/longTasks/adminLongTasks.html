@@ -1,0 +1,142 @@
+<template name="adminLongTasks">
+	<div class="main-content-flex">
+		<section class="page-container page-list flex-tab-main-content">
+			{{> header sectionName="LongTasks"}}
+			<div class="content">
+				{{#unless hasPermission 'view-user-administration'}}
+					<p>{{_ "You_are_not_authorized_to_view_this_page"}}</p>
+				{{else}}
+					<form class="search-form" role="form">
+						<div class="rc-input__wrapper">
+							<div class="rc-input__icon">
+								{{#if isReady}}
+									{{> icon block="rc-input__icon-svg" icon="magnifier" }}
+								{{else}}
+									{{> loading }}
+								{{/if}}
+							</div>
+							<input id="tasks-filter" type="text" class="rc-input__element"
+								   placeholder="{{_ "Search_by_method"}}" autofocus dir="auto">
+					 	</div>
+					</form>
+					<div class="results">
+						{{{_ "Showing_results" tasks.length}}}
+					</div>
+					{{#table fixed='true' onScroll=onTableScroll onResize=onTableResize}}
+						<thead>
+							<tr>
+					      <th width="12%">
+									<div class="table-fake-th">{{_ "ID"}}</div>
+								</th>
+						    <th width="4%">
+									<div class="table-fake-th">{{_ "Done"}}</div>
+								</th>
+								<th width="12%">
+									<div class="table-fake-th">{{_ "Method"}}</div>
+								</th>
+								<th width="24%">
+									<div class="table-fake-th">{{_ "Params"}}</div>
+								</th>
+								<th width="12%">
+									<div class="table-fake-th">{{_ "CallerId"}}</div>
+								</th>
+								<th width="10%">
+									<div class="table-fake-th">{{_ "Created"}}</div>
+								</th>
+								<th width="4%">
+									<div class="table-fake-th">{{_ "Execs"}}</div>
+								</th>
+						    <th width="10%">
+									<div class="table-fake-th">{{_ "Last"}}</div>
+								</th>
+								<th width="12%">
+									<div class="table-fake-th">{{_ "InstanceId"}}</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{{#each tasks}}
+							<tr class='user-info'>
+						    <td width="12%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ _id }}</span>
+										</div>
+									</div>
+								</td>
+								<td width="4%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ done }}</span>
+										</div>
+									</div>
+								</td>
+								<td width="12%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ method }}</span>
+										</div>
+									</div>
+								</td>
+								<td width="24%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ formatParams(params) }}</span>
+										</div>
+									</div>
+								</td>
+							<td width="12%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ callerId }}</span>
+										</div>
+									</div>
+								</td>
+							<td width="10%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ formatDate(ts) }}</span>
+										</div>
+									</div>
+								</td>
+							<td width="4%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ execs }}</span>
+										</div>
+									</div>
+								</td>
+								<td width="10%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ formatDate(last) }}</span>
+										</div>
+									</div>
+								</td>
+						    <td width="12%">
+									<div class="rc-table-wrapper">
+										<div class="rc-table-info">
+											<span class="rc-table-title">{{ instanceId }}</span>
+										</div>
+									</div>
+								</td>
+							</tr>
+							{{else}} {{# with searchText}}
+							<tr class="table-no-click">
+								<td>{{_ "No_results_found_for"}} {{.}}</td>
+							</tr>
+							{{/with}} {{/each}} {{#unless isReady}}
+							<tr class="table-no-click">
+								<td class="table-loading-td" colspan="{{#if showLastMessage}}5{{else}}4{{/if}}">{{> loading}}</td>
+							</tr>
+							{{/unless}}
+						</tbody>
+					{{/table}}
+				{{/unless}}
+			</div>
+		</section>
+		{{#with flexData}}
+			{{> flexTabBar}}
+		{{/with}}
+	</div>
+</template>

@@ -71,6 +71,7 @@ import './methods/setUserPassword';
 import './methods/toogleFavorite';
 import './methods/unmuteUserInRoom';
 import './methods/userSetUtcOffset';
+import './methods/truncateSubscriptions';
 import './publications/activeUsers';
 import './publications/channelAndPrivateAutocomplete';
 import './publications/fullUserData';

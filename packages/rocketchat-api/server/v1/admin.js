@@ -7,6 +7,28 @@ import * as heapdump from 'heapdump';
 import { existsSync, mkdirSync } from 'fs';
 import { elastic } from 'meteor/rocketchat:utils';
 
+API.v1.addRoute('admin.truncateSubscriptions', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId, count } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		if (!count) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `count`!');
+		}
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('truncateSubscriptions', userId, count));
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 	get() {
 		elastic.indeces().then((indeces) => {
@@ -126,7 +148,7 @@ API.v1.addRoute('admin.deleteRoom', { authRequired: true }, {
 		const { roomId } = this.requestParams();
 
 		if (!roomId) {
-			throw new Meteor.Error('error-invalid-params', 'Query must contains `roomId`!');
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `roomId`!');
 		}
 
 		const room = Rooms.findOneById(roomId);

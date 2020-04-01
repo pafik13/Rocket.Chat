@@ -2445,6 +2445,7 @@
   "Rooms": "Rooms",
   "Rooms_Max_Group_Members": "Max members count for groups",
   "Rooms_Members_Serch_Type": "Search type for members in rooms",
+  "Rooms_Max_Leaves_At_Once": "Max leaves at once",
   "Routing": "Routing",
   "Run_only_once_for_each_visitor": "Run only once for each visitor",
   "run-import": "Run Import",

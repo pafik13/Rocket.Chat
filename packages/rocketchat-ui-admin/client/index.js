@@ -24,3 +24,5 @@ import './blacklistedRooms/adminBlacklistedRooms.html';
 import './blacklistedRooms/adminBlacklistedRooms';
 import './subscriptions/adminSubscriptions.html';
 import './subscriptions/adminSubscriptions';
+import './longTasks/adminLongTasks.html';
+import './longTasks/adminLongTasks';

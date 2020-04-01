@@ -3,6 +3,7 @@ import { Logger } from 'meteor/rocketchat:logger';
 import { SyncedCron } from 'meteor/littledata:synced-cron';
 import { statistics } from 'meteor/rocketchat:statistics';
 import { randomInteger } from 'meteor/rocketchat:utils';
+import { LongTasks } from 'meteor/rocketchat:models';
 
 const logger = new Logger('SyncedCron');
 
@@ -25,6 +26,20 @@ function cleanupDeactivations() {
 	return Meteor.call('cleanupDeactivations');
 }
 
+function resumeLongTask() {
+	const task = LongTasks.getRandomTask();
+
+	if (task) {
+		if (!task.callerId) {
+			Meteor.call(task.method, ...task.params, task._id);
+		} else {
+			Meteor.runAsUser(task.callerId, () => {
+				Meteor.call(task.method, ...task.params, task._id);
+			});
+		}
+	}
+}
+
 Meteor.startup(function() {
 	return Meteor.defer(function() {
 		generateStatistics();
@@ -44,6 +59,14 @@ Meteor.startup(function() {
 				return parser.cron('*/1 * * * *');
 			},
 			job: cleanupDeactivations,
+		});
+
+		SyncedCron.add({
+			name: 'Long Task Execution',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: resumeLongTask,
 		});
 
 		// SyncedCron.add({
