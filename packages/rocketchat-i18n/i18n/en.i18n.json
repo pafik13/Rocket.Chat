@@ -3210,5 +3210,7 @@
   "Subscriptions": "Subscriptions",
   "Roles": "Roles",
   "Total": "Total",
-  "Search_by_username": "Search by username"
+  "Search_by_username": "Search by username",
+  "LongTasks": "Long Tasks",
+  "Search_by_method": "Search by method"
 }

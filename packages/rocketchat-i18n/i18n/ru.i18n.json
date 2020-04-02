@@ -3129,5 +3129,7 @@
   "Subscriptions": "Подписки",
   "Roles": "Роли",
   "Total": "Всего",
-  "Search_by_username": "Поиск по username"
+  "Search_by_username": "Поиск по username",
+  "LongTasks": "Длинные задачи",
+  "Search_by_method": "Поиск по method"
 }
