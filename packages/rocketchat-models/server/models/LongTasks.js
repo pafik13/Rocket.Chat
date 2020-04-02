@@ -81,7 +81,7 @@ class LongTasks extends Base {
 
 	getRandomTask() {
 		const tasks = Promise.await(this.model.rawCollection().aggregate(
-			[{ $match: { instanceId: InstanceStatus.id(), done: false } }, { $sample: { size: 1 } }]
+			[{ $match: { /* instanceId: InstanceStatus.id(), */ done: false } }, { $sample: { size: 1 } }]
 		).toArray());
 
 		return tasks[0];
