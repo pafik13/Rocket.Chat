@@ -1,8 +1,10 @@
 FROM rocketchat/base:12.16
 
-ADD . /app
+RUN set -x \
+ && apt-get update \
+ && apt-get install -y ffmpeg
 
-MAINTAINER buildmaster@rocket.chat
+ADD . /app
 
 RUN set -x \
  && cd /app/bundle/programs/server \
