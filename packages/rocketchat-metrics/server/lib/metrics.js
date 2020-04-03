@@ -214,7 +214,4 @@ const updatePrometheusConfig = async() => {
 	}
 };
 
-Meteor.startup(async() => {
-	settings.get('Prometheus_Enabled', updatePrometheusConfig);
-	settings.get('Prometheus_Port', updatePrometheusConfig);
-});
+Meteor.startup(updatePrometheusConfig);
