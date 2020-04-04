@@ -50,6 +50,7 @@ const traceConnection = (enable, filter, prefix, name, connection, userId) => {
 
 const wrapMethods = function(name, originalHandler, methodsMap) {
 	methodsMap[name] = function(...originalArgs) {
+		const start = Date.now();
 		traceConnection(Log_Trace_Methods, Log_Trace_Methods_Filter, 'method', name, this.connection, this.userId);
 		const end = metrics.meteorMethods.startTimer({
 			method: name === 'stream' ? `${ name }:${ originalArgs[0] }` : name,
@@ -72,6 +73,12 @@ const wrapMethods = function(name, originalHandler, methodsMap) {
 
 		const result = originalHandler.apply(this, originalArgs);
 		end();
+
+		const duration = Date.now() - start;
+		if (duration > 1000) {
+			logger.error('SLOW_METHOD_CALL', duration, name, '-> userId:', Meteor.userId(), ', arguments: ', args);
+		}
+
 		return result;
 	};
 };

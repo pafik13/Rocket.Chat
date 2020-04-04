@@ -221,6 +221,7 @@ class APIClass extends Restivus {
 				// Add a try/catch for each endpoint
 				const originalAction = endpoints[method].action;
 				endpoints[method].action = function _internalRouteActionHandler() {
+					const start = Date.now();
 					const rocketchatRestApiEnd = metrics.rocketchatRestApi.startTimer({
 						method,
 						version,
@@ -289,6 +290,11 @@ class APIClass extends Restivus {
 					rocketchatRestApiEnd({
 						status: result.statusCode,
 					});
+
+					const duration = Date.now() - start;
+					if (duration > 1000) {
+						logger.error('SLOW_REST_CALL', duration, this.request.route, this.bodyParams, this.queryParams, this.request.headers);
+					}
 
 					return result;
 				};
