@@ -37,6 +37,32 @@ function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) 
 	return roomSub;
 }
 
+API.v1.addRoute('groups.accept', { authRequired: true }, {
+	post() {
+		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('acceptGroup', findResult.rid);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('groups.decline', { authRequired: true }, {
+	post() {
+		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('leaveRoom', findResult.rid);
+
+			Meteor.call('complainAboutRoom', findResult.rid, 'спам');
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('groups.addAll', { authRequired: true }, {
 	post() {
 		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });

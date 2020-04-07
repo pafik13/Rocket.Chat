@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { getCredentials, api, request, credentials, group, apiPrivateChannelName } from '../../data/api-data.js';
-import { adminUsername } from '../../data/user';
+import { adminUsername, password } from '../../data/user';
 import { imgURL } from '../../data/interactions';
 
 function getRoomInfo(roomId) {
@@ -58,6 +58,94 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.property('success', true);
 			})
 			.end(done);
+	});
+
+	describe('[/groups.{accept,decline}]', () => {
+		let testGroup = {};
+		before((done) => {
+			request.post(api('groups.create'))
+				.set(credentials)
+				.send({
+					name: `test-group${ Date.now() }`,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					testGroup = res.body.group;
+				})
+				.end(done);
+		});
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
+		before((done) => {
+			request.post(api('groups.invite'))
+				.set(credentials)
+				.send({
+					roomName: testGroup.name,
+					userId: user._id,
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+		it('should accept invite', (done) => {
+			request.post(api('groups.accept'))
+				.set(userCredentials)
+				.send({
+					roomName: testGroup.name,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should decline invite', (done) => {
+			request.post(api('groups.decline'))
+				.set(userCredentials)
+				.send({
+					roomName: testGroup.name,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
 	});
 
 	describe('[/groups.info]', () => {

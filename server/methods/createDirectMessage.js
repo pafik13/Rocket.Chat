@@ -10,6 +10,8 @@ import { callbacks } from 'meteor/rocketchat:callbacks';
 Meteor.methods({
 	createDirectMessage(username) {
 		check(username, String);
+		const now = new Date();
+
 		const callerId = Meteor.userId();
 
 		if (!callerId) {
@@ -67,21 +69,50 @@ Meteor.methods({
 
 		const rid = [me._id, to._id].sort().join('');
 
-		const now = new Date();
+		const room = Rooms.findOneById(rid);
 
-		// Make sure we have a room
-		const roomUpsertResult = Rooms.upsert({
+		if (room) {
+			Rooms.update({
+				_id: rid,
+			}, {
+				$set: {
+					usernames: [me.username, to.username],
+				} });
+
+			Subscriptions.update({
+				rid,
+				'u._id': me._id,
+			},
+			{ $set: {
+				ls: now,
+				open: true,
+			} });
+
+			return { rid };
+		}
+
+		const roomsMaxDirects = settings.get('Rooms_Maximum_Directs');
+
+		const meSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': me._id, t: 'd' }));
+		if (meSubsCount >= roomsMaxDirects) {
+			throw new Meteor.Error('error-not-allowed', `You have reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
+				method: 'createDirectMessage',
+			});
+		}
+
+		const toSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': to._id, t: 'd' }));
+		if (toSubsCount >= roomsMaxDirects) {
+			throw new Meteor.Error('error-not-allowed', `Your interlocutor has reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
+				method: 'createDirectMessage',
+			});
+		}
+
+		Rooms.insert({
 			_id: rid,
-		}, {
-			$set: {
-				usernames: [me.username, to.username],
-			},
-			$setOnInsert: {
-				t: 'd',
-				msgs: 0,
-				ts: now,
-				usersCount: 2,
-			},
+			t: 'd',
+			msgs: 0,
+			ts: now,
+			usersCount: 2,
 		});
 
 		const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
@@ -90,86 +121,68 @@ Meteor.methods({
 			myDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}
 
-		// Make user I have a subcription to this room
-		const upsertSubscription = {
-			$set: {
-				ls: now,
-				open: true,
-			},
-			$setOnInsert: {
-				fname: to.name,
-				name: to.username,
-				t: 'd',
-				alert: false,
-				unread: 0,
-				userMentions: 0,
-				groupMentions: 0,
-				customFields: to.customFields,
-				i: {
-					_id: to._id,
-					username: to.username,
-				},
-				u: {
-					_id: me._id,
-					username: me.username,
-				},
-				ts: now,
-				...myDefaultSubscriptionPref,
-			},
-		};
-
-		if (to.active === false) {
-			upsertSubscription.$set.archived = true;
-		}
-
-		Subscriptions.upsert({
+		Subscriptions.insert({
+			ls: now,
+			open: true,
 			rid,
-			$and: [{ 'u._id': me._id }], // work around to solve problems with upsert and dot
-		}, upsertSubscription);
+			fname: to.name,
+			name: to.username,
+			t: 'd',
+			alert: false,
+			unread: 0,
+			userMentions: 0,
+			groupMentions: 0,
+			customFields: to.customFields,
+			i: {
+				_id: to._id,
+				username: to.username,
+			},
+			u: {
+				_id: me._id,
+				username: me.username,
+			},
+			ts: now,
+			...myDefaultSubscriptionPref,
+		});
 
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
 		if (!isNeedAcceptUploads) {
 			toDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}
 
-		Subscriptions.upsert({
+		Subscriptions.insert({
 			rid,
-			$and: [{ 'u._id': to._id }], // work around to solve problems with upsert and dot
-		}, {
-			$setOnInsert: {
-				fname: me.name,
-				name: me.username,
-				t: 'd',
-				open: false,
-				alert: false,
-				unaccepted: true,
-				unread: 0,
-				userMentions: 0,
-				groupMentions: 0,
-				customFields: me.customFields,
-				i: {
-					_id: me._id,
-					username: me.username,
-				},
-				u: {
-					_id: to._id,
-					username: to.username,
-				},
-				ts: now,
-				...toDefaultSubscriptionPref,
+			fname: me.name,
+			name: me.username,
+			t: 'd',
+			open: false,
+			alert: false,
+			unaccepted: true,
+			unread: 0,
+			userMentions: 0,
+			groupMentions: 0,
+			customFields: me.customFields,
+			i: {
+				_id: me._id,
+				username: me.username,
 			},
+			u: {
+				_id: to._id,
+				username: to.username,
+			},
+			ts: now,
+			...toDefaultSubscriptionPref,
 		});
 
-		// If the room is new, run a callback
-		if (roomUpsertResult.insertedId) {
-			if (hasBlock) {
-				Meteor.call('blockUser', { rid, blocked: block.blocked, reason: block.reason });
-			}
-
-			const insertedRoom = Rooms.findOneById(rid);
-
-			callbacks.run('afterCreateDirectRoom', insertedRoom, { from: me, to });
+		if (hasBlock) {
+			Meteor.call('blockUser', { rid, blocked: block.blocked, reason: block.reason });
 		}
+
+		const insertedRoom = Rooms.findOneById(rid);
+
+		console.log(insertedRoom);
+
+		callbacks.run('afterCreateDirectRoom', insertedRoom, { from: me, to });
 
 		return {
 			rid,

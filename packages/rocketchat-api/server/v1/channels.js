@@ -42,6 +42,33 @@ function findChannelByIdOrName({ params, checkedArchived = true, userId }) {
 	return room;
 }
 
+API.v1.addRoute('channels.accept', { authRequired: true }, {
+	post() {
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('acceptChannel', findResult._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('channels.decline', { authRequired: true }, {
+	post() {
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('leaveRoom', findResult._id);
+
+			Meteor.call('complainAboutRoom', findResult._id, 'спам');
+		});
+
+		return API.v1.success();
+	},
+});
+
+
 API.v1.addRoute('channels.addAll', { authRequired: true }, {
 	post() {
 		const findResult = findChannelByIdOrName({ params: this.requestParams() });

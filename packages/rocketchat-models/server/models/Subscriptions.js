@@ -695,7 +695,7 @@ export class Subscriptions extends Base {
 	}
 
 	// UPDATE
-	acceptDirect(_id) {
+	accept(_id) {
 		const query = {
 			_id,
 		};

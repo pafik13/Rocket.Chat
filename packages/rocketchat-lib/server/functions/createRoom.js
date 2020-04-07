@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { settings } from 'meteor/rocketchat:settings';
 import { Users, Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
@@ -137,6 +138,8 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 	room = Rooms.createWithFullRoomData(room);
 
+	const roomsMaxCount = settings.get('Rooms_Maximum_Count');
+
 	const subs = [];
 	for (const username of members) {
 		const member = Users.findOneByUsername(username, { fields: { username: 1, 'settings.preferences': 1 } });
@@ -158,11 +161,15 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 			extra.ls = now;
 		}
 
-		const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
-		subs.push({
-			user: member,
-			subscription: { _id: subId },
-		});
+		const memberSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': member._id }));
+
+		if (isTheOwner || memberSubsCount < roomsMaxCount) {
+			const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
+			subs.push({
+				user: member,
+				subscription: { _id: subId },
+			});
+		}
 	}
 
 	addUserRoles(owner._id, ['owner'], room._id);

@@ -42,6 +42,20 @@ API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute(['dm.decline', 'im.decline'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('leaveRoom', findResult.room._id);
+
+			Meteor.call('complainAboutUser', findResult.subscription.i._id, 'спам');
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute(['dm.accept.uploads', 'im.accept.uploads'], { authRequired: true }, {
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);

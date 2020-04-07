@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { settings } from 'meteor/rocketchat:settings';
 import { Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { callbacks } from 'meteor/rocketchat:callbacks';
@@ -11,6 +12,15 @@ export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 	let subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, user._id);
 	if (subscription) {
 		return;
+	}
+
+	const roomsMaxCount = settings.get('Rooms_Maximum_Count');
+
+	const subsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': user._id }));
+	if (subsCount >= roomsMaxCount) {
+		throw new Meteor.Error('error-not-allowed', `You have reached the maximum number of rooms: ${ roomsMaxCount }`, {
+			method: 'addUserToRoom',
+		});
 	}
 
 	if (room.t === 'c' || room.t === 'p') {
@@ -26,14 +36,16 @@ export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 		Rooms.muteUsernameByRoomId(room._id, user.username);
 	}
 
-	subscription = Subscriptions.createWithRoomAndUser(room, user, {
+	const sub = {
 		ts: now,
 		open: true,
 		alert: true,
 		unread: 1,
 		userMentions: 1,
 		groupMentions: 0,
-	});
+	};
+	if (inviter && user._id !== inviter._id) { sub.unaccepted = true; }
+	subscription = Subscriptions.createWithRoomAndUser(room, user, sub);
 
 	if (!silenced) {
 		if (inviter) {

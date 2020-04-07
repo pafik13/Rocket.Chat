@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 import { Subscriptions } from 'meteor/rocketchat:models';
 
 Meteor.methods({
-	acceptDirect(rid) {
+	acceptChannel(rid) {
 		this.unblock();
 		check(rid, String);
 
@@ -11,7 +11,7 @@ Meteor.methods({
 
 		if (!fromId) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'acceptDirect',
+				method: 'acceptChannel',
 			});
 		}
 
@@ -24,7 +24,7 @@ Meteor.methods({
 		const options = { fields: { _id: 1, unaccepted: 1 } };
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, fromId, options);
 
-		if (room.t === 'd' && !subscription) {
+		if (room.t === 'c' && !subscription) {
 			return false;
 		}
 

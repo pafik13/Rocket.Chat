@@ -932,6 +932,16 @@ settings.addGroup('General', function() {
 			public: true,
 			i18nDescription: 'Rooms_Max_Leaves_At_Once',
 		});
+		this.add('Rooms_Maximum_Directs', 200, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Maximum_Directs',
+		});
+		this.add('Rooms_Maximum_Count', 500, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Maximum_Count',
+		});
 	});
 	this.section('Notifications', function() {
 		this.add('Notifications_Max_Room_Members', 100, {
