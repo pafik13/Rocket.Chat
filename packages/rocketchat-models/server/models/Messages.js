@@ -732,35 +732,7 @@ export class Messages extends Base {
 		_.extend(record, extraData);
 
 		record._id = this.insertOrUpsert(record);
-		Rooms.incMsgCountById(room._id, 1);
-		return record;
-	}
-
-	createNavigationHistoryWithRoomIdMessageAndUser(roomId, message, user, extraData) {
-		const type = 'livechat_navigation_history';
-		const room = Rooms.findOneById(roomId, { fields: { sysMes: 1 } });
-		if ((room != null ? room.sysMes : undefined) === false) {
-			return;
-		}
-		const record = {
-			t: type,
-			rid: roomId,
-			ts: new Date,
-			msg: message,
-			u: {
-				_id: user._id,
-				username: user.username,
-			},
-			groupable: false,
-		};
-
-		if (this.settings.get('Message_Read_Receipt_Enabled')) {
-			record.unread = true;
-		}
-
-		_.extend(record, extraData);
-
-		record._id = this.insertOrUpsert(record);
+		Rooms.incMsgCountAndSetLastMessageById(room._id, 1, record.ts, record);
 		return record;
 	}
 
