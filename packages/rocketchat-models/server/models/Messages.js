@@ -66,12 +66,12 @@ export class Messages extends Base {
 		});
 	}
 
-	createChannelCreatedByRoomIdAndUser(roomId, user) {
-		return this.createWithTypeRoomIdMessageAndUser('channel-created', roomId, '', user);
+	createChannelCreatedByRoomAndUser(room, user) {
+		return this.createWithTypeRoomIdMessageAndUser('channel-created', room._id, room.fname, user);
 	}
 
-	createGroupCreatedByRoomIdAndUser(roomId, user) {
-		return this.createWithTypeRoomIdMessageAndUser('group-created', roomId, '', user);
+	createGroupCreatedByRoomAndUser(room, user) {
+		return this.createWithTypeRoomIdMessageAndUser('group-created', room._id, room.fname, user);
 	}
 
 	createRoomArchivedByRoomIdAndUser(roomId, user) {

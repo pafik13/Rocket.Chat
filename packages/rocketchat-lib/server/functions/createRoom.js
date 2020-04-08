@@ -175,12 +175,12 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 	addUserRoles(owner._id, ['owner'], room._id);
 
 	if (type === 'c') {
-		Messages.createChannelCreatedByRoomIdAndUser(room._id, owner);
+		Messages.createChannelCreatedByRoomAndUser(room, owner);
 		Meteor.defer(() => {
 			callbacks.run('afterCreateChannel', owner, room);
 		});
 	} else if (type === 'p') {
-		Messages.createGroupCreatedByRoomIdAndUser(room._id, owner);
+		Messages.createGroupCreatedByRoomAndUser(room, owner);
 		Meteor.defer(() => {
 			callbacks.run('afterCreatePrivateGroup', owner, room);
 		});
