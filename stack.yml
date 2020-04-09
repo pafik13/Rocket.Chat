@@ -16,3 +16,15 @@ services:
       discovery.type: "single-node"
     ports:
       - 9200:9200
+      
+#  rocket:
+#    image: anonym/rocket:develop
+#    environment:
+#      PORT: "3000"
+#      NODE_ENV: "production"
+#      ROOT_URL: "http://localhost:3000"
+#      MONGO_URL: "mongodb://mongo:27017/test"
+#      MONGO_OPLOG_URL: 'mongodb://mongo:27017/local'
+#      TEST_MODE: "true"
+#    ports:
+#      - 3000:3000
