@@ -34,8 +34,10 @@ API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
 
+		const { room } = findResult;
+
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('acceptDirect', findResult.room._id);
+			Meteor.call('acceptDirect', room._id);
 		});
 
 		return API.v1.success();
@@ -44,12 +46,20 @@ API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
 
 API.v1.addRoute(['dm.decline', 'im.decline'], { authRequired: true }, {
 	post() {
-		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+		const params = this.requestParams();
+
+		const findResult = findDirectMessageRoom(params, this.user);
+
+		const { room, subscription } = findResult;
 
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('leaveRoom', findResult.room._id);
+			if (params.reason) {
+				Meteor.call('complainAboutUser', subscription.i._id, params.reason);
+			}
 
-			Meteor.call('complainAboutUser', findResult.subscription.i._id, 'спам');
+			Meteor.call('blockUser', { rid: room._id, blocked: subscription.i._id, reason: params.reason });
+
+			Meteor.call('leaveRoom', room._id);
 		});
 
 		return API.v1.success();
@@ -427,18 +437,8 @@ API.v1.addRoute(['dm.blockUser', 'im.blockUser'], { authRequired: true }, {
 
 		const { room, subscription } = findResult;
 
-		let companion;
-		if (params.username) {
-			companion = params.username;
-		} else {
-			const index = room.usernames.indexOf(subscription.u.username);
-			companion = index === 0 ? room.usernames[1] : room.usernames[0];
-		}
-
-		companion = Users.findOneByUsername(companion, { fields: { username: 1 } });
-
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('blockUser', { rid: room._id, blocked: companion._id, reason: params.reason });
+			Meteor.call('blockUser', { rid: room._id, blocked: subscription.i._id, reason: params.reason });
 		});
 
 		return API.v1.success();
@@ -453,18 +453,8 @@ API.v1.addRoute(['dm.unblockUser', 'im.unblockUser'], { authRequired: true }, {
 
 		const { room, subscription } = findResult;
 
-		let companion;
-		if (params.username) {
-			companion = params.username;
-		} else {
-			const index = room.usernames.indexOf(subscription.u.username);
-			companion = index === 0 ? room.usernames[1] : room.usernames[0];
-		}
-
-		companion = Users.findOneByUsername(companion, { fields: { username: 1 } });
-
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('unblockUser', { rid: room._id, blocked: companion._id });
+			Meteor.call('unblockUser', { rid: room._id, blocked: subscription.i._id });
 		});
 
 		return API.v1.success();

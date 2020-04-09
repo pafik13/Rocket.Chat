@@ -56,12 +56,18 @@ API.v1.addRoute('channels.accept', { authRequired: true }, {
 
 API.v1.addRoute('channels.decline', { authRequired: true }, {
 	post() {
-		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+		const params = this.requestParams();
+
+		if (!params.reason) {
+			throw new Meteor.Error('error-reason-param-not-provided', 'The parameter "reason" is required');
+		}
+
+		const findResult = findChannelByIdOrName({ params });
 
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('leaveRoom', findResult._id);
+			Meteor.call('complainAboutRoom', findResult._id, params.reason);
 
-			Meteor.call('complainAboutRoom', findResult._id, 'спам');
+			Meteor.call('leaveRoom', findResult._id);
 		});
 
 		return API.v1.success();

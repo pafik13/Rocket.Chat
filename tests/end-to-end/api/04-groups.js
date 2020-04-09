@@ -138,6 +138,7 @@ describe('[Groups]', function() {
 				.set(userCredentials)
 				.send({
 					roomName: testGroup.name,
+					reason: 'SPAM',
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -253,11 +254,7 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.property('group').and.to.be.an('object');
 					const { group } = res.body;
 					expect(group).to.have.property('lastMessage').and.to.be.an('object');
-					expect(group.lastMessage).to.have.property('reactions').and.to.be.an('object');
-					expect(group.lastMessage).to.have.property('pinned').and.to.be.a('boolean');
-					expect(group.lastMessage).to.have.property('pinnedAt').and.to.be.a('string');
-					expect(group.lastMessage).to.have.property('pinnedBy').and.to.be.an('object');
-					expect(group.lastMessage).to.have.property('starred').and.to.be.an('array');
+					expect(group.lastMessage).to.have.property('t', 'message_pinned');
 				})
 				.end(done);
 		});
@@ -276,6 +273,10 @@ describe('[Groups]', function() {
 					const lastMessage = messages.filter((message) => message._id === groupMessage._id)[0];
 					expect(lastMessage).to.have.property('starred').and.to.be.an('array');
 					expect(lastMessage.starred[0]._id).to.be.equal(adminUsername);
+					expect(lastMessage).to.have.property('reactions').and.to.be.an('object');
+					expect(lastMessage).to.have.property('pinned').and.to.be.a('boolean');
+					expect(lastMessage).to.have.property('pinnedAt').and.to.be.a('string');
+					expect(lastMessage).to.have.property('pinnedBy').and.to.be.an('object');
 				})
 				.end(done);
 		});

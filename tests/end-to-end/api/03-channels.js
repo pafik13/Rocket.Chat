@@ -174,11 +174,7 @@ describe('[Channels]', function() {
 					expect(res.body).to.have.property('channel').and.to.be.an('object');
 					const { channel } = res.body;
 					expect(channel).to.have.property('lastMessage').and.to.be.an('object');
-					expect(channel.lastMessage).to.have.property('reactions').and.to.be.an('object');
-					expect(channel.lastMessage).to.have.property('pinned').and.to.be.a('boolean');
-					expect(channel.lastMessage).to.have.property('pinnedAt').and.to.be.a('string');
-					expect(channel.lastMessage).to.have.property('pinnedBy').and.to.be.an('object');
-					expect(channel.lastMessage).to.have.property('starred').and.to.be.an('array');
+					expect(channel.lastMessage).to.have.property('t', 'message_pinned');
 				})
 				.end(done);
 		});
@@ -197,6 +193,10 @@ describe('[Channels]', function() {
 					const lastMessage = messages.filter((message) => message._id === channelMessage._id)[0];
 					expect(lastMessage).to.have.property('starred').and.to.be.an('array');
 					expect(lastMessage.starred[0]._id).to.be.equal(adminUsername);
+					expect(lastMessage).to.have.property('reactions').and.to.be.an('object');
+					expect(lastMessage).to.have.property('pinned').and.to.be.a('boolean');
+					expect(lastMessage).to.have.property('pinnedAt').and.to.be.a('string');
+					expect(lastMessage).to.have.property('pinnedBy').and.to.be.an('object');
 				})
 				.end(done);
 		});
@@ -784,6 +784,7 @@ describe('[Channels]', function() {
 				.set(userCredentials)
 				.send({
 					roomName: apiPublicChannelName,
+					reason: 'SPAM',
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)

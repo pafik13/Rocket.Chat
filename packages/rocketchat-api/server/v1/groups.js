@@ -51,12 +51,18 @@ API.v1.addRoute('groups.accept', { authRequired: true }, {
 
 API.v1.addRoute('groups.decline', { authRequired: true }, {
 	post() {
-		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+		const params = this.requestParams();
+
+		if (!params.reason) {
+			throw new Meteor.Error('error-reason-param-not-provided', 'The parameter "reason" is required');
+		}
+
+		const findResult = findPrivateGroupByIdOrName({ params, userId: this.userId });
 
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('leaveRoom', findResult.rid);
 
-			Meteor.call('complainAboutRoom', findResult.rid, 'спам');
+			Meteor.call('complainAboutRoom', findResult.rid, params.reason);
 		});
 
 		return API.v1.success();
