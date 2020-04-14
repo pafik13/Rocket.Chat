@@ -55,6 +55,7 @@ metrics.ddpRateLimitExceeded = new client.Counter({ name: 'rocketchat_ddp_rate_l
 
 metrics.ddpOpenSockets = new client.Gauge({ name: 'rocketchat_ddp_open_sockets', help: 'number of open sockets' });
 metrics.ddpNamedSubs = new client.Gauge({ name: 'rocketchat_ddp_named_subs', help: 'number of named subscriptions' });
+metrics.ddpNamedSubsDetailed = new client.Gauge({ name: 'rocketchat_ddp_named_subs_detailed', help: 'number of named subscriptions for each name', labelNames: ['name'] });
 metrics.ddpUniversalSubs = new client.Gauge({ name: 'rocketchat_ddp_universal_subs', help: 'number of universal subscriptions' });
 metrics.ddpCollectionViews = new client.Gauge({ name: 'rocketchat_ddp_collection_views', help: 'number of collection views' });
 metrics.ddpCollectionViewsDocs = new client.Gauge({ name: 'rocketchat_ddp_collection_views_docs', help: 'number of documents of collection views' });
@@ -100,36 +101,53 @@ const setPrometheusData = async() => {
 	});
 
 	const { server } = Meteor;
-	const sessions = Object.values(server.sessions);
 	let namedSubs = 0;
 	let universalSubs = 0;
 	let collectionViews = 0;
 	let collectionViewsDocs = 0;
 	let inQueue = 0;
-	for (let s = 0, len = sessions.length, session; s < len; s++) {
-		session = sessions[s];
-		namedSubs += Object.keys(session._namedSubs).length;
-		universalSubs += Object.keys(session._universalSubs).length;
+	const namedSubsByNames = {};
+	let authSessions = 0;
+	const userIds = [];
+	for (const session of server.sessions.values()) {
+		if (session.userId) {
+			authSessions++;
+			userIds.push(session.userId);
+		}
+
+		for (const subscription of session._namedSubs.values()) {
+			namedSubs++;
+			if (subscription._name) {
+				const name = subscription._name;
+				if (namedSubsByNames[name]) {
+					namedSubsByNames[name] += 1;
+				} else {
+					namedSubsByNames[name] = 1;
+				}
+			}
+		}
+		universalSubs += session._universalSubs.length;
 		inQueue += session.inQueue.length;
-		const colViewsKeys = Object.keys(session.collectionViews);
-		collectionViews += colViewsKeys.length;
-		for (let k = 0, len = colViewsKeys.length; k < len; k++) {
-			const collectionView = session.collectionViews[colViewsKeys[k]];
-			collectionViewsDocs += Object.keys(collectionView.documents).length;
+		collectionViews += session.collectionViews.size;
+		for (const collectionView of session.collectionViews.values()) {
+			collectionViewsDocs += collectionView.documents.size;
 		}
 	}
 
 	metrics.ddpOpenSockets.set(server.stream_server.open_sockets.length);
 	metrics.ddpNamedSubs.set(namedSubs);
+	for (const [name, count] of Object.entries(namedSubsByNames)) {
+		metrics.ddpNamedSubsDetailed.set({ name }, count);
+	}
+
 	metrics.ddpUniversalSubs.set(universalSubs);
 	metrics.ddpCollectionViews.set(collectionViews);
 	metrics.ddpCollectionViewsDocs.set(collectionViewsDocs);
 	metrics.ddpInQueue.set(inQueue);
 
-	const authenticatedSessions = sessions.filter((s) => s.userId);
-	metrics.ddpSessions.set(sessions.length, date);
-	metrics.ddpAthenticatedSessions.set(authenticatedSessions.length, date);
-	metrics.ddpConnectedUsers.set(_.unique(authenticatedSessions.map((s) => s.userId)).length, date);
+	metrics.ddpSessions.set(server.sessions.size, date);
+	metrics.ddpAthenticatedSessions.set(authSessions, date);
+	metrics.ddpConnectedUsers.set(_.unique(userIds).length, date);
 
 	const statistics = Statistics.findLast();
 	if (!statistics) {

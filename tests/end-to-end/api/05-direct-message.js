@@ -92,6 +92,13 @@ describe('[Direct Messages]', function() {
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room');
+					expect(res.body).to.have.nested.property('room._id');
+					expect(res.body).to.have.nested.property('room.ts');
+					expect(res.body).to.have.nested.property('room.t', 'd');
+					expect(res.body).to.have.nested.property('room.msgs', 0);
+					expect(res.body).to.have.nested.property('room.usernames').and.to.have.lengthOf(2);
 					testDM = res.body.room;
 				})
 				.end(done);
