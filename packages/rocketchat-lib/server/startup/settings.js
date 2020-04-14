@@ -881,6 +881,18 @@ settings.addGroup('General', function() {
 		type: 'string',
 		public: true,
 	});
+	this.add('Use_redis', false, {
+		type: 'boolean',
+		public: true,
+	});
+	this.add('Redis_host', 'localhost', {
+		type: 'string',
+		public: true,
+	});
+	this.add('Redis_port', 6379, {
+		type: 'int',
+		public: true,
+	});
 	this.add('Robot_Instructions_File_Content', 'User-agent: *\nDisallow: /', {
 		type: 'string',
 		public: true,

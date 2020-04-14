@@ -13,5 +13,6 @@ export { RateLimiterClass as RateLimiter } from './RateLimiter';
 export { processDirectEmail } from './processDirectEmail';
 export { msgStream } from './msgStream';
 export { elastic } from './elastic';
+export { redis } from './redis';
 
 import './notifyUsersOnMessage';

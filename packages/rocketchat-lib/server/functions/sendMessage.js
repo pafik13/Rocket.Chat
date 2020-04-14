@@ -4,6 +4,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Messages } from 'meteor/rocketchat:models';
 import { Markdown } from 'meteor/rocketchat:markdown';
+import { redis } from '../lib';
 
 const objectMaybeIncluding = (types) => Match.Where((value) => {
 	Object.keys(types).forEach((field) => {
@@ -146,6 +147,13 @@ export const sendMessage = function(user, message, room, upsert = false) {
 
 	message = callbacks.run('beforeSaveMessage', message);
 	if (message) {
+		let msgsInRedis = Promise.await(redis.incr(room._id));
+		if (msgsInRedis <= room.msgs) {
+			msgsInRedis = room.msgs + 1;
+			Promise.await(redis.set(room._id, msgsInRedis));
+		}
+		message.serverId = msgsInRedis;
+
 		// Avoid saving sandstormSessionId to the database
 		let sandstormSessionId = null;
 		if (message.sandstormSessionId) {
