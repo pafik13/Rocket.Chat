@@ -113,6 +113,7 @@ Meteor.methods({
 			msgs: 0,
 			ts: now,
 			usersCount: 2,
+			usernames: [me.username, to.username],
 		});
 
 		const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
