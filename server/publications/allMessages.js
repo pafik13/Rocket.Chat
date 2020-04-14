@@ -1,10 +1,10 @@
 import { Meteor } from 'meteor/meteor';
-import { Random } from 'meteor/random';
-import { check } from 'meteor/check';
+// import { Random } from 'meteor/random';
+// import { check } from 'meteor/check';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { Messages, Subscriptions } from 'meteor/rocketchat:models';
 
-const subscriptionsByRoomId = {};
+const subscriptionsByRoomId = new Map();
 
 Meteor.publish('allMessages', function() {
 	if (!this.userId) {
@@ -12,7 +12,7 @@ Meteor.publish('allMessages', function() {
 	}
 
 	const subscription = this;
-	subscription.subId = Random.id();
+	/* subscription.subId = Random.id();*/
 	subscription.roomIds = [];
 
 	//   console.log('allMessages', subscription);
@@ -22,10 +22,12 @@ Meteor.publish('allMessages', function() {
 	//   console.log('allMessages', userRoomSubs);
 
 	userRoomSubs.forEach((s) => {
-		if (!subscriptionsByRoomId[s.rid]) {
-			subscriptionsByRoomId[s.rid] = {};
+		if (!subscriptionsByRoomId.has(s.rid)) {
+			subscriptionsByRoomId.set(s.rid, new Map());
 		}
-		subscriptionsByRoomId[s.rid][subscription.subId] = subscription;
+		const map = subscriptionsByRoomId.get(s.rid);
+		map.set(subscription, subscription);
+		//     [subscription.subId] = subscription;
 
 		subscription.roomIds.push(s.rid);
 	});
@@ -39,27 +41,21 @@ Meteor.publish('allMessages', function() {
 
 	const cursorHandle = cursor.observeChanges({
 		added(_id, record) {
-			const subs = subscriptionsByRoomId[record.rid];
+			const subs = subscriptionsByRoomId.get(record.rid);
 			if (!subs) { return; }
 
-			const subIds = Object.keys(subs);
-			if (!subIds.length) { return; }
-			subIds.forEach((subId) => {
-				const subscription = subs[subId];
+			for (const subscription of subs.values()) {
 				subscription.added('chat_message', _id, composeMessageObjectWithUser(record, subscription.userId));
-			});
+			}
 			return;
 		},
 		changed(_id, record) {
-			const subs = subscriptionsByRoomId[record.rid];
+			const subs = subscriptionsByRoomId.get(record.rid);
 			if (!subs) { return; }
 
-			const subIds = Object.keys(subs);
-			if (!subIds.length) { return; }
-			subIds.forEach((subId) => {
-				const subscription = subs[subId];
+			for (const subscription of subs.values()) {
 				subscription.changed('chat_message', _id, composeMessageObjectWithUser(record, subscription.userId));
-			});
+			}
 			return;
 		},
 	});
@@ -69,9 +65,12 @@ Meteor.publish('allMessages', function() {
 	return this.onStop(function() {
 		//     console.log('allMessages - onStop', subscriptionsByRoomId)
 		cursorHandle.stop();
-		const { subId, roomIds } = subscription;
+		const { /* subId, */ roomIds } = subscription;
 		roomIds.forEach((rid) => {
-			delete subscriptionsByRoomId[rid][subId];
+			const map = subscriptionsByRoomId.get(rid);
+			map.delete(subscription);
+
+			if (!map.size) { subscriptionsByRoomId.delete(rid); }
 		});
 		//     console.log('allMessages - onStop', subscriptionsByRoomId)
 	});
