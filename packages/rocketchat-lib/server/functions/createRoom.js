@@ -157,8 +157,10 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 		extra.open = true;
 
-		if (username === owner.username) {
+		if (isTheOwner) {
 			extra.ls = now;
+		} else {
+			extra.unaccepted = true;
 		}
 
 		const memberSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': member._id }));
