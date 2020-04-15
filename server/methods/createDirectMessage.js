@@ -79,7 +79,7 @@ Meteor.methods({
 					usernames: [me.username, to.username],
 				} });
 
-			Subscriptions.update({
+			const result = Subscriptions.update({
 				rid,
 				'u._id': me._id,
 			},
@@ -88,23 +88,60 @@ Meteor.methods({
 				open: true,
 			} });
 
+			// Если у меня нет подписки, но я не заблокирован собеседником,
+			// то почему бы не создать её и попробовать продолжить общение?
+			// Как такое вышло: я вышел из диалога (пожаловавшись или заблокировав)
+			if (!result) {
+				const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
+				const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
+				if (!isNeedAcceptUploads) {
+					myDefaultSubscriptionPref.uploadsState = 'acceptedAll';
+				}
+
+				Subscriptions.insert({
+					ls: now,
+					open: true,
+					rid,
+					fname: to.name,
+					name: to.username,
+					t: 'd',
+					alert: false,
+					unread: 0,
+					userMentions: 0,
+					groupMentions: 0,
+					customFields: to.customFields,
+					i: {
+						_id: to._id,
+						username: to.username,
+					},
+					u: {
+						_id: me._id,
+						username: me.username,
+					},
+					ts: now,
+					...myDefaultSubscriptionPref,
+				});
+			}
+
 			return { rid };
 		}
 
 		const roomsMaxDirects = settings.get('Rooms_Maximum_Directs');
 
-		const meSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': me._id, t: 'd' }));
-		if (meSubsCount >= roomsMaxDirects) {
-			throw new Meteor.Error('error-not-allowed', `You have reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
-				method: 'createDirectMessage',
-			});
-		}
+		if (roomsMaxDirects) {
+			const meSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': me._id, t: 'd' }));
+			if (meSubsCount >= roomsMaxDirects) {
+				throw new Meteor.Error('error-not-allowed', `You have reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
+					method: 'createDirectMessage',
+				});
+			}
 
-		const toSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': to._id, t: 'd' }));
-		if (toSubsCount >= roomsMaxDirects) {
-			throw new Meteor.Error('error-not-allowed', `Your interlocutor has reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
-				method: 'createDirectMessage',
-			});
+			const toSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': to._id, t: 'd' }));
+			if (toSubsCount >= roomsMaxDirects) {
+				throw new Meteor.Error('error-not-allowed', `Your interlocutor has reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
+					method: 'createDirectMessage',
+				});
+			}
 		}
 
 		Rooms.insert({
