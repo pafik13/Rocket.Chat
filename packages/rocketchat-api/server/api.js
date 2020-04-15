@@ -407,6 +407,7 @@ class APIClass extends Restivus {
 					data: {
 						userId: this.userId,
 						authToken: auth.token,
+						authTokenExpires: auth.tokenExpires,
 						me: getUserInfo(this.user),
 					},
 				};

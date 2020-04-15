@@ -41,6 +41,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -61,6 +62,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -79,6 +81,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -97,6 +100,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
