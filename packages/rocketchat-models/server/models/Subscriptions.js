@@ -1358,6 +1358,14 @@ export class Subscriptions extends Base {
 
 		return result;
 	}
+
+	countDirectsByUserId(userId) {
+		return this.model.rawCollection().count({ 'u._id': userId, t: 'd' });
+	}
+
+	countWODirectsByUserId(userId) {
+		return this.model.rawCollection().count({ 'u._id': userId, t: { $ne: 'd' } });
+	}
 }
 
 export default new Subscriptions('subscription', true);

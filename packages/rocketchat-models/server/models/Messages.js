@@ -66,6 +66,10 @@ export class Messages extends Base {
 		});
 	}
 
+	createRoomsLimitReachedForMember(room, owner, member) {
+		return this.createWithTypeRoomIdMessageAndUser('rooms-limit-reached', room._id, member.username, owner);
+	}
+
 	createChannelCreatedByRoomAndUser(room, user) {
 		return this.createWithTypeRoomIdMessageAndUser('channel-created', room._id, room.fname, user);
 	}

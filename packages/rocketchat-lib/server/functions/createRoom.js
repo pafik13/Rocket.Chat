@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { settings } from 'meteor/rocketchat:settings';
 import { Users, Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { callbacks } from 'meteor/rocketchat:callbacks';
-import { hasPermission, addUserRoles } from 'meteor/rocketchat:authorization';
+import { hasPermission /* addUserRoles */} from 'meteor/rocketchat:authorization';
 import { getValidRoomName, validateGeoJSON, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -82,6 +82,12 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		throw new Meteor.Error('error-invalid-user', 'Invalid user', { function: 'RocketChat.createRoom' });
 	}
 
+	const roomsMaxCount = settings.get('Rooms_Maximum_Count');
+	const ownerSubsCount = Promise.await(Subscriptions.countWODirectsByUserId(owner._id));
+	if (ownerSubsCount > roomsMaxCount) {
+		throw new Meteor.Error('error-invalid-name', `You have reached the maximum number of rooms: ${ roomsMaxCount }`, { function: 'RocketChat.createRoom' });
+	}
+
 	if (!_.contains(members, owner.username)) {
 		members.push(owner.username);
 	}
@@ -138,9 +144,9 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 	room = Rooms.createWithFullRoomData(room);
 
-	const roomsMaxCount = settings.get('Rooms_Maximum_Count');
 
 	const subs = [];
+	const whoReachLimit = [];
 	for (const username of members) {
 		const member = Users.findOneByUsername(username, { fields: { username: 1, 'settings.preferences': 1 } });
 		const isTheOwner = username === owner.username;
@@ -159,11 +165,12 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 
 		if (isTheOwner) {
 			extra.ls = now;
+			extra.roles = ['owner'];
 		} else {
 			extra.unaccepted = true;
 		}
 
-		const memberSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': member._id }));
+		const memberSubsCount = Promise.await(Subscriptions.countWODirectsByUserId(member._id));
 
 		if (isTheOwner || memberSubsCount < roomsMaxCount) {
 			const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
@@ -171,10 +178,12 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 				user: member,
 				subscription: { _id: subId },
 			});
+		} else {
+			whoReachLimit.push(member);
 		}
 	}
 
-	addUserRoles(owner._id, ['owner'], room._id);
+	// 	addUserRoles(owner._id, ['owner'], room._id);
 
 	if (type === 'c') {
 		Messages.createChannelCreatedByRoomAndUser(room, owner);
@@ -190,6 +199,10 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 	Meteor.defer(() => {
 		callbacks.run('afterCreateRoom', { owner, room }, subs);
 	});
+
+	for (const member of members) {
+		Messages.createRoomsLimitReachedForMember(room, owner, member);
+	}
 
 	return {
 		rid: room._id,

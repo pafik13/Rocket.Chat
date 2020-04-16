@@ -129,14 +129,14 @@ Meteor.methods({
 		const roomsMaxDirects = settings.get('Rooms_Maximum_Directs');
 
 		if (roomsMaxDirects) {
-			const meSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': me._id, t: 'd' }));
+			const meSubsCount = Promise.await(Subscriptions.countDirectsByUserId(me._id));
 			if (meSubsCount >= roomsMaxDirects) {
 				throw new Meteor.Error('error-not-allowed', `You have reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
 					method: 'createDirectMessage',
 				});
 			}
 
-			const toSubsCount = Promise.await(Subscriptions.model.rawCollection().count({ 'u._id': to._id, t: 'd' }));
+			const toSubsCount = Promise.await(Subscriptions.countDirectsByUserId(to._id));
 			if (toSubsCount >= roomsMaxDirects) {
 				throw new Meteor.Error('error-not-allowed', `Your interlocutor has reached the maximum number of direct messages: ${ roomsMaxDirects }`, {
 					method: 'createDirectMessage',
