@@ -29,6 +29,24 @@ API.v1.addRoute('admin.truncateSubscriptions', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('admin.cleanupSubscriptions', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('cleanupSubscriptions', userId));
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 	get() {
 		elastic.indeces().then((indeces) => {

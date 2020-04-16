@@ -74,6 +74,7 @@ import './methods/toogleFavorite';
 import './methods/unmuteUserInRoom';
 import './methods/userSetUtcOffset';
 import './methods/truncateSubscriptions';
+import './methods/cleanupSubscriptions';
 import './publications/activeUsers';
 import './publications/allMessages';
 import './publications/channelAndPrivateAutocomplete';
