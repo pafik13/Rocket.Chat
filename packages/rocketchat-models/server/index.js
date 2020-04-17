@@ -36,6 +36,7 @@ import Complaints from './models/Complaints';
 import BlockedUsers from './models/BlockedUsers';
 import LongTasks from './models/LongTasks';
 
+export { oplogEvents } from './oplogEvents';
 
 export { AppsLogsModel } from './models/apps-logs-model';
 export { AppsPersistenceModel } from './models/apps-persistence-model';

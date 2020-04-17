@@ -8,6 +8,7 @@ export { roomTypes } from './lib/roomTypes';
 export { RoomTypeRouteConfig, RoomTypeConfig, RoomSettingsEnum, UiTextContext } from '../lib/RoomTypeConfig';
 export { RoomTypesCommon } from '../lib/RoomTypesCommon';
 export { isDocker } from './functions/isDocker';
+export { getMongoInfo, getOplogInfo } from './functions/getMongoInfo';
 export { validateUrl } from './functions/validateUrl';
 export { validateGeoJSON } from './functions/validateGeoJSON';
 export { getAvatarUrlFromUsername } from '../lib/getAvatarUrlFromUsername';

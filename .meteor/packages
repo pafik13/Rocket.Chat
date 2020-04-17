@@ -172,3 +172,4 @@ rocketchat:promises
 rocketchat:ui-utils
 rocketchat:ui-cached-collection
 minifier-js@2.6.0
+facts-base
