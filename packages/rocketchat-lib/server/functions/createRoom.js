@@ -200,7 +200,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		callbacks.run('afterCreateRoom', { owner, room }, subs);
 	});
 
-	for (const member of members) {
+	for (const member of whoReachLimit) {
 		Messages.createRoomsLimitReachedForMember(room, owner, member);
 	}
 
