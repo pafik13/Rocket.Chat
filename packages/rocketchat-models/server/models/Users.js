@@ -1206,6 +1206,16 @@ Find users to send a message by email if:
 		console.timeEnd(timeLabel_Strategy);
 		return users;
 	}
+
+	removeOlderResumeTokensByUserId(userId, fromDate) {
+		this.update(userId, {
+			$pull: {
+				'services.resume.loginTokens': {
+					when: { $lt: fromDate },
+				},
+			},
+		});
+	}
 }
 
 export default new Users(Meteor.users, true);

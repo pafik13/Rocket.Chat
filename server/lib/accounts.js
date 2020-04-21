@@ -288,3 +288,21 @@ Accounts.validateNewUser(function(user) {
 
 	return true;
 });
+
+export const MAX_RESUME_LOGIN_TOKENS = parseInt(process.env.MAX_RESUME_LOGIN_TOKENS) || 50;
+export const MIN_RESUME_LOGIN_TOKENS = parseInt(process.env.MIN_RESUME_LOGIN_TOKENS) || 10;
+
+Accounts.onLogin(async({ user }) => {
+	if (!user || !user.services || !user.services.resume || !user.services.resume.loginTokens) {
+		return;
+	}
+	const { loginTokens } = user.services.resume;
+
+	if (loginTokens.length < MAX_RESUME_LOGIN_TOKENS) {
+		return;
+	}
+
+	const oldestDate = loginTokens.reverse()[MIN_RESUME_LOGIN_TOKENS - 1];
+
+	Users.removeOlderResumeTokensByUserId(user._id, oldestDate.when);
+});
