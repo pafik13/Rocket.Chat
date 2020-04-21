@@ -16,7 +16,12 @@ services:
       discovery.type: "single-node"
     ports:
       - 9200:9200
-      
+
+  redis:
+    image: redis:5
+    ports:
+      - 6379:6379
+
 #  rocket:
 #    image: anonym/rocket:develop
 #    environment:
