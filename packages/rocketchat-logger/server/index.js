@@ -1,7 +1,8 @@
-import { LoggerManager, Logger, SystemLogger } from './server';
+import { LoggerManager, Logger, SystemLogger, StdOut } from './server';
 
 export {
 	LoggerManager,
 	Logger,
 	SystemLogger,
+	StdOut,
 };

@@ -14,7 +14,6 @@ Package.onUse(function(api) {
 		'raix:eventemitter',
 		'templating',
 		'rocketchat:utils',
-		'rocketchat:settings',
 		'rocketchat:ui-utils',
 		'rocketchat:authorization',
 		'kadira:flow-router',
