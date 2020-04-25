@@ -3,7 +3,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('redis', {});
 
-let isUseRedis = settings.get('Use_redis');
+let isUseRedis = false ;// settings.get('Use_redis');
 let redisHost = settings.get('Redis_host') || 'localhost';
 let redisPort = settings.get('Redis_port') || 6379;
 
@@ -32,7 +32,9 @@ settings.get('Redis_host', (key, value) => {
 	try {
 		if (client) { client.disconnect(); }
 		redisHost = value || 'localhost';
-		client = new IORedis({ host: redisHost, port: redisPort });
+		if (isUseRedis) {
+			client = new IORedis({ host: redisHost, port: redisPort });
+		}
 	} catch (err) {
 		client = null;
 		isUseRedis = false;
@@ -45,7 +47,9 @@ settings.get('Redis_port', (key, value) => {
 	try {
 		if (client) { client.disconnect(); }
 		redisPort = value || 6379;
-		client = new IORedis({ host: redisHost, port: redisPort });
+		if (isUseRedis) {
+			client = new IORedis({ host: redisHost, port: redisPort });
+		}
 	} catch (err) {
 		client = null;
 		isUseRedis = false;
