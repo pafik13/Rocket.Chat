@@ -1,7 +1,8 @@
+import { Meteor } from 'meteor/meteor';
 import { Random } from 'meteor/random';
-import NATS from 'nats';
 import { InstanceStatus } from 'meteor/konecty:multiple-instances-status';
 import { EventEmitter } from 'events';
+import NATS from 'nats';
 
 const instanceId = InstanceStatus.id() || Random.id();
 
@@ -33,15 +34,15 @@ const addConnectCallback = (nc, l) => {
 	});
 };
 
-const addSubscription = (nc, l, e, subject) => {
-	nc.subscribe(subject, (msg) => {
-		l.debug('received', subject, msg);
+const addSubscription = (nc, l, e, s) => {
+	nc.subscribe(s, Meteor.bindEnvironment((msg, reply, subject, sid) => {
+		l.debug('received', s, subject, msg);
 		if (!isUseNats) { return; }
 		if (msg.instanceId !== instanceId) {
-			e.emit(subject, msg);
-			l.debug('emitted', subject, msg);
+			e.emit(s, msg, reply, subject, sid);
+			l.debug('emitted', s, subject, msg);
 		}
-	});
+	}));
 };
 
 if (client) { addConnectCallback(client, logger); }
@@ -57,10 +58,10 @@ const publish = (topic, msg) => {
 	client.publish(topic, msg);
 };
 
-const subscribe = (collection, cb) => {
-	ev.on(collection, cb);
+const subscribe = (sub, cb) => {
+	ev.on(sub, cb);
 	if (!isUseNats) { return; }
-	addSubscription(client, logger, ev, collection);
+	addSubscription(client, logger, ev, sub);
 };
 
 export const nats = {
