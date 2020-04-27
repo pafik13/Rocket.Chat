@@ -6,13 +6,13 @@ import NATS from 'nats';
 
 const instanceId = InstanceStatus.id() || Random.id();
 
-const debug = process.env.NATS_DEBUG;
+const isDebug = !!process.env.NATS_DEBUG;
 
 const logger = {
 	error: console.error,
 	info: console.info,
 	debug: (...args) => {
-		if (debug) {
+		if (isDebug) {
 			console.info(...args);
 		}
 	},
@@ -67,4 +67,5 @@ const subscribe = (sub, cb) => {
 export const nats = {
 	publish,
 	subscribe,
+	isDebug,
 };

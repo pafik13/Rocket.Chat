@@ -58,7 +58,7 @@ export class BaseDb extends EventEmitter {
 
 				if (!excludedFromNATS.includes(this.name)) {
 					nats.subscribe(this.collectionName, (msg) => {
-						console.info(`For collection ${ this.collectionName } received message: ${ JSON.stringify(msg) }`);
+						if (nats.isDebug) { console.info(`For collection ${ this.collectionName } received message: ${ JSON.stringify(msg) }`); }
 						this.emit('change', msg);
 					});
 				}
