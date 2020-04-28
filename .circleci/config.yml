@@ -291,10 +291,10 @@ jobs:
             tar xzf Rocket.Chat.tar.gz
             rm Rocket.Chat.tar.gz
 
-            if [[ $CIRCLE_BRANCH == 'develop' ]]; then
-              docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
+            docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
 
-              echo "Build official Docker image"
+            if [[ $CIRCLE_BRANCH == 'develop' ]]; then
+              echo "Build develop Docker image"
               cp ~/repo/.docker/Dockerfile .
               docker build -t anonym/rocket:develop .
 
@@ -309,6 +309,16 @@ jobs:
               docker tag anonym/rocket:preview gitlab.apianon.ru:5555/backend/rocket:preview
               docker push gitlab.apianon.ru:5555/backend/rocket:preview
 
+              exit 0
+            fi;
+
+            if [[ $CIRCLE_BRANCH == 'master' ]]; then
+              echo "Build Docker image"
+              cp ~/repo/.docker/Dockerfile .
+              docker build -t anonym/rocket:master .
+
+              docker tag anonym/rocket:master gitlab.apianon.ru:5555/backend/rocket:master
+              docker push gitlab.apianon.ru:5555/backend/rocket:master
               exit 0
             fi;
 
