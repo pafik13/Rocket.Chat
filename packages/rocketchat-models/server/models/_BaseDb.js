@@ -54,9 +54,7 @@ export class BaseDb extends EventEmitter {
 
 					MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry(query, this.processOplogRecord.bind(this));
 					MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle._defineTooFarBehind(Number.MAX_SAFE_INTEGER);
-				}
-
-				if (!excludedFromNATS.includes(this.name)) {
+				} else if (!excludedFromNATS.includes(this.name)) {
 					nats.subscribe(this.collectionName, (msg) => {
 						if (nats.isDebug) { console.info(`For collection ${ this.collectionName } received message: ${ JSON.stringify(msg) }`); }
 						this.emit('change', msg);
