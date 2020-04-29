@@ -116,7 +116,7 @@
 				</div>
 			</div>
 		{{/with}}
-
+    
 		{{#with settings.reactWhenReadOnly}}
 			{{#if canView}}
 			<div class="rc-user-info__row rc-user-info__row--separator">
@@ -163,6 +163,42 @@
 			{{/if}}
 		{{/with}}
 
+		{{#with settings.membersHidden}}
+			{{#if canView}}
+				<div class="rc-user-info__row">
+					<div class="rc-switch rc-switch--blue">
+						<label class="rc-switch__label">
+							<span class="rc-switch__text">
+								{{_ label}}{{equal default value '*'}}
+							</span>
+							<input type="checkbox" class="rc-switch__input js-input-check" name="membersHidden" checked="{{checked}}" disabled="{{./disabled}}">
+							<span class="rc-switch__button">
+								<span class="rc-switch__button-inside"></span>
+							</span>
+						</label>
+					</div>
+				</div>
+			{{/if}}
+		{{/with}}
+    
+		{{#with settings.filesHidden}}
+			{{#if canView}}
+				<div class="rc-user-info__row">
+					<div class="rc-switch rc-switch--blue">
+						<label class="rc-switch__label">
+							<span class="rc-switch__text">
+								{{_ label}}{{equal default value '*'}}
+							</span>
+							<input type="checkbox" class="rc-switch__input js-input-check" name="filesHidden" checked="{{checked}}" disabled="{{./disabled}}">
+							<span class="rc-switch__button">
+								<span class="rc-switch__button-inside"></span>
+							</span>
+						</label>
+					</div>
+				</div>
+			{{/if}}
+		{{/with}}
+    
 		{{#with settings.sysMes}}
 			{{#if canView}}
 				<div class="rc-user-info__row">
@@ -376,7 +412,7 @@
 			{{#if hasPurge}}
 				<div class="mail-messages__instructions mail-messages__instructions--warning">
 					<div class="mail-messages__instructions-wrapper">
-						{{> icon block="mail-messages__instructions-icon" icon="warning-empty"}}
+						{{> icon block="mail-messages__instructions-icon" icon="warning"}}
 						<div class="mail-messages__instructions-text">
 							{{#unless filesOnly}}
 								{{#unless excludePinned}}

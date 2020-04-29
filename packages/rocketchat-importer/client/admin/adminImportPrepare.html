@@ -1,7 +1,7 @@
 <template name="adminImportPrepare">
 	<section class="page-container page-home page-static page-settings">
 		{{#with importer}}
-			{{> header sectionName=name}}
+			{{> header sectionName=name fullpage="true"}}
 			<div class="content">
 				{{#unless isAdmin}}
 					<p>{{_ "You_are_not_authorized_to_view_this_page"}}</p>
@@ -68,6 +68,15 @@
 
 								<div class="section">
 									<h1>{{_ "Messages"}}: {{message_count}}</h1>
+								</div>
+								<div class="section">
+									<h1>{{_ "Avatars"}}: {{avatars_count}}</h1>
+								</div>
+								<div class="section">
+									<h1>{{_ "Names"}}: {{names_count}}</h1>
+								</div>
+								<div class="section">
+									<h1>{{_ "Statuses"}}: {{statuses_count}}</h1>
 								</div>
 							{{else}}
 								{{#if isPreparing}}

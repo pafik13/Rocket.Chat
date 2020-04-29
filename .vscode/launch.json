@@ -2,6 +2,22 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch Program",
+			"program": "${workspaceFolder}/.meteor/local/build/main.js",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"env": {
+				"PORT": "3000",
+				"ROOT_URL": "http://localhost:3000",
+				"MONGO_URL": "mongodb://localhost:27017/test",
+				"MONGO_OPLOG_URL": "mongodb://localhost:27017/local",
+				"TEST_MODE": "true"
+			}
+		},
+		{
 			"name": "Attach to meteor debug",
 			"type": "node",
 			"request": "attach",

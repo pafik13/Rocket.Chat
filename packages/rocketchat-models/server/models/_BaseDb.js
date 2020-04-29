@@ -1,8 +1,9 @@
+import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { Mongo, MongoInternals } from 'meteor/mongo';
-import { settings } from 'meteor/rocketchat:settings';
 import _ from 'underscore';
 import { EventEmitter } from 'events';
+import { nats } from '../nats';
 
 const baseName = 'rocketchat_';
 
@@ -15,10 +16,12 @@ try {
 }
 
 const isOplogAvailable = MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle && !!MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry;
+
 let isOplogEnabled = isOplogAvailable;
-settings.get('Force_Disable_OpLog_For_Cache', (key, value) => {
-	isOplogEnabled = isOplogAvailable && value === false;
-});
+
+const excludedFromNATS = [
+	'settings', 'permissions', 'roles',
+];
 
 export class BaseDb extends EventEmitter {
 	constructor(model, baseModel) {
@@ -39,6 +42,7 @@ export class BaseDb extends EventEmitter {
 		this.wrapModel();
 
 		let alreadyListeningToOplog = false;
+		this.listenSettings();
 		// When someone start listening for changes we start oplog if available
 		this.on('newListener', (event/* , listener*/) => {
 			if (event === 'change' && alreadyListeningToOplog === false) {
@@ -50,11 +54,25 @@ export class BaseDb extends EventEmitter {
 
 					MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry(query, this.processOplogRecord.bind(this));
 					MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle._defineTooFarBehind(Number.MAX_SAFE_INTEGER);
+				} else if (!excludedFromNATS.includes(this.name)) {
+					nats.subscribe(this.collectionName, (msg) => {
+						if (nats.isDebug) { console.info(`For collection ${ this.collectionName } received message: ${ JSON.stringify(msg) }`); }
+						this.emit('change', msg);
+					});
 				}
 			}
 		});
 
 		this.tryEnsureIndex({ _updatedAt: 1 });
+	}
+
+	listenSettings() {
+		Meteor.startup(async() => {
+			const { settings } = await import('meteor/rocketchat:settings');
+			settings.get('Force_Disable_OpLog_For_Cache', (key, value) => {
+				isOplogEnabled = isOplogAvailable && value === false;
+			});
+		});
 	}
 
 	get baseName() {
@@ -208,13 +226,17 @@ export class BaseDb extends EventEmitter {
 		record._id = result;
 
 		if (!isOplogEnabled && this.listenerCount('change') > 0) {
-			this.emit('change', {
+			const payload = {
 				action: 'insert',
 				clientAction: 'inserted',
 				id: result,
 				data: _.extend({}, record),
 				oplog: false,
-			});
+			};
+			this.emit('change', payload);
+			if (!excludedFromNATS.includes(this.name)) {
+				nats.publish(this.collectionName, payload);
+			}
 		}
 
 		return result;
@@ -246,23 +268,29 @@ export class BaseDb extends EventEmitter {
 
 		if (!isOplogEnabled && this.listenerCount('change') > 0) {
 			if (options.upsert === true && result.insertedId) {
-				this.emit('change', {
+				const payload = {
 					action: 'insert',
 					clientAction: 'inserted',
 					id: result.insertedId,
 					oplog: false,
-				});
-
-				return result;
+				};
+				this.emit('change', payload);
+				if (!excludedFromNATS.includes(this.name)) {
+					nats.publish(this.collectionName, payload);
+				}
 			}
 
 			for (const id of ids) {
-				this.emit('change', {
+				const payload = {
 					action: 'update',
 					clientAction: 'updated',
 					id,
 					oplog: false,
-				});
+				};
+				this.emit('change', payload);
+				if (!excludedFromNATS.includes(this.name)) {
+					nats.publish(this.collectionName, payload);
+				}
 			}
 		}
 
@@ -294,17 +322,25 @@ export class BaseDb extends EventEmitter {
 
 		if (!isOplogEnabled && this.listenerCount('change') > 0) {
 			for (const record of records) {
-				this.emit('change', {
+				const payload = {
 					action: 'remove',
 					clientAction: 'removed',
 					id: record._id,
 					data: _.extend({}, record),
 					oplog: false,
-				});
+				};
+				this.emit('change', payload);
+				if (!excludedFromNATS.includes(this.name)) {
+					nats.publish(this.collectionName, payload);
+				}
 			}
 		}
 
 		return result;
+	}
+
+	removeSimple(query) {
+		return this.originals.remove(query);
 	}
 
 	insertOrUpsert(...args) {

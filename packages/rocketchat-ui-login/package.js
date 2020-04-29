@@ -15,10 +15,12 @@ Package.onUse(function(api) {
 		'ecmascript',
 		'templating',
 		'rocketchat:utils',
+		'rocketchat:ui-utils',
 		'rocketchat:lib',
 		'rocketchat:ui',
 		'rocketchat:assets',
-		'rocketchat:2fa',
+		'rocketchat:settings',
+		'rocketchat:callbacks',
 		'kadira:flow-router',
 		'kadira:blaze-layout',
 	]);

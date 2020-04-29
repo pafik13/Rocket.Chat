@@ -4,13 +4,14 @@ import { Importers } from 'meteor/rocketchat:importer';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-import { t } from 'meteor/rocketchat:utils';
+import { hasRole } from 'meteor/rocketchat:authorization';
+import { settings } from 'meteor/rocketchat:settings';
+import { t, handleError, APIClient } from 'meteor/rocketchat:utils';
 import toastr from 'toastr';
 
 Template.adminImportPrepare.helpers({
 	isAdmin() {
-		return RocketChat.authz.hasRole(Meteor.userId(), 'admin');
+		return hasRole(Meteor.userId(), 'admin');
 	},
 	importer() {
 		const importerKey = FlowRouter.getParam('importer');
@@ -32,8 +33,17 @@ Template.adminImportPrepare.helpers({
 	message_count() {
 		return Template.instance().message_count.get();
 	},
+	avatars_count() {
+		return Template.instance().avatars_count.get();
+	},
+	names_count() {
+		return Template.instance().names_count.get();
+	},
+	statuses_count() {
+		return Template.instance().statuses_count.get();
+	},
 	fileSizeLimitMessage() {
-		const maxFileSize = RocketChat.settings.get('FileUpload_MaxFileSize');
+		const maxFileSize = settings.get('FileUpload_MaxFileSize');
 		let message;
 
 		if (maxFileSize > 0) {
@@ -95,7 +105,7 @@ function showException(error, defaultErrorString) {
 }
 
 function getImportFileData(importer, template) {
-	RocketChat.API.get(`v1/getImportFileData?importerKey=${ importer.key }`).then((data) => {
+	APIClient.get(`v1/getImportFileData?importerKey=${ importer.key }`).then((data) => {
 		if (!data) {
 			console.warn(`The importer ${ importer.key } is not set up correctly, as it did not return any data.`);
 			toastr.error(t('Importer_not_setup'));
@@ -120,6 +130,9 @@ function getImportFileData(importer, template) {
 		template.users.set(data.users);
 		template.channels.set(data.channels);
 		template.message_count.set(data.message_count);
+		template.avatars_count.set(data.avatars_count);
+		template.names_count.set(data.names_count);
+		template.statuses_count.set(data.statuses_count);
 		template.loaded.set(true);
 		template.preparing.set(false);
 	}).catch((error) => {
@@ -148,7 +161,7 @@ Template.adminImportPrepare.events({
 
 			reader.readAsBinaryString(file);
 			reader.onloadend = () => {
-				RocketChat.API.post('v1/uploadImportFile', {
+				APIClient.post('v1/uploadImportFile', {
 					binaryContent: reader.result,
 					contentType: file.type,
 					fileName: file.name,
@@ -174,7 +187,7 @@ Template.adminImportPrepare.events({
 
 		template.preparing.set(true);
 
-		RocketChat.API.post('v1/downloadPublicImportFile', {
+		APIClient.post('v1/downloadPublicImportFile', {
 			fileUrl,
 			importerKey: importer.key,
 		}).then(() => {
@@ -245,6 +258,9 @@ Template.adminImportPrepare.onCreated(function() {
 	this.users = new ReactiveVar([]);
 	this.channels = new ReactiveVar([]);
 	this.message_count = new ReactiveVar(0);
+	this.avatars_count = new ReactiveVar(0);
+	this.names_count = new ReactiveVar(0);
+	this.statuses_count = new ReactiveVar(0);
 
 	function loadSelection(progress) {
 		if ((progress != null ? progress.step : undefined)) {
@@ -254,6 +270,7 @@ Template.adminImportPrepare.onCreated(function() {
 				case 'importer_importing_users':
 				case 'importer_importing_channels':
 				case 'importer_importing_messages':
+				case 'importer_importing_avatars':
 				case 'importer_finishing':
 					return FlowRouter.go(`/admin/import/progress/${ FlowRouter.getParam('importer') }`);
 				case 'importer_user_selection':
@@ -264,6 +281,9 @@ Template.adminImportPrepare.onCreated(function() {
 						instance.users.set(data.users);
 						instance.channels.set(data.channels);
 						instance.message_count.set(data.message_count);
+						instance.avatars_count.set(data.avatars_count);
+						instance.names_count.set(data.names_count);
+						instance.statuses_count.set(data.statuses_count);
 						instance.loaded.set(true);
 						return instance.preparing.set(false);
 					});

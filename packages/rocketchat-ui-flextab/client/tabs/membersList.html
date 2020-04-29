@@ -14,8 +14,12 @@
 				</div>
 				<label class="rc-select">
 					<select id="status-type" class="rc-select__element js-type" name="status-type">
-						<option value="">{{_ 'online'}}</option>
-						<option value="">{{_ 'All_users'}}</option>
+						<option value="online">{{_ 'online'}}</option>
+						<option value="all">{{_ 'All_users'}}</option>
+						<option value="leaders">{{_ 'Leaders'}}</option>
+            <option value="moderators">{{_ 'Moderators'}}</option>
+            <option value="owners">{{_ 'Owners'}}</option>
+            <option value="banned">{{_ 'Banned_users'}}</option>
 					</select>
 					{{> icon block="rc-select__arrow" icon="arrow-down" }}
 				</label>

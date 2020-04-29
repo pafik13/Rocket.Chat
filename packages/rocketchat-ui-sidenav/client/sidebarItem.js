@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
-import { t, getUserPreference, roomTypes } from 'meteor/rocketchat:utils';
+import { t, getUserPreference, roomTypes, complaintReasonsList } from 'meteor/rocketchat:utils';
 import moment from 'moment';
 import { popover, renderMessageBody } from 'meteor/rocketchat:ui-utils';
 import { Users, ChatSubscription } from 'meteor/rocketchat:models';
@@ -101,17 +101,6 @@ Template.sidebarItem.events({
 	'click [data-id], click .sidebar-item__link'() {
 		return menu.close();
 	},
-	'mouseenter .sidebar-item__link'(e) {
-		const element = e.currentTarget;
-		const ellipsedElement = element.querySelector('.sidebar-item__ellipsis');
-		const isTextEllipsed = ellipsedElement.offsetWidth < ellipsedElement.scrollWidth;
-
-		if (isTextEllipsed) {
-			element.setAttribute('title', element.getAttribute('aria-label'));
-		} else {
-			element.removeAttribute('title');
-		}
-	},
 	'click .sidebar-item__menu'(e) {
 		e.preventDefault();
 
@@ -125,6 +114,16 @@ Template.sidebarItem.events({
 
 			return !(((roomData.cl != null) && !roomData.cl) || (['d', 'l'].includes(roomData.t)));
 		};
+
+		const isDirect = () => {
+			const roomData = Session.get(`roomData${ this.rid }`);
+
+			if (!roomData) { return false; }
+
+			return 	roomData.t === 'd';
+		};
+
+		const hasComplaintReasons = () => complaintReasonsList().length;
 
 		const canFavorite = settings.get('Favorite_Rooms') && ChatSubscription.find({ rid: this.rid }).count() > 0;
 		const isFavorite = () => {
@@ -175,6 +174,16 @@ Template.sidebarItem.events({
 				type: 'sidebar-item',
 				id: 'leave',
 				modifier: 'error',
+			});
+		}
+
+		if (hasComplaintReasons() && !isDirect()) {
+			items.push({
+				icon: 'file-document',
+				name: t('Complain'),
+				type: 'sidebar-item',
+				id: 'complain',
+				modifier: 'alert',
 			});
 		}
 

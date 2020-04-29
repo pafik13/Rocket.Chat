@@ -12,7 +12,7 @@ Package.onUse(function(api) {
 		'rocketchat:file',
 		'jalik:ufs',
 		'jalik:ufs-gridfs',
-		'jalik:ufs-local@0.2.5',
+		'jalik:ufs-local',
 		'edgee:slingshot',
 		'ostrio:cookies',
 		'rocketchat:models',
@@ -26,6 +26,8 @@ Package.onUse(function(api) {
 		'tracker',
 		'webapp',
 		'konecty:multiple-instances-status',
+		'templating',
+		'rocketchat:ui-utils',
 	]);
 	api.mainModule('client/index.js', 'client');
 	api.mainModule('server/index.js', 'server');

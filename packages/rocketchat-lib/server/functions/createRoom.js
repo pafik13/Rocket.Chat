@@ -1,8 +1,74 @@
 import { Meteor } from 'meteor/meteor';
+import { settings } from 'meteor/rocketchat:settings';
+import { Users, Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { hasPermission /* addUserRoles */} from 'meteor/rocketchat:authorization';
+import { getValidRoomName, validateGeoJSON, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
 import _ from 'underscore';
 import s from 'underscore.string';
 
-RocketChat.createRoom = function(type, name, owner, members, readOnly, extraData = {}) {
+
+function createDirectRoom(source, target, extraData, options) {
+	const rid = [source._id, target._id].sort().join('');
+
+	Rooms.upsert({ _id: rid }, {
+		$setOnInsert: Object.assign({
+			t: 'd',
+			usernames: [source.username, target.username],
+			msgs: 0,
+			ts: new Date(),
+		}, extraData),
+	});
+
+	Subscriptions.upsert({ rid, 'u._id': target._id }, {
+		$setOnInsert: Object.assign({
+			name: source.username,
+			t: 'd',
+			open: true,
+			alert: true,
+			unread: 0,
+			customFields: source.customFields,
+			i: {
+				_id: source._id,
+				username: source.username,
+			},
+			u: {
+				_id: target._id,
+				username: target.username,
+			},
+		}, options.subscriptionExtra),
+	});
+
+	Subscriptions.upsert({ rid, 'u._id': source._id }, {
+		$setOnInsert: Object.assign({
+			name: target.username,
+			t: 'd',
+			open: true,
+			alert: true,
+			unread: 0,
+			customFields: target.customFields,
+			i: {
+				_id: target._id,
+				username: target.username,
+			},
+			u: {
+				_id: source._id,
+				username: source.username,
+			},
+		}, options.subscriptionExtra),
+	});
+
+	return {
+		_id: rid,
+		t: 'd',
+	};
+}
+
+export const createRoom = function(type, name, owner, members, readOnly, extraData = {}, options = {}) {
+	if (type === 'd') {
+		return createDirectRoom(members[0], members[1], extraData, options);
+	}
+
 	name = s.trim(name);
 	owner = s.trim(owner);
 	members = [].concat(members);
@@ -11,9 +77,15 @@ RocketChat.createRoom = function(type, name, owner, members, readOnly, extraData
 		throw new Meteor.Error('error-invalid-name', 'Invalid name', { function: 'RocketChat.createRoom' });
 	}
 
-	owner = RocketChat.models.Users.findOneByUsername(owner, { fields: { username: 1 } });
+	owner = Users.findOneByUsername(owner, { fields: { username: 1 } });
 	if (!owner) {
 		throw new Meteor.Error('error-invalid-user', 'Invalid user', { function: 'RocketChat.createRoom' });
+	}
+
+	const roomsMaxCount = settings.get('Rooms_Maximum_Count');
+	const ownerSubsCount = Promise.await(Subscriptions.countWODirectsByUserId(owner._id));
+	if (ownerSubsCount > roomsMaxCount) {
+		throw new Meteor.Error('error-invalid-name', `You have reached the maximum number of rooms: ${ roomsMaxCount }`, { function: 'RocketChat.createRoom' });
 	}
 
 	if (!_.contains(members, owner.username)) {
@@ -25,9 +97,23 @@ RocketChat.createRoom = function(type, name, owner, members, readOnly, extraData
 		delete extraData.reactWhenReadOnly;
 	}
 
+	if (extraData.location) {
+		const locationErrors = validateGeoJSON(extraData.location);
+		if (locationErrors) {
+			throw new Meteor.Error('error-invalid-location', locationErrors, { function: 'RocketChat.createRoom' });
+		}
+	}
+
 	const now = new Date();
+
+	const validRoomNameOptions = {};
+
+	if (options.nameValidationRegex) {
+		validRoomNameOptions.nameValidationRegex = options.nameValidationRegex;
+	}
+
 	let room = Object.assign({
-		name: RocketChat.getValidRoomName(name),
+		name: getValidRoomName(name, null, validRoomNameOptions),
 		fname: name,
 		t: type,
 		msgs: 0,
@@ -36,77 +122,86 @@ RocketChat.createRoom = function(type, name, owner, members, readOnly, extraData
 			_id: owner._id,
 			username: owner.username,
 		},
+		default: false,
 	}, extraData, {
 		ts: now,
 		ro: readOnly === true,
 		sysMes: readOnly !== true,
+		isImageFilesAllowed: true,
+		isAudioFilesAllowed: true,
+		isVideoFilesAllowed: true,
+		isOtherFilesAllowed: true,
 	});
 
-	if (type === 'd') {
-		room.usernames = members;
-	}
-
-	if (Apps && Apps.isLoaded()) {
-		const prevent = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreatePrevent', room));
-		if (prevent) {
-			throw new Meteor.Error('error-app-prevented-creation', 'A Rocket.Chat App prevented the room creation.');
-		}
-
-		let result;
-		result = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreateExtend', room));
-		result = Promise.await(Apps.getBridges().getListenerBridge().roomEvent('IPreRoomCreateModify', result));
-
-		if (typeof result === 'object') {
-			room = Object.assign(room, result);
-		}
+	const blacklisted = !spotlightRoomsIsValidText(name);
+	if (blacklisted) {
+		room.blacklisted = blacklisted;
 	}
 
 	if (type === 'c') {
-		RocketChat.callbacks.run('beforeCreateChannel', owner, room);
+		callbacks.run('beforeCreateChannel', owner, room);
 	}
 
-	room = RocketChat.models.Rooms.createWithFullRoomData(room);
+	room = Rooms.createWithFullRoomData(room);
 
+
+	const subs = [];
+	const whoReachLimit = [];
 	for (const username of members) {
-		const member = RocketChat.models.Users.findOneByUsername(username, { fields: { username: 1, 'settings.preferences': 1 } });
+		const member = Users.findOneByUsername(username, { fields: { username: 1, 'settings.preferences': 1 } });
 		const isTheOwner = username === owner.username;
 		if (!member) {
 			continue;
 		}
 
 		// make all room members (Except the owner) muted by default, unless they have the post-readonly permission
-		if (readOnly === true && !RocketChat.authz.hasPermission(member._id, 'post-readonly') && !isTheOwner) {
-			RocketChat.models.Rooms.muteUsernameByRoomId(room._id, username);
+		if (readOnly === true && !hasPermission(member._id, 'post-readonly') && !isTheOwner) {
+			Rooms.muteUsernameByRoomId(room._id, username);
 		}
 
-		const extra = { open: true };
+		const extra = options.subscriptionExtra || {};
 
-		if (username === owner.username) {
+		extra.open = true;
+
+		if (isTheOwner) {
 			extra.ls = now;
+			extra.roles = ['owner'];
+		} else {
+			extra.unaccepted = true;
 		}
 
-		RocketChat.models.Subscriptions.createWithRoomAndUser(room, member, extra);
+		const memberSubsCount = Promise.await(Subscriptions.countWODirectsByUserId(member._id));
+
+		if (isTheOwner || memberSubsCount < roomsMaxCount) {
+			const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
+			subs.push({
+				user: member,
+				subscription: { _id: subId },
+			});
+		} else {
+			whoReachLimit.push(member);
+		}
 	}
 
-	RocketChat.authz.addUserRoles(owner._id, ['owner'], room._id);
+	// 	addUserRoles(owner._id, ['owner'], room._id);
 
 	if (type === 'c') {
+		Messages.createChannelCreatedByRoomAndUser(room, owner);
 		Meteor.defer(() => {
-			RocketChat.callbacks.run('afterCreateChannel', owner, room);
+			callbacks.run('afterCreateChannel', owner, room);
 		});
 	} else if (type === 'p') {
+		Messages.createGroupCreatedByRoomAndUser(room, owner);
 		Meteor.defer(() => {
-			RocketChat.callbacks.run('afterCreatePrivateGroup', owner, room);
+			callbacks.run('afterCreatePrivateGroup', owner, room);
 		});
 	}
 	Meteor.defer(() => {
-		RocketChat.callbacks.run('afterCreateRoom', owner, room);
+		callbacks.run('afterCreateRoom', { owner, room }, subs);
 	});
 
-	if (Apps && Apps.isLoaded()) {
-		// This returns a promise, but it won't mutate anything about the message
-		// so, we don't really care if it is successful or fails
-		Apps.getBridges().getListenerBridge().roomEvent('IPostRoomCreate', room);
+	for (const member of whoReachLimit) {
+		Messages.createRoomsLimitReachedForMember(room, owner, member);
 	}
 
 	return {

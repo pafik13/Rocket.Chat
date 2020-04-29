@@ -3,7 +3,6 @@ import { Random } from 'meteor/random';
 import { EJSON } from 'meteor/ejson';
 import { Log } from 'meteor/logging';
 import { EventEmitter } from 'events';
-import { settings } from 'meteor/rocketchat:settings';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -335,6 +334,7 @@ const StdOut = new class extends EventEmitter {
 		super();
 		const { write } = process.stdout;
 		this.queue = [];
+		this.limit = 1000;
 		process.stdout.write = (...args) => {
 			write.apply(process.stdout, args);
 			const date = new Date;
@@ -346,14 +346,17 @@ const StdOut = new class extends EventEmitter {
 			};
 			this.queue.push(item);
 
-			if (typeof settings !== 'undefined') {
-				const limit = settings.get('Log_View_Limit');
-				if (limit && this.queue.length > limit) {
-					this.queue.shift();
-				}
+			if (this.limit && this.queue.length > this.limit) {
+				this.queue.shift();
 			}
+
 			this.emit('write', string, item);
 		};
+	}
+	trim() {
+		while (this.limit && this.queue.length > this.limit) {
+			this.queue.shift();
+		}
 	}
 };
 

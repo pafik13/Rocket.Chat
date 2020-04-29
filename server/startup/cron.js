@@ -1,8 +1,9 @@
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http';
 import { Logger } from 'meteor/rocketchat:logger';
-import { getWorkspaceAccessToken } from 'meteor/rocketchat:cloud';
 import { SyncedCron } from 'meteor/littledata:synced-cron';
+import { statistics } from 'meteor/rocketchat:statistics';
+import { randomInteger } from 'meteor/rocketchat:utils';
+import { LongTasks } from 'meteor/rocketchat:models';
 
 const logger = new Logger('SyncedCron');
 
@@ -14,32 +15,29 @@ SyncedCron.config({
 });
 
 function generateStatistics() {
-	const statistics = RocketChat.statistics.save();
-
-	statistics.host = Meteor.absoluteUrl();
-
-	if (RocketChat.settings.get('Statistics_reporting')) {
-		try {
-			const headers = {};
-			const token = getWorkspaceAccessToken();
-
-			if (token) {
-				headers.Authorization = `Bearer ${ token }`;
-			}
-
-			HTTP.post('https://collector.rocket.chat/', {
-				data: statistics,
-				headers,
-			});
-		} catch (error) {
-			/* error*/
-			logger.warn('Failed to send usage report');
-		}
-	}
+	statistics.save();
 }
 
-function cleanupOEmbedCache() {
-	return Meteor.call('OEmbedCacheCleanup');
+// function cleanupOEmbedCache() {
+// 	return Meteor.call('OEmbedCacheCleanup');
+// }
+
+function cleanupDeactivations() {
+	return Meteor.call('cleanupDeactivations');
+}
+
+function resumeLongTask() {
+	const task = LongTasks.getRandomTask();
+
+	if (task) {
+		if (!task.callerId) {
+			Meteor.call(task.method, ...task.params, task._id);
+		} else {
+			Meteor.runAsUser(task.callerId, () => {
+				Meteor.call(task.method, ...task.params, task._id);
+			});
+		}
+	}
 }
 
 Meteor.startup(function() {
@@ -49,19 +47,36 @@ Meteor.startup(function() {
 		SyncedCron.add({
 			name: 'Generate and save statistics',
 			schedule(parser) {
-				return parser.cron(`${ new Date().getMinutes() } * * * *`);
+				const minutes = randomInteger(0, 59);
+				return parser.cron(`${ minutes } * * * *`);
 			},
 			job: generateStatistics,
 		});
 
 		SyncedCron.add({
-			name: 'Cleanup OEmbed cache',
+			name: 'Cleanup Users Deactivations',
 			schedule(parser) {
-				const now = new Date();
-				return parser.cron(`${ now.getMinutes() } ${ now.getHours() } * * *`);
+				return parser.cron('*/1 * * * *');
 			},
-			job: cleanupOEmbedCache,
+			job: cleanupDeactivations,
 		});
+
+		SyncedCron.add({
+			name: 'Long Task Execution',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: resumeLongTask,
+		});
+
+		// SyncedCron.add({
+		// 	name: 'Cleanup OEmbed cache',
+		// 	schedule(parser) {
+		// 		const now = new Date();
+		// 		return parser.cron(`${ now.getMinutes() } ${ now.getHours() } * * *`);
+		// 	},
+		// 	job: cleanupOEmbedCache,
+		// });
 
 		return SyncedCron.start();
 	});

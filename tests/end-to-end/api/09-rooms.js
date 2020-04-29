@@ -1,7 +1,24 @@
+import { expect } from 'chai';
+
 import { getCredentials, api, request, credentials } from '../../data/api-data.js';
 import { password } from '../../data/user';
 import { closeRoom, createRoom } from '../../data/rooms.helper';
 import { updatePermission } from '../../data/permissions.helper';
+import { imgURL } from '../../data/interactions';
+
+
+function getMessages(roomId, roomType) {
+	return new Promise((resolve/* , reject*/) => {
+		request.get(api(`${ roomType }.messages`))
+			.set(credentials)
+			.query({
+				roomId,
+			})
+			.end((err, req) => {
+				resolve(req.body);
+			});
+	});
+}
 
 describe('[Rooms]', function() {
 	this.retries(0);
@@ -35,7 +52,7 @@ describe('[Rooms]', function() {
 			.end(done);
 	});
 
-	describe('/rooms.saveNotification:', () => {
+	describe('/rooms.saveNotification', () => {
 		let testChannel;
 		it('create an channel', (done) => {
 			createRoom({ type: 'c', name: `channel.test.${ Date.now() }` })
@@ -44,7 +61,7 @@ describe('[Rooms]', function() {
 					done();
 				});
 		});
-		it('/rooms.saveNotification:', (done) => {
+		it('/rooms.saveNotification', (done) => {
 			request.post(api('rooms.saveNotification'))
 				.set(credentials)
 				.send({
@@ -275,7 +292,12 @@ describe('[Rooms]', function() {
 		let testChannel;
 		let testGroup;
 		let testDM;
-		const expectedKeys = ['_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'ro', 'sysMes', 'default', '_updatedAt'];
+		const channelExpectedKeys = [
+			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'sysMes', 'filesHidden', 'default', 'ro', 'lm',
+			'lastMessage', '_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed',
+		];
+		const groupExpectedKeys = Array.from(channelExpectedKeys);
+		groupExpectedKeys.push('membersHidden');
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
 		after((done) => {
@@ -313,7 +335,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.keys(expectedKeys);
+					expect(res.body.room).to.have.keys(channelExpectedKeys);
 				})
 				.end(done);
 		});
@@ -327,7 +349,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(channelExpectedKeys);
 				})
 				.end(done);
 		});
@@ -341,7 +363,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(groupExpectedKeys);
 				})
 				.end(done);
 		});
@@ -355,7 +377,7 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('room').and.to.be.an('object');
-					expect(res.body.room).to.have.all.keys(expectedKeys);
+					expect(res.body.room).to.have.all.keys(groupExpectedKeys);
 				})
 				.end(done);
 		});
@@ -421,19 +443,6 @@ describe('[Rooms]', function() {
 					done();
 				});
 		});
-		it('should return an Error when trying leave a DM room', (done) => {
-			request.post(api('rooms.leave'))
-				.set(credentials)
-				.send({
-					roomId: testDM._id,
-				})
-				.expect(400)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', false);
-					expect(res.body).to.have.property('errorType', 'error-not-allowed');
-				})
-				.end(done);
-		});
 		it('should return an Error when trying to leave a public channel and you are the last owner', (done) => {
 			request.post(api('rooms.leave'))
 				.set(credentials)
@@ -489,6 +498,18 @@ describe('[Rooms]', function() {
 					})
 					.end(done);
 			});
+		});
+		it('should leave the DM room', (done) => {
+			request.post(api('rooms.leave'))
+				.set(credentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
 		});
 		it('should leave the public channel when the room has at least another owner and the user has the necessary permission(leave-c)', (done) => {
 			updatePermission('leave-c', ['admin']).then(() => {
@@ -549,4 +570,363 @@ describe('[Rooms]', function() {
 			});
 		});
 	});
+
+	describe('[/rooms.uploadAvatar (channel/group)]', () => {
+		let testChannel;
+		let testGroup;
+		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
+		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+
+
+		const channelNewName = `channel-name-${ Date.now() }`;
+		const channelNewDesc = `channel-desc-${ Date.now() }`;
+		const groupNewName = `group-name-${ Date.now() }`;
+		const groupNewDesc = `group-desc-${ Date.now() }`;
+
+		it('create an channel', (done) => {
+			createRoom({ type: 'c', name: testChannelName })
+				.end((err, res) => {
+					testChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a group', (done) => {
+			createRoom(({ type: 'p', name: testGroupName }))
+				.end((err, res) => {
+					testGroup = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.uploadAvatar - channel', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.uploadAvatar - group', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should return channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					testChannel = res.body.room;
+				})
+				.end(done);
+		});
+		it('should update channel by roomId', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					name: channelNewName,
+					description: channelNewDesc,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should return new channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', channelNewName);
+					expect(res.body.room).to.have.property('description', channelNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					expect(res.body.room.customFields.photoUrl).is.not.equal(testChannel.customFields.photoUrl);
+				})
+				.end(done);
+		});
+
+		it('should return group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					testGroup = res.body.room;
+				})
+				.end(done);
+		});
+		it('should update group by roomId', (done) => {
+			request.post(api(`rooms.uploadAvatar/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					name: groupNewName,
+					description: groupNewDesc,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should return new group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', groupNewName);
+					expect(res.body.room).to.have.property('description', groupNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.not.equal('');
+					expect(res.body.room.customFields.photoUrl).is.not.equal(testGroup.customFields.photoUrl);
+				})
+				.end(done);
+		});
+	});
+
+	describe('[/rooms.update (channel/group)]', () => {
+		let testChannel;
+		let testGroup;
+		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
+		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+
+
+		const channelNewName = `channel-name-${ Date.now() }-${ Math.random() }`;
+		const channelNewDesc = `channel-desc-${ Date.now() }-${ Math.random() }`;
+		const groupNewName = `group-name-${ Date.now() }-${ Math.random() }`;
+		const groupNewDesc = `group-desc-${ Date.now() }-${ Math.random() }`;
+
+		it('create an channel', (done) => {
+			createRoom({ type: 'c', name: testChannelName })
+				.end((err, res) => {
+					testChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a group', (done) => {
+			createRoom(({ type: 'p', name: testGroupName }))
+				.end((err, res) => {
+					testGroup = res.body.group;
+					done();
+				});
+		});
+
+		it('should return channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.equal('');
+					testChannel = res.body.room;
+				})
+				.end(done);
+		});
+
+		it('/rooms.update - channel', (done) => {
+			request.post(api(`rooms.update/${ testChannel._id }`))
+				.set(credentials)
+				.send({
+					name: channelNewName,
+					description: channelNewDesc,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should return new channel info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', channelNewName);
+					expect(res.body.room).to.have.property('description', channelNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.equal('');
+				})
+				.end(done);
+		});
+
+		it('should return group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.equal('');
+					testGroup = res.body.room;
+				})
+				.end(done);
+		});
+
+		it('should update group by roomId', (done) => {
+			request.post(api(`rooms.update/${ testGroup._id }`))
+				.set(credentials)
+				.send({
+					name: groupNewName,
+					description: groupNewDesc,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should return new group info by roomId', (done) => {
+			request.get(api('rooms.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room').and.to.be.an('object');
+					expect(res.body.room).to.have.property('name', groupNewName);
+					expect(res.body.room).to.have.property('description', groupNewDesc);
+					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
+					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.equal('');
+				})
+				.end(done);
+		});
+	});
+
+	describe('[/rooms.uploads (channel/group)]', () => {
+		let testChannel;
+		let testGroup;
+		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
+		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
+		it('create an channel', (done) => {
+			createRoom({ type: 'c', name: testChannelName })
+				.end((err, res) => {
+					testChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a group', (done) => {
+			createRoom(({ type: 'p', name: testGroupName }))
+				.end((err, res) => {
+					testGroup = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.upload - channel', (done) => {
+			request.post(api(`rooms.upload/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					msg: 'This is a message with a file',
+					description: 'Simple text file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.upload - group', (done) => {
+			request.post(api(`rooms.upload/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', imgURL)
+				.field({
+					msg: 'This is a message with a file',
+					description: 'Simple text file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/rooms.deleteFileMessage - channel', async() => {
+			const { messages } = await getMessages(testChannel._id, 'channels');
+			const message = messages[0];
+			return request.post(api('rooms.deleteFileMessage'))
+				.set(credentials)
+				.send({
+					fileId: message.file._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				});
+		});
+
+		it('/rooms.deleteFileMessage - group', async() => {
+			const { messages } = await getMessages(testGroup._id, 'groups');
+			const message = messages[0];
+			return request.post(api('rooms.deleteFileMessage'))
+				.set(credentials)
+				.send({
+					fileId: message.file._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				});
+		});
+	});
+
 });

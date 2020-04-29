@@ -8,9 +8,9 @@ test-install-dependencies: &test-install-dependencies
   name: Install dependencies
   command: |
     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
-    echo "deb [ arch=amd64 ] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google.list
-    echo "deb [ arch=amd64 ] http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google.list
+    echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.2 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
     sudo apt-get update
     sudo apt-get install -y mongodb-org-shell google-chrome-stable
 
@@ -25,7 +25,7 @@ test-npm-install: &test-npm-install
     npm install
 
 test-store_artifacts: &test-store_artifacts
-  path: .screenshots/
+  path: tests/cypress/screenshots/
 
 test-configure-replicaset: &test-configure-replicaset
   name: Configure Replica Set
@@ -33,8 +33,20 @@ test-configure-replicaset: &test-configure-replicaset
     mongo --eval 'rs.initiate({_id:"rs0", members: [{"_id":1, "host":"localhost:27017"}]})'
     mongo --eval 'rs.status()'
 
+test-configure-elastic-index: &test-configure-elastic-index
+  name: Configure Elasctic Index
+  command: |
+    bash .circleci/queries.sh check
+    bash .circleci/queries.sh create
+
+test-info-elastic-index: &test-info-elastic-index
+  name: Info Elasctic Index
+  command: |
+    bash .circleci/queries.sh check
+    bash .circleci/queries.sh indeces
+
 test-docker-image: &test-docker-image
-  circleci/node:8.11-browsers
+  circleci/node:12.16.1-browsers
 
 test: &test
   <<: *defaults
@@ -54,18 +66,10 @@ test-with-oplog: &test-with-oplog
     - checkout
     - run: *test-install-dependencies
     - run: *test-configure-replicaset
+    - run: *test-configure-elastic-index
     - run: *test-npm-install
     - run: *test-run
-    - store_artifacts: *test-store_artifacts
-
-test-without-oplog: &test-without-oplog
-  <<: *test
-  steps:
-    - attach_workspace: *attach_workspace
-    - checkout
-    - run: *test-install-dependencies
-    - run: *test-npm-install
-    - run: *test-run
+    - run: *test-info-elastic-index
     - store_artifacts: *test-store_artifacts
 
 
@@ -74,14 +78,14 @@ jobs:
   build:
     <<: *defaults
     docker:
-      - image: circleci/node:8.11
+      - image: circleci/node:12.16.1
 
     steps:
       - checkout
 
       # - restore_cache:
       #     keys:
-      #       - node-modules-cache-{{ checksum ".circleci/config.yml" }}-{{ checksum "package.json" }}
+      #       - node:12.16.1-modules-cache-{{ checksum ".circleci/config.yml" }}-{{ checksum "package.json" }}
 
       # - restore_cache:
       #     keys:
@@ -106,6 +110,8 @@ jobs:
 
             # only install meteor if bin isn't found
             command -v meteor >/dev/null 2>&1 || curl https://install.meteor.com | sed s/--progress-bar/-sL/g | /bin/sh
+
+            sudo apt-get install g++ build-essential
 
       - run:
           name: Versions
@@ -207,20 +213,9 @@ jobs:
       - image: *test-docker-image
       - image: mongo:3.2
         command: [mongod, --noprealloc, --smallfiles, --replSet=rs0]
-
-  test-with-oplog-mongo-3-4:
-    <<: *test-with-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:3.4
-        command: [mongod, --noprealloc, --smallfiles, --replSet=rs0]
-
-  test-with-oplog-mongo-3-6:
-    <<: *test-with-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:3.6
-        command: [mongod, --noprealloc, --smallfiles, --replSet=rs0]
+      - image: elasticsearch:7.5.1
+        environment:
+          - discovery.type: single-node
 
   test-with-oplog-mongo-4-0:
     <<: *test-with-oplog
@@ -228,37 +223,14 @@ jobs:
       - image: *test-docker-image
       - image: mongo:4.0
         command: [mongod, --noprealloc, --smallfiles, --replSet=rs0]
-
-
-  test-without-oplog-mongo-3-2:
-    <<: *test-without-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:3.2
-
-  test-without-oplog-mongo-3-4:
-    <<: *test-without-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:3.4
-
-  test-without-oplog-mongo-3-6:
-    <<: *test-without-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:3.6
-
-  test-without-oplog-mongo-4-0:
-    <<: *test-without-oplog
-    docker:
-      - image: *test-docker-image
-      - image: mongo:4.0
-
+      - image: elasticsearch:7.5.1
+        environment:
+          - discovery.type: single-node
 
   deploy:
     <<: *defaults
     docker:
-      - image: circleci/node:8.11
+      - image: circleci/node:12.16.1
 
     steps:
       - attach_workspace:
@@ -272,9 +244,9 @@ jobs:
             if [[ $CIRCLE_PULL_REQUESTS ]]; then exit 0; fi;
 
             sudo apt-get -y -qq update
-            sudo apt-get -y -qq install python3.4-dev
+            sudo apt-get -y -qq install python3.5-dev
             curl -O https://bootstrap.pypa.io/get-pip.py
-            python3.4 get-pip.py --user
+            python3.5 get-pip.py --user
             export PATH=~/.local/bin:$PATH
             pip install awscli --upgrade --user
 
@@ -286,17 +258,17 @@ jobs:
             export PATH=~/.local/bin:$PATH
             export CIRCLE_TAG=${CIRCLE_TAG:=}
 
-            source .circleci/setartname.sh
+            # source .circleci/setartname.sh
             source .circleci/setdeploydir.sh
-            bash .circleci/setupsig.sh
+            # bash .circleci/setupsig.sh
             bash .circleci/namefiles.sh
             # echo ".circleci/sandstorm.sh"
 
-            aws s3 cp $ROCKET_DEPLOY_DIR/ s3://download.rocket.chat/build/ --recursive
+            aws s3 cp $ROCKET_DEPLOY_DIR/ s3://rocket-chat-anonym/builds/ --recursive
 
-            bash .circleci/update-releases.sh
-            bash .circleci/snap.sh
-            bash .circleci/redhat-registry.sh
+            # bash .circleci/update-releases.sh
+            # bash .circleci/snap.sh
+            # bash .circleci/redhat-registry.sh
 
   image-build:
     <<: *defaults
@@ -319,93 +291,36 @@ jobs:
             tar xzf Rocket.Chat.tar.gz
             rm Rocket.Chat.tar.gz
 
-            export CIRCLE_TAG=${CIRCLE_TAG:=}
-            if [[ $CIRCLE_TAG ]]; then
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
-
-              echo "Build official Docker image"
-              cp ~/repo/.docker/Dockerfile .
-              docker build -t rocketchat/rocket.chat:$CIRCLE_TAG .
-              docker push rocketchat/rocket.chat:$CIRCLE_TAG
-
-              echo "Build preview Docker image"
-              cp ~/repo/.docker-mongo/Dockerfile .
-              cp ~/repo/.docker-mongo/entrypoint.sh .
-              docker build -t rocketchat/rocket.chat.preview:$CIRCLE_TAG .
-              docker push rocketchat/rocket.chat.preview:$CIRCLE_TAG
-
-              if echo "$CIRCLE_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' ; then
-                docker tag rocketchat/rocket.chat:$CIRCLE_TAG rocketchat/rocket.chat:latest
-                docker push rocketchat/rocket.chat:latest
-
-                docker tag rocketchat/rocket.chat.preview:$CIRCLE_TAG rocketchat/rocket.chat.preview:latest
-                docker push rocketchat/rocket.chat.preview:latest
-              elif echo "$CIRCLE_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$' ; then
-                docker tag rocketchat/rocket.chat:$CIRCLE_TAG rocketchat/rocket.chat:release-candidate
-                docker push rocketchat/rocket.chat:release-candidate
-
-                docker tag rocketchat/rocket.chat.preview:$CIRCLE_TAG rocketchat/rocket.chat.preview:release-candidate
-                docker push rocketchat/rocket.chat.preview:release-candidate
-              fi
-
-              exit 0
-            fi;
+            docker login gitlab.apianon.ru:5555 -u $DOCKER_USER -p $DOCKER_PASS
 
             if [[ $CIRCLE_BRANCH == 'develop' ]]; then
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
-
-              echo "Build official Docker image"
+              echo "Build develop Docker image"
               cp ~/repo/.docker/Dockerfile .
-              docker build -t rocketchat/rocket.chat:develop .
-              docker push rocketchat/rocket.chat:develop
+              docker build -t anonym/rocket:develop .
+
+              docker tag anonym/rocket:develop gitlab.apianon.ru:5555/backend/rocket:develop
+              docker push gitlab.apianon.ru:5555/backend/rocket:develop
 
               echo "Build preview Docker image"
               cp ~/repo/.docker-mongo/Dockerfile .
               cp ~/repo/.docker-mongo/entrypoint.sh .
-              docker build -t rocketchat/rocket.chat.preview:develop .
-              docker push rocketchat/rocket.chat.preview:develop
+              docker build -t anonym/rocket:preview .
+
+              docker tag anonym/rocket:preview gitlab.apianon.ru:5555/backend/rocket:preview
+              docker push gitlab.apianon.ru:5555/backend/rocket:preview
 
               exit 0
             fi;
 
-  pr-image-build:
-    <<: *defaults
+            if [[ $CIRCLE_BRANCH == 'master' ]]; then
+              echo "Build Docker image"
+              cp ~/repo/.docker/Dockerfile .
+              docker build -t anonym/rocket:master .
 
-    docker:
-      - image: docker:17.05.0-ce-git
-
-    steps:
-      - attach_workspace:
-          at: /tmp
-
-      - checkout
-
-      - setup_remote_docker
-
-      - run:
-          name: Build Docker image for PRs
-          command: |
-            export CIRCLE_PR_NUMBER="${CIRCLE_PR_NUMBER:-${CIRCLE_PULL_REQUEST##*/}}"
-            if [[ -z $CIRCLE_PR_NUMBER ]]; then
+              docker tag anonym/rocket:master gitlab.apianon.ru:5555/backend/rocket:master
+              docker push gitlab.apianon.ru:5555/backend/rocket:master
               exit 0
             fi;
-
-            cd /tmp/build
-            tar xzf Rocket.Chat.tar.gz
-            rm Rocket.Chat.tar.gz
-
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-
-            echo "Build official Docker image"
-            cp ~/repo/.docker/Dockerfile .
-            docker build -t rocketchat/rocket.chat:pr-$CIRCLE_PR_NUMBER .
-            docker push rocketchat/rocket.chat:pr-$CIRCLE_PR_NUMBER
-
-            echo "Build preview Docker image"
-            cp ~/repo/.docker-mongo/Dockerfile .
-            cp ~/repo/.docker-mongo/entrypoint.sh .
-            docker build -t rocketchat/rocket.chat.preview:pr-$CIRCLE_PR_NUMBER .
-            docker push rocketchat/rocket.chat.preview:pr-$CIRCLE_PR_NUMBER
 
 workflows:
   version: 2
@@ -421,30 +336,13 @@ workflows:
           filters:
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
-      - test-with-oplog-mongo-3-4: &test-mongo-no-pr
-          requires:
-            - build
-          filters:
-            branches:
-              only: develop
-            tags:
-              only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
-      - test-with-oplog-mongo-3-6: *test-mongo-no-pr
       - test-with-oplog-mongo-4-0: *test-mongo
-      - test-without-oplog-mongo-3-2: *test-mongo-no-pr
-      - test-without-oplog-mongo-3-4: *test-mongo-no-pr
-      - test-without-oplog-mongo-3-6: *test-mongo-no-pr
-      - test-without-oplog-mongo-4-0: *test-mongo-no-pr
       - deploy:
           requires:
+            # - build
+#           requires:
             - test-with-oplog-mongo-3-2
-            - test-with-oplog-mongo-3-4
-            - test-with-oplog-mongo-3-6
             - test-with-oplog-mongo-4-0
-            - test-without-oplog-mongo-3-2
-            - test-without-oplog-mongo-3-4
-            - test-without-oplog-mongo-3-6
-            - test-without-oplog-mongo-4-0
           filters:
             branches:
               only: develop
@@ -454,25 +352,8 @@ workflows:
           requires:
             - deploy
           filters:
-            branches:
-              only: develop
-            tags:
-              only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
-      - hold:
-          type: approval
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: develop
-            tags:
-              only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
-      - pr-image-build:
-          requires:
-            - hold
-          filters:
-            branches:
-              ignore: develop
+          #  branches:
+          #    ignore: develop
             tags:
               only: /^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$/
 

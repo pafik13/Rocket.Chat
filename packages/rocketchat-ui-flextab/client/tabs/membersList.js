@@ -3,9 +3,10 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { Tracker } from 'meteor/tracker';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
-import { ChatRoom, RoomManager, popover } from 'meteor/rocketchat:ui';
-import { t, isRtl } from 'meteor/rocketchat:utils';
+import { RoomManager, popover } from 'meteor/rocketchat:ui-utils';
+import { ChatRoom, Subscriptions } from 'meteor/rocketchat:models';
+import { settings } from 'meteor/rocketchat:settings';
+import { t, isRtl, handleError, roomTypes } from 'meteor/rocketchat:utils';
 import { WebRTC } from 'meteor/rocketchat:webrtc';
 import _ from 'underscore';
 import { getActions } from './userActions';
@@ -13,7 +14,7 @@ import { getActions } from './userActions';
 Template.membersList.helpers({
 	ignored() {
 		const { user } = this;
-		const sub = RocketChat.models.Subscriptions.findOne({ rid: Session.get('openedRoom') });
+		const sub = Subscriptions.findOne({ rid: Session.get('openedRoom') });
 		return sub && sub.ignored && sub.ignored.indexOf(user._id) > -1 ? `(${ t('Ignored') })` : '';
 	},
 	tAddUsers() {
@@ -22,7 +23,7 @@ Template.membersList.helpers({
 
 	isGroupChat() {
 		const room = ChatRoom.findOne(this.rid, { reactive: false });
-		return RocketChat.roomTypes.roomTypes[room.t].isGroupChat();
+		return roomTypes.roomTypes[room.t].isGroupChat();
 	},
 
 	isDirectChat() {
@@ -82,7 +83,7 @@ Template.membersList.helpers({
 			};
 		});
 
-		if (RocketChat.settings.get('UI_Use_Real_Name')) {
+		if (settings.get('UI_Use_Real_Name')) {
 			users = _.sortBy(users, (u) => u.user.name);
 		} else {
 			users = _.sortBy(users, (u) => u.user.username);
@@ -114,7 +115,7 @@ Template.membersList.helpers({
 	canAddUser() {
 		const roomData = Session.get(`roomData${ this._id }`);
 		if (!roomData) { return ''; }
-		return (() => RocketChat.roomTypes.roomTypes[roomData.t].canAddUser(roomData))();
+		return (() => roomTypes.roomTypes[roomData.t].canAddUser(roomData))();
 	},
 
 	autocompleteSettingsAddUser() {
@@ -159,13 +160,13 @@ Template.membersList.helpers({
 			tabBar: Template.currentData().tabBar,
 			username: Template.instance().userDetail.get(),
 			clear: Template.instance().clearUserDetail,
-			showAll: RocketChat.roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
-			hideAdminControls: RocketChat.roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
+			showAll: roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
+			hideAdminControls: roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
 			video: ['d'].includes(room != null ? room.t : undefined),
 		};
 	},
 	displayName() {
-		if (RocketChat.settings.get('UI_Use_Real_Name') && this.user.name) {
+		if (settings.get('UI_Use_Real_Name') && this.user.name) {
 			return this.user.name;
 		}
 
@@ -186,8 +187,7 @@ Template.membersList.events({
 		instance.filter.set(e.target.value.trim());
 	},
 	'change .js-type'(e, instance) {
-		const seeAll = instance.showAllUsers.get();
-		instance.showAllUsers.set(!seeAll);
+		instance.statusType.set(e.target.value.trim());
 	},
 	'click .see-all'(e, instance) {
 		const seeAll = instance.showAllUsers.get();
@@ -203,8 +203,8 @@ Template.membersList.events({
 		const room = Session.get(`roomData${ instance.data.rid }`);
 		const _actions = getActions({
 			user: this.user.user,
-			hideAdminControls: RocketChat.roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
-			directActions: RocketChat.roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
+			hideAdminControls: roomTypes.roomTypes[room.t].userDetailShowAdmin(room) || false,
+			directActions: roomTypes.roomTypes[room.t].userDetailShowAll(room) || false,
 		})
 			.map((action) => (typeof action === 'function' ? action.call(this) : action))
 			.filter((action) => action && (!action.condition || action.condition.call(this)));
@@ -256,7 +256,7 @@ Template.membersList.events({
 
 		const roomData = Session.get(`roomData${ template.data.rid }`);
 
-		if (RocketChat.roomTypes.roomTypes[roomData.t].canAddUser(roomData)) {
+		if (roomTypes.roomTypes[roomData.t].canAddUser(roomData)) {
 			return Meteor.call('addUserToRoom', { rid: roomData._id, username: doc.username }, function(error) {
 				if (error) {
 					return handleError(error);
@@ -274,6 +274,7 @@ Template.membersList.events({
 
 Template.membersList.onCreated(function() {
 	this.showAllUsers = new ReactiveVar(false);
+	this.statusType = new ReactiveVar('online');
 	this.usersLimit = new ReactiveVar(100);
 	this.userDetail = new ReactiveVar;
 	this.showDetail = new ReactiveVar(false);
@@ -289,14 +290,37 @@ Template.membersList.onCreated(function() {
 	Tracker.autorun(() => {
 		if (this.data.rid == null) { return; }
 		this.loading.set(true);
-		return Meteor.call('getUsersOfRoom', this.data.rid, this.showAllUsers.get(), (error, users) => {
-			this.users.set(users.records);
-			this.total.set(users.total);
-			return this.loading.set(false);
+		const statusType = this.statusType.get();
+		switch (statusType) {
+			case 'online':
+			case 'all':
+				return Meteor.call('getUsersOfRoom', this.data.rid, statusType !== 'online', (error, users) => {
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			case 'leaders':
+			case 'moderators':
+			case 'owners':
+				return Meteor.call('getUsersOfRoomByRole', this.data.rid, statusType.slice(0, -1), (error, users) => {
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			case 'banned':
+				return Meteor.call('getBannedUsers', this.data.rid, (error, users) => {
+					for (let recs = users.records, i = 0, len = recs.length; i < len; i++) {
+						recs[i].isBanned = true;
+					}
+					this.users.set(users.records);
+					this.total.set(users.total);
+					return this.loading.set(false);
+				});
+			default:
+				return;
 		}
-		);
-	}
-	);
+
+	});
 
 	this.clearUserDetail = () => {
 		this.showDetail.set(false);

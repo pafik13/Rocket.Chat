@@ -1,4 +1,9 @@
 import { Meteor } from 'meteor/meteor';
+import { roomTypes, composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
+import { hasPermission } from 'meteor/rocketchat:authorization';
+import { Rooms, Subscriptions, Users } from 'meteor/rocketchat:models';
+import { settings } from 'meteor/rocketchat:settings';
+import { Notifications } from 'meteor/rocketchat:notifications';
 import _ from 'underscore';
 
 const fields = {
@@ -41,6 +46,13 @@ const fields = {
 	broadcast: 1,
 	encrypted: 1,
 	e2eKeyId: 1,
+	departmentId: 1,
+	isImageFilesAllowed: 1,
+	isAudioFilesAllowed: 1,
+	isVideoFilesAllowed: 1,
+	isOtherFilesAllowed: 1,
+	membersHidden: 1,
+	filesHidden: 1,
 };
 
 const roomMap = (record) => {
@@ -52,11 +64,12 @@ const roomMap = (record) => {
 
 Meteor.methods({
 	'rooms/get'(updatedAt) {
+		const userId = Meteor.userId();
 		let options = { fields };
 
-		if (!Meteor.userId()) {
-			if (RocketChat.settings.get('Accounts_AllowAnonymousRead') === true) {
-				return RocketChat.models.Rooms.findByDefaultAndTypes(true, ['c'], options).fetch();
+		if (!userId) {
+			if (settings.get('Accounts_AllowAnonymousRead') === true) {
+				return Rooms.findByDefaultAndTypes(true, ['c'], options).fetch();
 			}
 			return [];
 		}
@@ -67,44 +80,57 @@ Meteor.methods({
 			fields,
 		};
 
+		const user = Users.findOneByIdWithCustomFields(userId);
+
 		if (updatedAt instanceof Date) {
+			const records = Rooms.findBySubscriptionUserIdUpdatedAfter(userId, updatedAt, options).fetch();
+
+			records.forEach(function(record) {
+				record.u = user;
+				if (record.lastMessage && record.lastMessage.u) {
+					record.lastMessage = composeMessageObjectWithUser(record.lastMessage, record.lastMessage.u._id);
+				} else {
+					record.lastMessage = null;
+				}
+			});
 			return {
-				update: RocketChat.models.Rooms.findBySubscriptionUserIdUpdatedAfter(Meteor.userId(), updatedAt, options).fetch(),
-				remove: RocketChat.models.Rooms.trashFindDeletedAfter(updatedAt, {}, { fields: { _id: 1, _deletedAt: 1 } }).fetch(),
+				update: records,
+				remove: Rooms.trashFindDeletedAfter(updatedAt, {}, { fields: { _id: 1, _deletedAt: 1 } }).fetch(),
 			};
 		}
 
-		return RocketChat.models.Rooms.findBySubscriptionUserId(Meteor.userId(), options).fetch();
+		const records = Rooms.findBySubscriptionUserId(userId, options).fetch();
+		records.forEach(function(record) {
+			record.u = user;
+			if (record.lastMessage && record.lastMessage.u) {
+				record.lastMessage = composeMessageObjectWithUser(record.lastMessage, record.lastMessage.u._id);
+			} else {
+				record.lastMessage = null;
+			}
+		});
+		return records;
 	},
 
 	getRoomByTypeAndName(type, name) {
 		const userId = Meteor.userId();
 
-		if (!userId && RocketChat.settings.get('Accounts_AllowAnonymousRead') === false) {
+		if (!userId && settings.get('Accounts_AllowAnonymousRead') === false) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getRoomByTypeAndName' });
 		}
 
-		const roomFind = RocketChat.roomTypes.getRoomFind(type);
+		const roomFind = roomTypes.getRoomFind(type);
 
-		let room;
+		const room = roomFind ? roomFind.call(this, name) : Rooms.findByTypeAndName(type, name);
 
-		if (roomFind) {
-			room = roomFind.call(this, name);
-		} else {
-			room = RocketChat.models.Rooms.findByTypeAndName(type, name).fetch();
-		}
-
-		if (!room || room.length === 0) {
+		if (!room) {
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'getRoomByTypeAndName' });
 		}
-
-		room = room[0];
 
 		if (!Meteor.call('canAccessRoom', room._id, userId)) {
 			throw new Meteor.Error('error-no-permission', 'No permission', { method: 'getRoomByTypeAndName' });
 		}
 
-		if (RocketChat.settings.get('Store_Last_Message') && !RocketChat.authz.hasPermission(userId, 'preview-c-room')) {
+		if (settings.get('Store_Last_Message') && !hasPermission(userId, 'preview-c-room')) {
 			delete room.lastMessage;
 		}
 
@@ -114,15 +140,15 @@ Meteor.methods({
 
 const getSubscriptions = (id) => {
 	const fields = { 'u._id': 1 };
-	return RocketChat.models.Subscriptions.trashFind({ rid: id }, { fields });
+	return Subscriptions.trashFind({ rid: id }, { fields });
 };
 
-RocketChat.models.Rooms.on('change', ({ clientAction, id, data }) => {
+Rooms.on('change', ({ clientAction, id, data }) => {
 	switch (clientAction) {
 		case 'updated':
 		case 'inserted':
 			// Override data cuz we do not publish all fields
-			data = RocketChat.models.Rooms.findOneById(id, { fields });
+			data = Rooms.findOneById(id, { fields });
 			break;
 
 		case 'removed':
@@ -133,9 +159,12 @@ RocketChat.models.Rooms.on('change', ({ clientAction, id, data }) => {
 	if (data) {
 		if (clientAction === 'removed') {
 			getSubscriptions(clientAction, id).forEach(({ u }) => {
-				RocketChat.Notifications.notifyUserInThisInstance(u._id, 'rooms-changed', clientAction, data);
+				Notifications.notifyUserInThisInstance(u._id, 'rooms-changed', clientAction, data);
 			});
 		}
-		RocketChat.Notifications.streamUser.__emit(id, clientAction, data);
+		if (data.lastMessage) {
+			data.lastMessage = composeMessageObjectWithUser(data.lastMessage, null);
+		}
+		Notifications.streamUser.__emit(id, clientAction, data);
 	}
 });

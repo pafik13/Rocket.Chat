@@ -1,9 +1,9 @@
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { fixCordova } from 'meteor/rocketchat:lazy-load';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { DateFormat } from 'meteor/rocketchat:lib';
-import { t } from 'meteor/rocketchat:utils';
-import { popover } from 'meteor/rocketchat:ui';
+import { t, handleError } from 'meteor/rocketchat:utils';
+import { popover, modal } from 'meteor/rocketchat:ui-utils';
 import { Template } from 'meteor/templating';
 import _ from 'underscore';
 
@@ -29,8 +29,6 @@ Template.uploadedFilesList.helpers({
 		return roomFiles.find({ rid: this.rid }, { sort: { uploadedAt: -1 } });
 	},
 
-	fixCordova,
-
 	url() {
 		return `/file-upload/${ this._id }/${ this.name }`;
 	},
@@ -44,7 +42,7 @@ Template.uploadedFilesList.helpers({
 
 	thumb() {
 		if (/image/.test(this.type)) {
-			return fixCordova(this.url);
+			return this.url;
 		}
 	},
 	format(timestamp) {
@@ -87,7 +85,7 @@ Template.uploadedFilesList.helpers({
 		}
 
 		return {
-			id: 'file-generic',
+			id: 'clip',
 			type: 'generic',
 			extension,
 		};
@@ -132,7 +130,7 @@ Template.uploadedFilesList.events({
 						{
 							items: [
 								{
-									icon: 'import',
+									icon: 'download',
 									name: t('Download'),
 									action: () => {
 										const a = document.createElement('a');
@@ -142,6 +140,37 @@ Template.uploadedFilesList.events({
 										a.click();
 										window.URL.revokeObjectURL(this.file.url);
 										a.remove();
+									},
+								},
+								{
+									icon: 'trash',
+									name: t('Delete'),
+									modifier: 'alert',
+									action: () => {
+										modal.open({
+											title: t('Are_you_sure'),
+											text: t('You_will_not_be_able_to_recover_file'),
+											type: 'warning',
+											showCancelButton: true,
+											confirmButtonColor: '#DD6B55',
+											confirmButtonText: t('Yes_delete_it'),
+											cancelButtonText: t('Cancel'),
+											html: false,
+										}, () => {
+											Meteor.call('deleteFileMessage', this.file._id, (error) => {
+												if (error) {
+													handleError(error);
+												} else {
+													modal.open({
+														title: t('Deleted'),
+														text: t('Your_entry_has_been_deleted'),
+														type: 'success',
+														timer: 1000,
+														showConfirmButton: false,
+													});
+												}
+											});
+										});
 									},
 								},
 							],
@@ -157,4 +186,8 @@ Template.uploadedFilesList.events({
 
 		popover.open(config);
 	},
+});
+
+Template.uploadedFilesList.onRendered(function() {
+	this.firstNode.querySelector('[name="file-search"]').focus();
 });

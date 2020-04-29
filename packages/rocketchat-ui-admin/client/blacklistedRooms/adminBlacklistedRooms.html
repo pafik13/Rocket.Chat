@@ -1,0 +1,59 @@
+<template name="adminBlacklistedRooms">
+	<div class="main-content-flex">
+		<section class="page-container page-list flex-tab-main-content" my-tag="myTag">
+			{{> header sectionName="Blacklisted Rooms" fixedHeight="true" fullpage="true"}}
+			<div class="content">
+				{{#unless hasPermission 'view-room-administration'}}
+					<p>{{_ "You_are_not_authorized_to_view_this_page"}}</p>
+				{{else}}
+					<form class="search-form" role="form">
+						<label><input type="checkbox" name="room-type" value="c"> {{_ "Channels"}}</label>
+						<label><input type="checkbox" name="room-type" value="p"> {{_ "Private_Groups"}}</label>
+					</form>
+					<div class="results">
+            {{{_ "Showing_results" blacklistedRoomsCount}}}
+					</div>
+					{{#table fixed='true' onItemClick=onTableItemClick onScroll=onTableScroll onResize=onTableResize}}
+            <thead>
+							<tr>
+								<th width="25%"><div class="table-fake-th">{{_ "Name"}}</div></th>
+                <th width="25%"><div class="table-fake-th">{{_ "FName"}}</div></th>
+								<th width="15%"><div class="table-fake-th">{{_ "Type"}}</div></th>
+								<th width="10%"><div class="table-fake-th">{{_ "Users"}}</div></th>
+								<th width="10%"><div class="table-fake-th">{{_ "Msgs"}}</div></th>
+								<th width="15%"><div class="table-fake-th">{{_ "Default"}}</div></th>
+							</tr>
+						</thead>
+						<tbody>
+					      {{#each blacklistedRooms}}
+								<tr>
+									<td width="25%"><div class="rc-table-wrapper">
+										<div class="rc-table-avatar">{{> avatar username=name roomIcon="true"}}</div>
+										<div class="rc-table-info">
+											<span class="rc-table-title">
+												{{>icon icon="hashtag" block="rc-directory-icon"}} {{name}}
+											</span>
+										</div>
+									</div></td>
+									<td width="25%"><div class="rc-table-wrapper">{{fname}}</div></td>
+									<td width="15%"><div class="rc-table-wrapper">{{type}}</div></td>
+									<td width="10%"><div class="rc-table-wrapper">{{usersCount}}</div></td>
+									<td width="10%"><div class="rc-table-wrapper">{{msgs}}</div></td>
+									<td width="15%"><div class="rc-table-wrapper">{{default}}</div></td>
+								</tr>
+							{{/each}}
+							{{#unless isReady}}
+								<tr class="table-no-click">
+									<td class="table-loading-td" colspan="{{#if showLastMessage}}5{{else}}4{{/if}}">{{> loading}}</td>
+								</tr>
+							{{/unless}}
+						</tbody>
+					{{/table}}
+				{{/unless}}
+			</div>
+		</section>
+		{{#with flexData}}
+			{{> flexTabBar}}
+		{{/with}}
+	</div>
+</template>

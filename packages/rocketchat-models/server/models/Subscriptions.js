@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Base } from './_Base';
 import { Match } from 'meteor/check';
 import Rooms from './Rooms';
@@ -13,6 +14,9 @@ export class Subscriptions extends Base {
 		this.tryEnsureIndex({ rid: 1, alert: 1, 'u._id': 1 });
 		this.tryEnsureIndex({ rid: 1, roles: 1 });
 		this.tryEnsureIndex({ 'u._id': 1, name: 1, t: 1 });
+		this.tryEnsureIndex({ 'i._id': 1 });
+		this.tryEnsureIndex({ 'u._id': 1, 'i._id': 1 });
+
 		this.tryEnsureIndex({ open: 1 });
 		this.tryEnsureIndex({ alert: 1 });
 
@@ -27,6 +31,78 @@ export class Subscriptions extends Base {
 		this.tryEnsureIndex({ autoTranslate: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ autoTranslateLanguage: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ 'userHighlights.0': 1 }, { sparse: 1 });
+	}
+
+	findByRoomIds(roomIds) {
+		const query = {
+			rid: {
+				$in: roomIds,
+			},
+		};
+		const options = {
+			fields: {
+				'u._id': 1,
+				rid: 1,
+			},
+		};
+
+		return this._db.find(query, options);
+	}
+
+	removeByVisitorToken(token) {
+		const query = {
+			'v.token': token,
+		};
+
+		this.remove(query);
+	}
+
+	updateAutoTranslateById(_id, autoTranslate) {
+		const query = {
+			_id,
+		};
+
+		let update;
+		if (autoTranslate) {
+			update = {
+				$set: {
+					autoTranslate,
+				},
+			};
+		} else {
+			update = {
+				$unset: {
+					autoTranslate: 1,
+				},
+			};
+		}
+
+		return this.update(query, update);
+	}
+
+	updateAutoTranslateLanguageById(_id, autoTranslateLanguage) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: {
+				autoTranslateLanguage,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	getAutoTranslateLanguagesByRoomAndNotUser(rid, userId) {
+		const subscriptionsRaw = this.model.rawCollection();
+		const distinct = Meteor.wrapAsync(subscriptionsRaw.distinct, subscriptionsRaw);
+		const query = {
+			rid,
+			'u._id': { $ne: userId },
+			autoTranslate: true,
+		};
+		return distinct('autoTranslateLanguage', query);
 	}
 
 	roleBaseQuery(userId, scope) {
@@ -50,6 +126,18 @@ export class Subscriptions extends Base {
 		};
 
 		return this.find(query, options);
+	}
+
+	updateUploadsSettingsById(_id, settings) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$set: settings,
+		};
+
+		return this.update(query, update);
 	}
 
 	updateAudioNotificationsById(_id, audioNotifications) {
@@ -388,6 +476,16 @@ export class Subscriptions extends Base {
 		return this.findOne(query, options);
 	}
 
+	findOneByRoomIdAndInterlocutorId(roomId, interlocutorId, options) {
+		const query = {
+			t: 'd',
+			rid: roomId,
+			'i._id': interlocutorId,
+		};
+
+		return this.findOne(query, options);
+	}
+
 	findOneByRoomIdAndUsername(roomId, username, options) {
 		const query = {
 			rid: roomId,
@@ -512,11 +610,36 @@ export class Subscriptions extends Base {
 		return subscription && subscription.ls;
 	}
 
+	findNOldestForUser(userId, count) {
+		const options = {
+			fields: {
+				rid: 1,
+				t: 1,
+				_updatedAt: 1,
+			},
+			sort: { _updatedAt: 1 },
+			limit: count,
+		};
+		const query = { 'u._id': userId };
+		return this.find(query, options);
+	}
+
 	findByRoomIdAndUserIds(roomId, userIds, options) {
 		const query = {
 			rid: roomId,
 			'u._id': {
 				$in: userIds,
+			},
+		};
+
+		return this.find(query, options);
+	}
+
+	findByUserIdAndRoomIds(userId, roomIds, options) {
+		const query = {
+			'u._id': userId,
+			rid: {
+				$in: roomIds,
 			},
 		};
 
@@ -572,6 +695,20 @@ export class Subscriptions extends Base {
 	}
 
 	// UPDATE
+	accept(_id) {
+		const query = {
+			_id,
+		};
+
+		const update = {
+			$unset: {
+				unaccepted: '',
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	archiveByRoomId(roomId) {
 		const query =
 			{ rid: roomId };
@@ -672,8 +809,7 @@ export class Subscriptions extends Base {
 
 	setCustomFieldsDirectMessagesByUserId(userId, fields) {
 		const query = {
-			'u._id': userId,
-			t: 'd',
+			'i._id': userId,
 		};
 		const update = { $set: { customFields: fields } };
 		const options = { multi: true };
@@ -872,17 +1008,27 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	setBlockedByRoomId(rid, blocked, blocker) {
+	setBlockedByRoomId(rid, blocked, blocker, reason = '') {
 		const query = {
 			rid,
 			'u._id': blocked,
 		};
 
-		const update = {
-			$set: {
-				blocked: true,
-			},
-		};
+		let update;
+		if (reason) {
+			update = {
+				$set: {
+					blocked: true,
+					blockReason: reason,
+				},
+			};
+		} else {
+			update = {
+				$set: {
+					blocked: true,
+				},
+			};
+		}
 
 		const query2 = {
 			rid,
@@ -907,6 +1053,7 @@ export class Subscriptions extends Base {
 		const update = {
 			$unset: {
 				blocked: 1,
+				blockReason: 1,
 			},
 		};
 
@@ -918,6 +1065,7 @@ export class Subscriptions extends Base {
 		const update2 = {
 			$unset: {
 				blocker: 1,
+				blockReason: 1,
 			},
 		};
 
@@ -1127,6 +1275,15 @@ export class Subscriptions extends Base {
 			const Utils = await import('meteor/rocketchat:utils');
 			this.getDefaultSubscriptionPref = Utils.getDefaultSubscriptionPref;
 		}
+		const defSubPref = this.getDefaultSubscriptionPref(user);
+		if (room.t !== 'd') {
+			delete defSubPref.uploadsState;
+			delete defSubPref.isImageFilesAllowed;
+			delete defSubPref.isAudioFilesAllowed;
+			delete defSubPref.isVideoFilesAllowed;
+			delete defSubPref.isOtherFilesAllowed;
+		}
+
 		const subscription = {
 			open: false,
 			alert: false,
@@ -1144,7 +1301,7 @@ export class Subscriptions extends Base {
 				username: user.username,
 				name: user.name,
 			},
-			...this.getDefaultSubscriptionPref(user),
+			...defSubPref,
 			...extraData,
 		};
 
@@ -1200,6 +1357,14 @@ export class Subscriptions extends Base {
 		}
 
 		return result;
+	}
+
+	countDirectsByUserId(userId) {
+		return this.model.rawCollection().count({ 'u._id': userId, t: 'd' });
+	}
+
+	countWODirectsByUserId(userId) {
+		return this.model.rawCollection().count({ 'u._id': userId, t: { $ne: 'd' } });
 	}
 }
 

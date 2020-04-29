@@ -9,6 +9,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { t, roomTypes } from 'meteor/rocketchat:utils';
 import { hasAllPermission } from 'meteor/rocketchat:authorization';
+import toastr from 'toastr';
 import _ from 'underscore';
 
 const acEvents = {
@@ -34,6 +35,16 @@ const acEvents = {
 	'blur [name="users"]'(e, t) {
 		t.ac.onBlur(e);
 	},
+};
+
+const validateAvatarUrl = (url) => {
+	const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+		'((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+		'((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+		'(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+		'(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+		'(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+	return !!pattern.test(url);
 };
 
 const validateChannelName = (name) => {
@@ -79,6 +90,9 @@ Template.createChannel.helpers({
 	selectedUsers() {
 		return Template.instance().selectedUsers.get();
 	},
+	invalidAvatarUrl() {
+		return Template.instance().invalidAvatarUrl.get();
+	},
 	inUse() {
 		return Template.instance().inUse.get();
 	},
@@ -89,7 +103,7 @@ Template.createChannel.helpers({
 		return invalid || inUse;
 	},
 	typeLabel() {
-		return t(Template.instance().type.get() === 'p' ? t('Private_Channel') : t('Public_Channel'));
+		return t(Template.instance().type.get() === 'p' ? t('Private_Group') : t('Public_Channel'));
 	},
 	typeDescription() {
 		return t(Template.instance().type.get() === 'p' ? t('Just_invited_people_can_access_this_channel') : t('Everyone_can_access_this_channel'));
@@ -121,11 +135,13 @@ Template.createChannel.helpers({
 	createIsDisabled() {
 		const instance = Template.instance();
 		const invalid = instance.invalid.get();
+		const invalidAvatarUrl = instance.invalidAvatarUrl.get();
+		const invalidLocation = instance.invalidLocation.get();
 		const extensions_invalid = instance.extensions_invalid.get();
 		const inUse = instance.inUse.get();
 		const name = instance.name.get();
 
-		if (name.length === 0 || invalid || inUse === true || inUse === undefined || extensions_invalid) {
+		if (name.length === 0 || invalid || inUse === true || inUse === undefined || extensions_invalid || invalidAvatarUrl || invalidLocation) {
 			return 'disabled';
 		}
 		return '';
@@ -218,18 +234,73 @@ Template.createChannel.events({
 			t.name.set(modified);
 		}
 	},
+	'input [name="avatar"]'(e, t) {
+		const input = e.target;
+		const { value } = input;
+		const position = input.selectionEnd || input.selectionStart;
+		const { length } = value;
+
+		document.activeElement === input && e && /input/i.test(e.type) && (input.selectionEnd = position + input.value.length - length);
+
+		if (value !== '') {
+			t.invalidAvatarUrl.set(!validateAvatarUrl(value));
+		} else {
+			t.invalidAvatarUrl.set(false);
+		}
+		t.avatarUrl.set(value);
+	},
+	'change [name="lng"]'(e, t) {
+		const input = e.target;
+		const { value } = input;
+		const position = input.selectionEnd || input.selectionStart;
+		const { length } = value;
+
+		document.activeElement === input && e && /input/i.test(e.type) && (input.selectionEnd = position + input.value.length - length);
+
+		if (value !== '') {
+			const num = Number(value);
+			t.invalidLocation.set(!isFinite(num) || isNaN(num));
+		} else {
+			t.invalidLocation.set(false);
+		}
+		t.locationLng.set(value);
+	},
+	'change [name="lat"]'(e, t) {
+		const input = e.target;
+		const { value } = input;
+		const position = input.selectionEnd || input.selectionStart;
+		const { length } = value;
+
+		document.activeElement === input && e && /input/i.test(e.type) && (input.selectionEnd = position + input.value.length - length);
+
+		if (value !== '') {
+			const num = Number(value);
+			t.invalidLocation.set(!isFinite(num) || isNaN(num));
+		} else {
+			t.invalidLocation.set(false);
+		}
+		t.locationLat.set(value);
+	},
 	'submit .create-channel__content'(e, instance) {
 		e.preventDefault();
 		e.stopPropagation();
 		const name = e.target.name.value;
+		const photoUrl = e.target.avatar.value;
 		const type = instance.type.get();
 		const readOnly = instance.readOnly.get();
 		const broadcast = instance.broadcast.get();
 		const encrypted = instance.encrypted.get();
 		const isPrivate = type === 'p';
+		const isInvalidLocation = instance.invalidLocation.get();
 
 		if (instance.invalid.get() || instance.inUse.get()) {
 			return e.target.name.focus();
+		}
+		if (instance.invalidAvatarUrl.get()) {
+			return e.target.avatar.focus();
+		}
+		if (isInvalidLocation) {
+			return e.target.locationLng.focus();
 		}
 		if (!Object.keys(instance.extensions_validations).map((key) => instance.extensions_validations[key]).reduce((valid, fn) => fn(instance) && valid, true)) {
 			return instance.extensions_invalid.set(true);
@@ -238,14 +309,34 @@ Template.createChannel.events({
 		const extraData = Object.keys(instance.extensions_submits)
 			.reduce((result, key) => ({ ...result, ...instance.extensions_submits[key](instance) }), { broadcast, encrypted });
 
-		Meteor.call(isPrivate ? 'createPrivateGroup' : 'createChannel', name, instance.selectedUsers.get().map((user) => user.username), readOnly, {}, extraData, function(err, result) {
+		if (!isInvalidLocation) {
+			const lng = instance.locationLng.get();
+			const lat = instance.locationLat.get();
+			if (lng && lat) {
+				extraData.location = {
+					type: 'Point',
+					coordinates: [Number(lng), Number(lat)],
+				};
+			}
+		}
+
+		console.log('extraData', extraData);
+
+		Meteor.call(isPrivate ? 'createPrivateGroup' : 'createChannel', name, instance.selectedUsers.get().map((user) => user.username), readOnly, { photoUrl }, extraData, function(err, result) {
 			if (err) {
 				if (err.error === 'error-invalid-name') {
-					return instance.invalid.set(true);
+					instance.invalid.set(true);
+					return;
 				}
 				if (err.error === 'error-duplicate-channel-name') {
-					return instance.inUse.set(true);
+					instance.inUse.set(true);
+					return;
 				}
+				if (err.error === 'error-invalid-room-name') {
+					toastr.error(t('error-invalid-room-name', { room_name: name }));
+					return;
+				}
+				toastr.error(err.message);
 				return;
 			}
 
@@ -283,6 +374,11 @@ Template.createChannel.onCreated(function() {
 	this.extensions_validations = {};
 	this.extensions_submits = {};
 	this.name = new ReactiveVar('');
+	this.avatarUrl = new ReactiveVar('');
+	this.invalidAvatarUrl = new ReactiveVar(false);
+	this.locationLng = new ReactiveVar(undefined);
+	this.locationLat = new ReactiveVar(undefined);
+	this.invalidLocation = new ReactiveVar(false);
 	this.type = new ReactiveVar(hasAllPermission(['create-p']) ? 'p' : 'c');
 	this.readOnly = new ReactiveVar(false);
 	this.broadcast = new ReactiveVar(false);

@@ -1,5 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
+import { hasPermission } from 'meteor/rocketchat:authorization';
+import { createRoom } from '../functions';
+import { validateUrl } from 'meteor/rocketchat:utils';
 
 Meteor.methods({
 	createPrivateGroup(name, members, readOnly = false, customFields = {}, extraData = {}) {
@@ -10,7 +13,7 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createPrivateGroup' });
 		}
 
-		if (!RocketChat.authz.hasPermission(Meteor.userId(), 'create-p')) {
+		if (!hasPermission(Meteor.userId(), 'create-p')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'createPrivateGroup' });
 		}
 
@@ -25,6 +28,17 @@ Meteor.methods({
 			}),
 		}));
 
-		return RocketChat.createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
+		customFields = {
+			anonym_id: -1,
+			photoUrl: '',
+			registeredAt: new Date().toISOString(),
+			...customFields,
+		};
+
+		if (customFields.photoUrl && !validateUrl(customFields.photoUrl)) {
+			throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', { method: 'createPrivateGroup' });
+		}
+
+		return createRoom('p', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, membersHidden: false, filesHidden: false, ...extraData });
 	},
 });

@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { DDPCommon } from 'meteor/ddp-common';
 import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
-import { settings } from 'meteor/rocketchat:settings';
 
 const changedPayload = function(collection, id, fields) {
 	return DDPCommon.stringifyDDP({
@@ -55,11 +54,20 @@ class RoomStreamer extends Meteor.Streamer {
 
 class Notifications {
 	constructor() {
+		const self = this;
 		this.debug = false;
 		this.notifyUser = this.notifyUser.bind(this);
 		this.streamAll = new Meteor.Streamer('notify-all');
 		this.streamLogged = new Meteor.Streamer('notify-logged');
 		this.streamRoom = new Meteor.Streamer('notify-room');
+
+		// 		const rooms = Rooms.find({}, { name: 1 }).fetch();
+		// 		rooms.forEach((room) => {
+		// 			self.streamRoom.on(`${ room._id }/typing`, function(...args) {
+		// 				console.log(`RocketChat.Notifications: action=[${ room._id }/typing] with args=[${ args }]`);
+		// 			});
+		// 		});
+
 		this.streamRoomUsers = new Meteor.Streamer('notify-room-users');
 		this.streamUser = new RoomStreamer('notify-user');
 		this.streamAll.allowWrite('none');
@@ -74,7 +82,7 @@ class Notifications {
 			// });
 			if (Subscriptions.findOneByRoomIdAndUserId(roomId, this.userId) != null) {
 				const subscriptions = Subscriptions.findByRoomIdAndNotUserId(roomId, this.userId).fetch();
-				subscriptions.forEach((subscription) => this.notifyUser(subscription.u._id, e, ...args));
+				subscriptions.forEach((subscription) => self.notifyUser(subscription.u._id, e, ...args));
 			}
 			return false;
 		});
@@ -178,7 +186,6 @@ notifications.streamRoom.allowWrite(function(eventName, username, typing, extraD
 		return true;
 	}
 	if (e === 'typing') {
-		const key = settings.get('UI_Use_Real_Name') ? 'name' : 'username';
 		// typing from livechat widget
 		if (extraData && extraData.token) {
 			const room = Rooms.findOneById(roomId);
@@ -187,17 +194,11 @@ notifications.streamRoom.allowWrite(function(eventName, username, typing, extraD
 			}
 		}
 
-		const user = Meteor.users.findOne(this.userId, {
-			fields: {
-				[key]: 1,
-			},
-		});
-
-		if (!user) {
+		if (!this.userId) {
 			return false;
 		}
 
-		return user[key] === username;
+		return true;
 	}
 	return false;
 });

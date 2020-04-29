@@ -3,6 +3,7 @@ import { UploadFS } from 'meteor/jalik:ufs';
 import { Random } from 'meteor/random';
 import _ from 'underscore';
 import S3 from 'aws-sdk/clients/s3';
+import CloudFront from 'aws-sdk/clients/cloudfront';
 import stream from 'stream';
 
 /**
@@ -28,9 +29,17 @@ export class AmazonS3Store extends UploadFS.Store {
 
 		super(options);
 
+		// 		console.log('AmazonS3Store:CloudFront.Signer', typeof CloudFront.Signer);
+		// 		console.log('AmazonS3Store:options', options.CDN);
+
 		const classOptions = options;
 
 		const s3 = new S3(options.connection);
+		let cloudFront;
+		if (options.CDN) {
+			const { accessKeyId, privateKey } = options.CDN;
+			cloudFront = new CloudFront.Signer(accessKeyId, privateKey);
+		}
 
 		options.getPath = options.getPath || function(file) {
 			return file._id;
@@ -47,13 +56,27 @@ export class AmazonS3Store extends UploadFS.Store {
 			}
 		};
 
-		this.getRedirectURL = function(file) {
-			const params = {
-				Key: this.getPath(file),
-				Expires: classOptions.URLExpiryTimeSpan,
-			};
+		this.getRedirectURL = function(file, canUseCDN = true) {
+			let url;
+			const fileKey = this.getPath(file);
 
-			return s3.getSignedUrl('getObject', params);
+			if (cloudFront && canUseCDN) {
+				const params = {
+					url: options.CDN.domain + fileKey,
+					expires: Math.floor((new Date()).getTime() / 1000) + classOptions.URLExpiryTimeSpan,
+				};
+				url = cloudFront.getSignedUrl(params);
+				// 				console.log('AmazonS3Store:getRedirectURL:url', params.url);
+				// 				console.log('AmazonS3Store:getRedirectURL:getSignedUrl', url);
+			} else {
+				const params = {
+					Key: fileKey,
+					Expires: classOptions.URLExpiryTimeSpan,
+				};
+				url = s3.getSignedUrl('getObject', params);
+			}
+
+			return url;
 		};
 
 		/**

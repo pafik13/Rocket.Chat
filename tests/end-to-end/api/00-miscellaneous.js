@@ -1,3 +1,5 @@
+import { expect } from 'chai';
+
 import { getCredentials, api, login, request, credentials } from '../../data/api-data.js';
 import { adminEmail, adminUsername, adminPassword, password } from '../../data/user.js';
 
@@ -39,6 +41,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -59,6 +62,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -77,6 +81,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -95,6 +100,7 @@ describe('miscellaneous', function() {
 				expect(res.body).to.have.property('data').and.to.be.an('object');
 				expect(res.body.data).to.have.property('userId');
 				expect(res.body.data).to.have.property('authToken');
+				expect(res.body.data).to.have.property('authTokenExpires');
 				expect(res.body.data).to.have.property('me');
 			})
 			.end(done);
@@ -111,7 +117,8 @@ describe('miscellaneous', function() {
 					'saveMobileBandwidth', 'collapseMediaByDefault', 'hideUsernames', 'hideRoles', 'hideFlexTab', 'hideAvatars',
 					'sidebarViewMode', 'sidebarHideAvatar', 'sidebarShowUnread', 'sidebarShowFavorites', 'sidebarGroupByType',
 					'sendOnEnter', 'messageViewMode', 'emailNotificationMode', 'roomCounterSidebar', 'newRoomNotification', 'newMessageNotification',
-					'muteFocusedConversations', 'notificationsSoundVolume'];
+					'muteFocusedConversations', 'notificationsSoundVolume', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed',
+					'isOtherFilesAllowed', 'uploadsState'];
 				expect(res.body).to.have.property('success', true);
 				expect(res.body).to.have.property('_id', credentials['X-User-Id']);
 				expect(res.body).to.have.property('username', login.user);
@@ -362,6 +369,9 @@ describe('miscellaneous', function() {
 					expect(res.body.rooms[0]).to.have.property('_id');
 					expect(res.body.rooms[0]).to.have.property('name');
 					expect(res.body.rooms[0]).to.have.property('t');
+					expect(res.body.rooms[0]).to.have.property('fname');
+					expect(res.body.rooms[0]).to.have.property('customFields');
+					expect(res.body.rooms[0]).to.have.property('usersCount');
 				})
 				.end(done);
 		});

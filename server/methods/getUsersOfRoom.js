@@ -1,4 +1,6 @@
 import { Meteor } from 'meteor/meteor';
+import { Subscriptions } from 'meteor/rocketchat:models';
+import { hasPermission } from 'meteor/rocketchat:authorization';
 
 Meteor.methods({
 	async getUsersOfRoom(rid, showAll) {
@@ -12,15 +14,19 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'getUsersOfRoom' });
 		}
 
-		if (room.broadcast && !RocketChat.authz.hasPermission(userId, 'view-broadcast-member-list', rid)) {
+		if (room.broadcast && !hasPermission(userId, 'view-broadcast-member-list', rid)) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoom' });
 		}
 
-		const subscriptions = RocketChat.models.Subscriptions.findByRoomIdWhenUsernameExists(rid);
+		if (room.t === 'p' && room.membersHidden && !hasPermission(userId, 'view-p-member-list', rid)) {
+			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'getUsersOfRoom' });
+		}
+
+		const subscriptions = Subscriptions.findByRoomIdWhenUsernameExists(rid);
 
 		return {
 			total: subscriptions.count(),
-			records: await RocketChat.models.Subscriptions.model.rawCollection().aggregate([
+			records: await Subscriptions.model.rawCollection().aggregate([
 				{ $match: { rid } },
 				{
 					$lookup:
@@ -37,6 +43,7 @@ Meteor.methods({
 						'u.name': 1,
 						'u.username': 1,
 						'u.status': 1,
+						'u.customFields': 1,
 					},
 				},
 				...(showAll ? [] : [{ $match: { 'u.status': { $in: ['online', 'away', 'busy'] } } }]),
@@ -45,6 +52,7 @@ Meteor.methods({
 						_id: { $arrayElemAt: ['$u._id', 0] },
 						name: { $arrayElemAt: ['$u.name', 0] },
 						username: { $arrayElemAt: ['$u.username', 0] },
+						customFields: { $arrayElemAt: ['$u.customFields', 0] },
 					},
 				},
 			]).toArray(),

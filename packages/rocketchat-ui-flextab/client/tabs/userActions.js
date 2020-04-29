@@ -2,29 +2,31 @@ import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Session } from 'meteor/session';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { RocketChat, handleError } from 'meteor/rocketchat:lib';
 import { WebRTC } from 'meteor/rocketchat:webrtc';
-import { modal, ChatRoom, ChatSubscription, RoomRoles } from 'meteor/rocketchat:ui';
-import { t } from 'meteor/rocketchat:utils';
+import { ChatRoom, ChatSubscription, RoomRoles, Subscriptions } from 'meteor/rocketchat:models';
+import { modal } from 'meteor/rocketchat:ui-utils';
+import { t, handleError, complaintReasonsList } from 'meteor/rocketchat:utils';
+import { settings } from 'meteor/rocketchat:settings';
+import { hasAllPermission, hasRole } from 'meteor/rocketchat:authorization';
 import _ from 'underscore';
 import toastr from 'toastr';
 
 export const getActions = function({ user, directActions, hideAdminControls }) {
 
-	const hasPermission = RocketChat.authz.hasAllPermission;
+	const hasPermission = hasAllPermission;
 	const isIgnored = () => {
-		const sub = RocketChat.models.Subscriptions.findOne({ rid : Session.get('openedRoom') });
+		const sub = Subscriptions.findOne({ rid : Session.get('openedRoom') });
 		return sub && sub.ignored && sub.ignored.indexOf(user._id) > -1;
 	};
-	const canSetLeader = () => RocketChat.authz.hasAllPermission('set-leader', Session.get('openedRoom'));
+	const canSetLeader = () => hasAllPermission('set-leader', Session.get('openedRoom'));
 	const active = () => user && user.active;
 	const hasAdminRole = () => {
 		if (user && user._id) {
-			return RocketChat.authz.hasRole(user._id, 'admin');
+			return hasRole(user._id, 'admin');
 		}
 	};
-	const canRemoveUser = () => RocketChat.authz.hasAllPermission('remove-user', Session.get('openedRoom'));
-	const canSetModerator = () => RocketChat.authz.hasAllPermission('set-moderator', Session.get('openedRoom'));
+	const canRemoveUser = () => hasAllPermission('remove-user', Session.get('openedRoom'));
+	const canSetModerator = () => hasAllPermission('set-moderator', Session.get('openedRoom'));
 	const isDirect = () => {
 		const room = ChatRoom.findOne(Session.get('openedRoom'));
 		return (room != null ? room.t : undefined) === 'd';
@@ -38,6 +40,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			return !!RoomRoles.findOne({ rid: Session.get('openedRoom'), 'u._id': user._id, roles: 'leader' });
 		}
 	};
+	const isBanned = () => (user && user._id && user.isBanned);
 	const isOwner = () => {
 		if (user && user._id) {
 			return !!RoomRoles.findOne({ rid: Session.get('openedRoom'), 'u._id': user._id, roles: 'owner' });
@@ -48,15 +51,15 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			return !!RoomRoles.findOne({ rid: Session.get('openedRoom'), 'u._id': user._id, roles: 'moderator' });
 		}
 	};
-	const canSetOwner = () => RocketChat.authz.hasAllPermission('set-owner', Session.get('openedRoom'));
+	const canSetOwner = () => hasAllPermission('set-owner', Session.get('openedRoom'));
 	const canDirectMessage = (username) => {
 		const rid = Session.get('openedRoom');
-		const subscription = RocketChat.models.Subscriptions.findOne({ rid });
-		const canOpenDm = RocketChat.authz.hasAllPermission('create-d') || RocketChat.models.Subscriptions.findOne({ name: username });
+		const subscription = Subscriptions.findOne({ rid });
+		const canOpenDm = hasAllPermission('create-d') || Subscriptions.findOne({ name: username });
 		const dmIsNotAlreadyOpen = subscription && subscription.name !== username;
 		return canOpenDm && dmIsNotAlreadyOpen;
 	};
-	const canMuteUser = () => RocketChat.authz.hasAllPermission('mute-user', Session.get('openedRoom'));
+	const canMuteUser = () => hasAllPermission('mute-user', Session.get('openedRoom'));
 	const userMuted = () => {
 		const room = ChatRoom.findOne(Session.get('openedRoom'));
 		return _.isArray(room && room.muted) && (room.muted.indexOf(user && user.username) !== -1);
@@ -191,8 +194,34 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				icon : 'mic',
 				name:t('Block_User'),
 				modifier: 'alert',
-				action: prevent(getUser, ({ _id }) => Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id }, success(() => toastr.success(t('User_is_blocked'))))),
+				action: prevent(getUser, ({ _id }) => {
+					modal.open({
+						title: t('Reason_To_Block'),
+						type: 'input',
+						inputType: 'text',
+						inputPlaceholder: t('Reason_To_Block_Placeholder'),
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Block_User'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+					}, (reason) => {
+						Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id, reason }, success(() => {
+							modal.open({
+								title: t('Success'),
+								text: t('User_is_blocked'),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+								closeOnConfirm: false,
+							});
+						}));
+					});
+				}),
 			};
+			//         prevent(getUser, ({ _id }) => Meteor.call('blockUser', { rid: Session.get('openedRoom'), blocked: _id }, success(() => toastr.success(t('User_is_blocked'))))),
+			// 			};
 		}, () => {
 			if (!directActions || !canSetOwner()) {
 				return;
@@ -331,7 +360,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 					name: t('Unmute_user'),
 					action:prevent(getUser, ({ username }) => {
 						const rid = Session.get('openedRoom');
-						if (!RocketChat.authz.hasAllPermission('mute-user', rid)) {
+						if (!hasAllPermission('mute-user', rid)) {
 							return toastr.error(TAPi18n.__('error-not-allowed'));
 						}
 						Meteor.call('unmuteUserInRoom', { rid, username }, success(() => toastr.success(TAPi18n.__('User_unmuted_in_room'))));
@@ -345,7 +374,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				action: prevent(getUser, ({ username }) => {
 					const rid = Session.get('openedRoom');
 					const room = ChatRoom.findOne(rid);
-					if (!RocketChat.authz.hasAllPermission('mute-user', rid)) {
+					if (!hasAllPermission('mute-user', rid)) {
 						return toastr.error(TAPi18n.__('error-not-allowed'));
 					}
 					modal.open({
@@ -379,7 +408,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			action: prevent(getUser, (user) => {
 				const rid = Session.get('openedRoom');
 				const room = ChatRoom.findOne(rid);
-				if (!RocketChat.authz.hasAllPermission('remove-user', rid)) {
+				if (!hasAllPermission('remove-user', rid)) {
 					return toastr.error(TAPi18n.__('error-not-allowed'));
 				}
 				modal.open({
@@ -403,7 +432,79 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 					return this.instance.clear();
 				})));
 			}),
-			condition: () => directActions && canRemoveUser(),
+			condition: () => directActions && canRemoveUser() && !isBanned(),
+		}, () => {
+			if (!directActions || !canRemoveUser()) {
+				return;
+			}
+			if (!isBanned()) {
+				return {
+					group: 'channel',
+					icon: 'sign-out',
+					modifier: 'alert',
+					name: t('Ban_user'),
+					action: prevent(getUser, (user) => {
+						const rid = Session.get('openedRoom');
+						const room = ChatRoom.findOne(rid);
+						if (!hasAllPermission('remove-user', rid)) {
+							return toastr.error(TAPi18n.__('error-not-allowed'));
+						}
+						modal.open({
+							title: t('Are_you_sure'),
+							text: t('The_user_will_be_removed_from_s_and_will_be_banned', room.name),
+							type: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#DD6B55',
+							confirmButtonText: t('Yes_remove_and_ban_user'),
+							cancelButtonText: t('Cancel'),
+							closeOnConfirm: false,
+							html: false,
+						}, () => Meteor.call('banUser', { rid, username: user.username }, success(() => {
+							modal.open({
+								title: t('Removed_and_banned'),
+								text: t('User_has_been_removed_from_s_and_banned', room.name),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+							});
+							return this.instance.clear();
+						})));
+					}),
+				};
+			}
+			return {
+				group: 'admin',
+				icon: 'sign-out',
+				modifier: 'alert',
+				name: t('Unban_user'),
+				action: prevent(getUser, (user) => {
+					const rid = Session.get('openedRoom');
+					const room = ChatRoom.findOne(rid);
+					if (!hasAllPermission('remove-user', rid)) {
+						return toastr.error(TAPi18n.__('error-not-allowed'));
+					}
+					modal.open({
+						title: t('Are_you_sure'),
+						text: t('The_user_will_be_unbanned_in_s', room.name),
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Yes_unban_user'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+					}, () => Meteor.call('unbanUser', { rid, username: user.username }, success(() => {
+						modal.open({
+							title: t('Unbanned'),
+							text: t('User_has_been_unbanned_in_s', room.name),
+							type: 'success',
+							timer: 2000,
+							showConfirmButton: false,
+						});
+						return this.instance.clear();
+					})));
+				}),
+			};
 		}, {
 			icon : 'edit',
 			name: 'Edit',
@@ -416,7 +517,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 			icon : 'trash',
 			name: 'Delete',
 			action: prevent(getUser, ({ _id }) => {
-				const erasureType = RocketChat.settings.get('Message_ErasureType');
+				const erasureType = settings.get('Message_ErasureType');
 				const warningKey = `Delete_User_Warning_${ erasureType }`;
 
 				modal.open({
@@ -484,10 +585,124 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				action: prevent(getUser, ({ _id }) => Meteor.call('setUserActiveStatus', _id, true, success(() => toastr.success(t('User_has_been_activated'))))),
 			};
 		}, () => {
+			if (hideAdminControls || !hasPermission('edit-other-user-active-status')) {
+				return;
+			}
+			if (active()) {
+				const hour = 60 * 60;
+				const optionName = t('Deactivate_period');
+				return {
+					group: 'admin',
+					icon : 'user',
+					id: 'deactivate-for-period',
+					name: t('Deactivate_for_period'),
+					modifier: 'alert',
+					action: prevent(getUser, ({ _id }) => {
+						modal.open({
+							title: t('Are_you_sure'),
+							type: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#DD6B55',
+							confirmButtonText: t('Yes_deactivate_for_period'),
+							cancelButtonText: t('Cancel'),
+							closeOnConfirm: false,
+							html: false,
+							popover: {
+								initValue: String(hour * 2),
+								options: [{
+									id: '2hours',
+									name: optionName,
+									label: `${ t('2hours') }`,
+									value: String(hour * 2),
+								},
+								{
+									id: '24hours',
+									name: optionName,
+									label: `${ t('24hours') }`,
+									value: String(hour * 24),
+								},
+								{
+									id: '7days',
+									name: optionName,
+									label: `${ t('7days') }`,
+									value: String(hour * 24 * 7),
+								},
+								{
+									id: '14days',
+									name: optionName,
+									label: `${ t('14days') }`,
+									value: String(hour * 24 * 14),
+								},
+								],
+							},
+						}, (seconds) => {
+							Meteor.call('deactivateUserForPeriod', _id, parseInt(seconds), success(() => {
+								modal.open({
+									title: t('Success'),
+									text: t('User_has_been_deactivated'),
+									type: 'success',
+									timer: 2000,
+									showConfirmButton: false,
+									closeOnConfirm: false,
+								});
+								return this.instance.clear();
+							}));
+						});
+					}),
+				};
+			}
+		}, () => {
+			if (!hideAdminControls) {
+				return;
+			}
+			const optionName = t('Complaint_reason');
+			const reasons = complaintReasonsList();
+			const initValue = reasons[0];
+			const options = reasons.map((r, i) => ({
+				id: `reason_${ i }`,
+				name: optionName,
+				label: r,
+				value: String(r),
+			}));
+			return {
+				group: 'channel',
+				icon : 'file-document',
+				id: 'complain',
+				name: t('Complain'),
+				modifier: 'alert',
+				action: prevent(getUser, ({ _id }) => {
+					modal.open({
+						title: t('Are_you_sure'),
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#DD6B55',
+						confirmButtonText: t('Complain_about_user'),
+						cancelButtonText: t('Cancel'),
+						closeOnConfirm: false,
+						html: false,
+						popover: {
+							initValue,
+							options,
+						},
+					}, (reason) => {
+						Meteor.call('complainAboutUser', _id, reason, success(() => {
+							modal.open({
+								title: t('Success'),
+								text: t('Complaint_has_been_saved'),
+								type: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+								closeOnConfirm: false,
+							});
+						}));
+					});
+				}),
+			};
+		}, () => {
 			if (hideAdminControls || !hasPermission('reset-other-user-e2e-key')) {
 				return;
 			}
-			if (!RocketChat.settings.get('E2E_Enable')) {
+			if (!settings.get('E2E_Enable')) {
 				return;
 			}
 

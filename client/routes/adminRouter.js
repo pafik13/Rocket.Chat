@@ -8,10 +8,38 @@ FlowRouter.route('/admin/users', {
 	},
 });
 
+FlowRouter.route('/admin/longTasks', {
+	name: 'admin-longTasks',
+	action() {
+		BlazeLayout.render('main', { center: 'adminLongTasks' });
+	},
+});
+
+FlowRouter.route('/admin/subscriptions', {
+	name: 'admin-subscriptions',
+	action() {
+		BlazeLayout.render('main', { center: 'adminSubscriptions' });
+	},
+});
+
 FlowRouter.route('/admin/rooms', {
 	name: 'admin-rooms',
 	action() {
 		BlazeLayout.render('main', { center: 'adminRooms' });
+	},
+});
+
+FlowRouter.route('/admin/complaints', {
+	name: 'admin-complaints',
+	action() {
+		BlazeLayout.render('main', { center: 'adminComplaints' });
+	},
+});
+
+FlowRouter.route('/admin/blacklistedRooms', {
+	name: 'admin-blacklistedRooms',
+	action() {
+		BlazeLayout.render('main', { center: 'adminBlacklistedRooms' });
 	},
 });
 

@@ -1,7 +1,5 @@
 import { exec } from 'child_process';
 import os from 'os';
-import fs from 'fs';
-import path from 'path';
 import Future from 'fibers/future';
 import async from 'async';
 
@@ -53,8 +51,7 @@ class VersionCompiler {
 							output.commit.branch = result.replace('\n', '');
 						}
 
-						const pkg = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
-						output.marketplaceApiVersion = pkg.dependencies['@rocket.chat/apps-engine'].replace(/[^0-9.]/g, '');
+						output.marketplaceApiVersion = '0.0.0';
 
 						output = `exports.Info = ${ JSON.stringify(output, null, 4) };`;
 						file.addJavaScript({

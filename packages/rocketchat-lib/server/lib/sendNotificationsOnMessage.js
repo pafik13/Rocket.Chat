@@ -1,8 +1,12 @@
 import { Meteor } from 'meteor/meteor';
+// import { Random } from 'meteor/random';
 import moment from 'moment';
-
+import { hasPermission } from 'meteor/rocketchat:authorization';
+import { settings } from 'meteor/rocketchat:settings';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { Subscriptions } from 'meteor/rocketchat:models';
+import { roomTypes } from 'meteor/rocketchat:utils';
 import { callJoinRoom, messageContainsHighlight, parseMessageTextPerUser, replaceMentionedUsernamesWithFullNames } from '../functions/notifications/';
-import { sendEmail, shouldNotifyEmail } from '../functions/notifications/email';
 import { sendSinglePush, shouldNotifyMobile } from '../functions/notifications/mobile';
 import { notifyDesktopUser, shouldNotifyDesktop } from '../functions/notifications/desktop';
 import { notifyAudioUser, shouldNotifyAudio } from '../functions/notifications/audio';
@@ -35,7 +39,7 @@ const sendNotification = async({
 
 	const roomType = room.t;
 	// If the user doesn't have permission to view direct messages, don't send notification of direct messages.
-	if (roomType === 'd' && !RocketChat.authz.hasPermission(subscription.u._id, 'view-d-room')) {
+	if (roomType === 'd' && !hasPermission(subscription.u._id, 'view-d-room')) {
 		return;
 	}
 
@@ -47,10 +51,7 @@ const sendNotification = async({
 		audioNotifications,
 		desktopNotifications,
 		mobilePushNotifications,
-		emailNotifications,
 	} = subscription;
-
-	let notificationSent = false;
 
 	// busy users don't receive audio notification
 	if (shouldNotifyAudio({
@@ -79,7 +80,6 @@ const sendNotification = async({
 		hasMentionToUser,
 		roomType,
 	})) {
-		notificationSent = true;
 		notifyDesktopUser({
 			notificationMessage,
 			userId: subscription.u._id,
@@ -99,7 +99,6 @@ const sendNotification = async({
 		statusConnection: receiver.statusConnection,
 		roomType,
 	})) {
-		notificationSent = true;
 
 		sendSinglePush({
 			notificationMessage,
@@ -110,29 +109,6 @@ const sendNotification = async({
 			senderName: sender.name,
 			receiverUsername: receiver.username,
 		});
-	}
-
-	if (receiver.emails && shouldNotifyEmail({
-		disableAllMessageNotifications,
-		statusConnection: receiver.statusConnection,
-		emailNotifications,
-		isHighlighted,
-		hasMentionToUser,
-		hasMentionToAll,
-		roomType,
-	})) {
-		receiver.emails.some((email) => {
-			if (email.verified) {
-				sendEmail({ message, receiver, subscription, room, emailAddress: email.address, hasMentionToUser });
-
-				return true;
-			}
-			return false;
-		});
-	}
-
-	if (notificationSent) {
-		RocketChat.Sandstorm.notify(message, [subscription.u._id], `@${ sender.username }: ${ message.msg }`, room.t === 'p' ? 'privateMessage' : 'message');
 	}
 };
 
@@ -186,7 +162,7 @@ async function sendAllNotifications(message, room) {
 		return message;
 	}
 
-	const sender = RocketChat.roomTypes.getConfig(room.t).getMsgSender(message.u._id);
+	const sender = roomTypes.getConfig(room.t).getMsgSender(message.u._id);
 	if (!sender) {
 		return message;
 	}
@@ -196,14 +172,14 @@ async function sendAllNotifications(message, room) {
 	const hasMentionToAll = mentionIds.includes('all');
 	const hasMentionToHere = mentionIds.includes('here');
 
-	let notificationMessage = RocketChat.callbacks.run('beforeSendMessageNotifications', message.msg);
-	if (mentionIds.length > 0 && RocketChat.settings.get('UI_Use_Real_Name')) {
+	let notificationMessage = callbacks.run('beforeSendMessageNotifications', message.msg);
+	if (mentionIds.length > 0 && settings.get('UI_Use_Real_Name')) {
 		notificationMessage = replaceMentionedUsernamesWithFullNames(message.msg, message.mentions);
 	}
 
 	// Don't fetch all users if room exceeds max members
-	const maxMembersForNotification = RocketChat.settings.get('Notifications_Max_Room_Members');
-	const roomMembersCount = RocketChat.models.Subscriptions.findByRoomId(room._id).count();
+	const maxMembersForNotification = settings.get('Notifications_Max_Room_Members');
+	const roomMembersCount = Subscriptions.findByRoomId(room._id).count();
 	const disableAllMessageNotifications = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
 
 	const query = {
@@ -238,7 +214,7 @@ async function sendAllNotifications(message, room) {
 		}
 
 		const serverField = kind === 'email' ? 'emailNotificationMode' : `${ kind }Notifications`;
-		const serverPreference = RocketChat.settings.get(`Accounts_Default_User_Preferences_${ serverField }`);
+		const serverPreference = settings.get(`Accounts_Default_User_Preferences_${ serverField }`);
 		if ((room.t === 'd' && serverPreference !== 'nothing') || (!disableAllMessageNotifications && (serverPreference === 'all' || hasMentionToAll || hasMentionToHere))) {
 			query.$or.push({
 				[notificationField]: { $exists: false },
@@ -253,31 +229,40 @@ async function sendAllNotifications(message, room) {
 
 	// the find bellow is crucial. all subscription records returned will receive at least one kind of notification.
 	// the query is defined by the server's default values and Notifications_Max_Room_Members setting.
-
-	const subscriptions = await RocketChat.models.Subscriptions.model.rawCollection().aggregate([
+	// 	const timeToken = `notification::${ Random.id() }`;
+	// 	console.time(timeToken);
+	const cursor = Subscriptions.model.rawCollection().aggregate([
 		{ $match: query },
 		lookup,
 		filter,
 		project,
-	]).toArray();
+	]);
 
-	subscriptions.forEach((subscription) => sendNotification({
-		subscription,
-		sender,
-		hasMentionToAll,
-		hasMentionToHere,
-		message,
-		notificationMessage,
-		room,
-		mentionIds,
-		disableAllMessageNotifications,
-	}));
+	// 	let count = 0;
+	while (await cursor.hasNext()) {
+		// load   one document from the resultset into memory
+		const subscription = await cursor.next();
+		await sendNotification({
+			subscription,
+			sender,
+			hasMentionToAll,
+			hasMentionToHere,
+			message,
+			notificationMessage,
+			room,
+			mentionIds,
+			disableAllMessageNotifications,
+		});
+		// 		count++;
+	}
+	// 	console.timeEnd(timeToken);
+	// 	console.log(`${ timeToken }::count=${ count }`);
 
 	// on public channels, if a mentioned user is not member of the channel yet, he will first join the channel and then be notified based on his preferences.
 	if (room.t === 'c') {
 		// get subscriptions from users already in room (to not send them a notification)
 		const mentions = [...mentionIdsWithoutGroups];
-		RocketChat.models.Subscriptions.findByRoomIdAndUserIds(room._id, mentionIdsWithoutGroups, { fields: { 'u._id': 1 } }).forEach((subscription) => {
+		Subscriptions.findByRoomIdAndUserIds(room._id, mentionIdsWithoutGroups, { fields: { 'u._id': 1 } }).forEach((subscription) => {
 			const index = mentions.indexOf(subscription.u._id);
 			if (index !== -1) {
 				mentions.splice(index, 1);
@@ -292,7 +277,7 @@ async function sendAllNotifications(message, room) {
 			})
 		).then((users) => {
 			users.forEach((userId) => {
-				const subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, userId);
+				const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, userId);
 
 				sendNotification({
 					subscription,
@@ -313,6 +298,6 @@ async function sendAllNotifications(message, room) {
 	return message;
 }
 
-RocketChat.callbacks.add('afterSaveMessage', (message, room) => Promise.await(sendAllNotifications(message, room)), RocketChat.callbacks.priority.LOW, 'sendNotificationsOnMessage');
+callbacks.add('afterSaveMessage', (message, room) => Promise.await(sendAllNotifications(message, room)), callbacks.priority.LOW, 'sendNotificationsOnMessage');
 
 export { sendNotification, sendAllNotifications };

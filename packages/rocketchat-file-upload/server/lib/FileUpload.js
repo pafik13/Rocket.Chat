@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import fs from 'fs';
 import stream from 'stream';
+import streamBuffers from 'stream-buffers';
 import mime from 'mime-type/with-db';
 import Future from 'fibers/future';
 import sharp from 'sharp';
@@ -10,6 +11,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import * as Models from 'meteor/rocketchat:models';
 import { FileUpload as _FileUpload } from '../../lib/FileUpload';
 import { roomTypes } from 'meteor/rocketchat:utils';
+import * as probe from 'ffmpeg-probe';
 
 const cookie = new Cookies();
 
@@ -91,7 +93,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 		const height = settings.get('Accounts_AvatarSize');
 		const future = new Future();
 
-		const s = sharp(tempFilePath);
+		const s = sharp(tempFilePath, { failOnError: false });
 		s.rotate();
 		// Get metadata to resize the image the first time to keep "inside" the dimensions
 		// then resize again to create the canvas around
@@ -108,7 +110,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 					height: Math.min(height || 0, metadata.height || Infinity),
 					fit: sharp.fit.cover,
 				})
-				.pipe(sharp()
+				.pipe(sharp({ failOnError: false })
 					.resize({
 						height,
 						width: height,
@@ -139,7 +141,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 		file = FileUpload.addExtensionTo(file);
 		const image = FileUpload.getStore('Uploads')._store.getReadStream(file._id, file);
 
-		const transformer = sharp()
+		const transformer = sharp({ failOnError: false })
 			.resize({ width: 32, height: 32, fit: 'inside' })
 			.jpeg()
 			.blur();
@@ -149,7 +151,14 @@ export const FileUpload = Object.assign(_FileUpload, {
 	},
 
 	uploadsOnValidate(file) {
-		if (!/^image\/((x-windows-)?bmp|p?jpeg|png)$/.test(file.type)) {
+		let fileType = 'UNKNOWN';
+		if (/^audio\/.+/.test(file.type)) {
+			fileType = 'AUDIO';
+		} else if (/^image\/((x-windows-)?bmp|p?jpeg|png)$/.test(file.type)) {
+			fileType = 'IMAGE';
+		} else if (/^video\/.+/.test(file.type)) {
+			fileType = 'VIDEO';
+		} else {
 			return;
 		}
 
@@ -157,50 +166,70 @@ export const FileUpload = Object.assign(_FileUpload, {
 
 		const fut = new Future();
 
-		const s = sharp(tmpFile);
-		s.metadata(Meteor.bindEnvironment((err, metadata) => {
-			if (err != null) {
-				console.error(err);
-				return fut.return();
-			}
-
-			const identify = {
-				format: metadata.format,
-				size: {
-					width: metadata.width,
-					height: metadata.height,
-				},
-			};
-
-			const reorientation = (cb) => {
-				if (!metadata.orientation) {
-					return cb();
-				}
-				s.rotate()
-					.toFile(`${ tmpFile }.tmp`)
-					.then(Meteor.bindEnvironment(() => {
-						fs.unlink(tmpFile, Meteor.bindEnvironment(() => {
-							fs.rename(`${ tmpFile }.tmp`, tmpFile, Meteor.bindEnvironment(() => {
-								cb();
-							}));
-						}));
-					})).catch((err) => {
+		switch (fileType) {
+			case 'AUDIO':
+			case 'VIDEO':
+				probe.default(tmpFile)
+					.then((identify) => {
+						this.getCollection().direct.update({ _id: file._id }, {
+							$set: { identify },
+						});
+						fut.return();
+					})
+					.catch((err) => {
 						console.error(err);
 						fut.return();
 					});
+				break;
+			case 'IMAGE':
+				const s = sharp(tmpFile, { failOnError: false });
+				s.metadata(Meteor.bindEnvironment((err, metadata) => {
+					if (err != null) {
+						console.error(err);
+						return fut.return();
+					}
 
-				return;
-			};
+					const identify = {
+						format: metadata.format,
+						size: {
+							width: metadata.width,
+							height: metadata.height,
+						},
+					};
 
-			reorientation(() => {
-				const { size } = fs.lstatSync(tmpFile);
-				this.getCollection().direct.update({ _id: file._id }, {
-					$set: { size, identify },
-				});
+					const reorientation = (cb) => {
+						if (!metadata.orientation) {
+							return cb();
+						}
+						s.rotate()
+							.toFile(`${ tmpFile }.tmp`)
+							.then(Meteor.bindEnvironment(() => {
+								fs.unlink(tmpFile, Meteor.bindEnvironment(() => {
+									fs.rename(`${ tmpFile }.tmp`, tmpFile, Meteor.bindEnvironment(() => {
+										cb();
+									}));
+								}));
+							})).catch((err) => {
+								console.error(err);
+								fut.return();
+							});
 
+						return;
+					};
+
+					reorientation(() => {
+						const { size } = fs.lstatSync(tmpFile);
+						this.getCollection().direct.update({ _id: file._id }, {
+							$set: { size, identify },
+						});
+
+						fut.return();
+					});
+				}));
+				break;
+			default:
 				fut.return();
-			});
-		}));
+		}
 
 		return fut.wait();
 	},
@@ -240,9 +269,12 @@ export const FileUpload = Object.assign(_FileUpload, {
 			return file;
 		}
 
-		const ext = mime.extension(file.type);
-		if (ext && false === new RegExp(`\.${ ext }$`, 'i').test(file.name)) {
-			file.name = `${ file.name }.${ ext }`;
+		// This file type can be pretty much anything, so it's better if we don't mess with the file extension
+		if (file.type !== 'application/octet-stream') {
+			const ext = mime.extension(file.type);
+			if (ext && false === new RegExp(`\.${ ext }$`, 'i').test(file.name)) {
+				file.name = `${ file.name }.${ ext }`;
+			}
 		}
 
 		return file;
@@ -269,6 +301,22 @@ export const FileUpload = Object.assign(_FileUpload, {
 		}
 		res.writeHead(404);
 		res.end();
+	},
+
+	getBuffer(file, cb) {
+		const store = this.getStoreByName(file.store);
+
+		if (!store || !store.get) { cb(new Error('Store is invalid'), null); }
+
+		const buffer = new streamBuffers.WritableStreamBuffer({
+			initialSize: file.size,
+		});
+
+		buffer.on('finish', () => {
+			cb(null, buffer.getContents());
+		});
+
+		store.copy(file, buffer);
 	},
 
 	copy(file, targetFile) {

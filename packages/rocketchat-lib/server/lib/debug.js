@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { InstanceStatus } from 'meteor/konecty:multiple-instances-status';
+import { settings } from 'meteor/rocketchat:settings';
+import { metrics } from 'meteor/rocketchat:metrics';
 import _ from 'underscore';
 import { Logger } from 'meteor/rocketchat:logger';
 
@@ -17,13 +19,13 @@ const logger = new Logger('Meteor', {
 
 let Log_Trace_Methods;
 let Log_Trace_Subscriptions;
-RocketChat.settings.get('Log_Trace_Methods', (key, value) => Log_Trace_Methods = value);
-RocketChat.settings.get('Log_Trace_Subscriptions', (key, value) => Log_Trace_Subscriptions = value);
+settings.get('Log_Trace_Methods', (key, value) => Log_Trace_Methods = value);
+settings.get('Log_Trace_Subscriptions', (key, value) => Log_Trace_Subscriptions = value);
 
 let Log_Trace_Methods_Filter;
 let Log_Trace_Subscriptions_Filter;
-RocketChat.settings.get('Log_Trace_Methods_Filter', (key, value) => Log_Trace_Methods_Filter = value ? new RegExp(value) : undefined);
-RocketChat.settings.get('Log_Trace_Subscriptions_Filter', (key, value) => Log_Trace_Subscriptions_Filter = value ? new RegExp(value) : undefined);
+settings.get('Log_Trace_Methods_Filter', (key, value) => Log_Trace_Methods_Filter = value ? new RegExp(value) : undefined);
+settings.get('Log_Trace_Subscriptions_Filter', (key, value) => Log_Trace_Subscriptions_Filter = value ? new RegExp(value) : undefined);
 
 const traceConnection = (enable, filter, prefix, name, connection, userId) => {
 	if (!enable) {
@@ -48,8 +50,9 @@ const traceConnection = (enable, filter, prefix, name, connection, userId) => {
 
 const wrapMethods = function(name, originalHandler, methodsMap) {
 	methodsMap[name] = function(...originalArgs) {
+		const start = Date.now();
 		traceConnection(Log_Trace_Methods, Log_Trace_Methods_Filter, 'method', name, this.connection, this.userId);
-		const end = RocketChat.metrics.meteorMethods.startTimer({
+		const end = metrics.meteorMethods.startTimer({
 			method: name === 'stream' ? `${ name }:${ originalArgs[0] }` : name,
 			has_connection: this.connection != null,
 			has_user: this.userId != null,
@@ -70,6 +73,12 @@ const wrapMethods = function(name, originalHandler, methodsMap) {
 
 		const result = originalHandler.apply(this, originalArgs);
 		end();
+
+		const duration = Date.now() - start;
+		if (duration > 1000) {
+			logger.error('SLOW_METHOD_CALL', duration, name, '-> userId:', Meteor.userId(), ', arguments: ', args);
+		}
+
 		return result;
 	};
 };
@@ -89,7 +98,7 @@ Meteor.publish = function(name, func) {
 	return originalMeteorPublish(name, function(...args) {
 		traceConnection(Log_Trace_Subscriptions, Log_Trace_Subscriptions_Filter, 'subscription', name, this.connection, this.userId);
 		logger.publish(name, '-> userId:', this.userId, ', arguments: ', args);
-		const end = RocketChat.metrics.meteorSubscriptions.startTimer({ subscription: name });
+		const end = metrics.meteorSubscriptions.startTimer({ subscription: name });
 
 		const originalReady = this.ready;
 		this.ready = function() {

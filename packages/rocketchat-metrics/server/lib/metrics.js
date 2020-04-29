@@ -1,14 +1,18 @@
 import client from 'prom-client';
+import gcStats from 'prometheus-gc-stats';
 import connect from 'connect';
 import http from 'http';
 import _ from 'underscore';
 import { Meteor } from 'meteor/meteor';
-import { Info } from 'meteor/rocketchat:utils';
+import { Info, getOplogInfo } from 'meteor/rocketchat:utils';
 import { Migrations } from 'meteor/rocketchat:migrations';
 import { settings } from 'meteor/rocketchat:settings';
-import { Statistics } from 'meteor/rocketchat:models';
+import { Statistics, oplogEvents } from 'meteor/rocketchat:models';
+import { Facts } from 'meteor/facts-base';
 
 client.collectDefaultMetrics();
+const startGcStats = gcStats(client.register); // gcStats() would have the same effect in this case
+startGcStats();
 
 export const metrics = {};
 
@@ -50,10 +54,24 @@ metrics.ddpAthenticatedSessions = new client.Gauge({ name: 'rocketchat_ddp_sessi
 metrics.ddpConnectedUsers = new client.Gauge({ name: 'rocketchat_ddp_connected_users', help: 'number of unique connected users' });
 metrics.ddpRateLimitExceeded = new client.Counter({ name: 'rocketchat_ddp_rate_limit_exceeded', labelNames: ['limit_name', 'user_id', 'client_address', 'type', 'name', 'connection_id'], help: 'number of times a ddp rate limiter was exceeded' });
 
+metrics.ddpOpenSockets = new client.Gauge({ name: 'rocketchat_ddp_open_sockets', help: 'number of open sockets' });
+metrics.ddpNamedSubs = new client.Gauge({ name: 'rocketchat_ddp_named_subs', help: 'number of named subscriptions' });
+metrics.ddpNamedSubsDetailed = new client.Gauge({ name: 'rocketchat_ddp_named_subs_detailed', help: 'number of named subscriptions for each name', labelNames: ['name'] });
+metrics.ddpUniversalSubs = new client.Gauge({ name: 'rocketchat_ddp_universal_subs', help: 'number of universal subscriptions' });
+metrics.ddpCollectionViews = new client.Gauge({ name: 'rocketchat_ddp_collection_views', help: 'number of collection views' });
+metrics.ddpCollectionViewsDocs = new client.Gauge({ name: 'rocketchat_ddp_collection_views_docs', help: 'number of documents of collection views' });
+metrics.ddpInQueue = new client.Gauge({ name: 'rocketchat_ddp_in_queue', help: 'number of documents in queue' });
+
 metrics.version = new client.Gauge({ name: 'rocketchat_version', labelNames: ['version'], help: 'Rocket.Chat version' });
 metrics.migration = new client.Gauge({ name: 'rocketchat_migration', help: 'migration versoin' });
 metrics.instanceCount = new client.Gauge({ name: 'rocketchat_instance_count', help: 'instances running' });
 metrics.oplogEnabled = new client.Gauge({ name: 'rocketchat_oplog_enabled', labelNames: ['enabled'], help: 'oplog enabled' });
+metrics.oplogQueue = new client.Gauge({ name: 'rocketchat_oplog_queue', labelNames: ['queue'], help: 'oplog queue' });
+metrics.oplogEvents = new client.Counter({
+	name: 'rocketchat_oplog_events',
+	help: 'Oplog events',
+	labelNames: ['collection', 'op'],
+});
 
 // User statistics
 metrics.totalUsers = new client.Gauge({ name: 'rocketchat_users_total', help: 'total of users' });
@@ -77,6 +95,14 @@ metrics.totalPrivateGroupMessages = new client.Gauge({ name: 'rocketchat_private
 metrics.totalDirectMessages = new client.Gauge({ name: 'rocketchat_direct_messages_total', help: 'total of messages in direct rooms' });
 metrics.totalLivechatMessages = new client.Gauge({ name: 'rocketchat_livechat_messages_total', help: 'total of messages in livechat rooms' });
 
+// Meteor Facts
+metrics.meteorFacts = new client.Gauge({ name: 'rocketchat_meteor_facts', labelNames: ['pkg', 'fact'], help: 'internal meteor facts' });
+
+Facts.incrementServerFact = function(pkg, fact, increment) {
+	metrics.meteorFacts.inc({ pkg, fact }, increment);
+};
+
+
 const setPrometheusData = async() => {
 	client.register.setDefaultLabels({
 		uniqueId: settings.get('uniqueID'),
@@ -89,11 +115,54 @@ const setPrometheusData = async() => {
 		version: Info.version,
 	});
 
-	const sessions = Object.values(Meteor.server.sessions);
-	const authenticatedSessions = sessions.filter((s) => s.userId);
-	metrics.ddpSessions.set(sessions.length, date);
-	metrics.ddpAthenticatedSessions.set(authenticatedSessions.length, date);
-	metrics.ddpConnectedUsers.set(_.unique(authenticatedSessions.map((s) => s.userId)).length, date);
+	const { server } = Meteor;
+	let namedSubs = 0;
+	let universalSubs = 0;
+	let collectionViews = 0;
+	let collectionViewsDocs = 0;
+	let inQueue = 0;
+	const namedSubsByNames = {};
+	let authSessions = 0;
+	const userIds = [];
+	for (const session of server.sessions.values()) {
+		if (session.userId) {
+			authSessions++;
+			userIds.push(session.userId);
+		}
+
+		for (const subscription of session._namedSubs.values()) {
+			namedSubs++;
+			if (subscription._name) {
+				const name = subscription._name;
+				if (namedSubsByNames[name]) {
+					namedSubsByNames[name] += 1;
+				} else {
+					namedSubsByNames[name] = 1;
+				}
+			}
+		}
+		universalSubs += session._universalSubs.length;
+		inQueue += session.inQueue.length;
+		collectionViews += session.collectionViews.size;
+		for (const collectionView of session.collectionViews.values()) {
+			collectionViewsDocs += collectionView.documents.size;
+		}
+	}
+
+	metrics.ddpOpenSockets.set(server.stream_server.open_sockets.length);
+	metrics.ddpNamedSubs.set(namedSubs);
+	for (const [name, count] of Object.entries(namedSubsByNames)) {
+		metrics.ddpNamedSubsDetailed.set({ name }, count);
+	}
+
+	metrics.ddpUniversalSubs.set(universalSubs);
+	metrics.ddpCollectionViews.set(collectionViews);
+	metrics.ddpCollectionViewsDocs.set(collectionViewsDocs);
+	metrics.ddpInQueue.set(inQueue);
+
+	metrics.ddpSessions.set(server.sessions.size, date);
+	metrics.ddpAthenticatedSessions.set(authSessions, date);
+	metrics.ddpConnectedUsers.set(_.unique(userIds).length, date);
 
 	const statistics = Statistics.findLast();
 	if (!statistics) {
@@ -126,6 +195,14 @@ const setPrometheusData = async() => {
 	metrics.totalPrivateGroupMessages.set(statistics.totalPrivateGroupMessages, date);
 	metrics.totalDirectMessages.set(statistics.totalDirectMessages, date);
 	metrics.totalLivechatMessages.set(statistics.totalLivechatMessages, date);
+
+	const { mongo } = getOplogInfo();
+
+	let oplogQueue = 0;
+	if (mongo._oplogHandle && mongo._oplogHandle._entryQueue) {
+		oplogQueue = mongo._oplogHandle._entryQueue.length;
+	}
+	metrics.oplogQueue.set(oplogQueue);
 };
 
 const app = connect();
@@ -155,9 +232,18 @@ app.use('/', (req, res) => {
 
 const server = http.createServer(app);
 
+const oplogMetric = ({ collection, op }) => {
+	metrics.oplogEvents.inc({
+		collection,
+		op,
+	});
+};
+
 let timer;
 const updatePrometheusConfig = async() => {
-	const port = process.env.PROMETHEUS_PORT || settings.get('Prometheus_Port');
+	const portBySettings = settings.get('Prometheus_Port');
+	const port = process.env.PROMETHEUS_PORT || (portBySettings === '' ? Number(process.env.PORT) + 6300 : portBySettings);
+	console.log('Prometheus_Port', port);
 	const enabled = settings.get('Prometheus_Enabled');
 	if (port == null || enabled == null) {
 		return;
@@ -168,14 +254,14 @@ const updatePrometheusConfig = async() => {
 			port,
 			host: process.env.BIND_IP || '0.0.0.0',
 		});
+		console.log('Prometheus exporter starts on port: ', port);
 		timer = Meteor.setInterval(setPrometheusData, 5000);
+		oplogEvents.on('record', oplogMetric);
 	} else {
 		server.close();
 		Meteor.clearInterval(timer);
+		oplogEvents.removeListener('record', oplogMetric);
 	}
 };
 
-Meteor.startup(async() => {
-	settings.get('Prometheus_Enabled', updatePrometheusConfig);
-	settings.get('Prometheus_Port', updatePrometheusConfig);
-});
+Meteor.startup(updatePrometheusConfig);

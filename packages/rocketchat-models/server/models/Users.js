@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { settings } from 'meteor/rocketchat:settings';
 import { Base } from './_Base';
 import Subscriptions from './Subscriptions';
 import _ from 'underscore';
@@ -15,8 +14,243 @@ export class Users extends Base {
 		this.tryEnsureIndex({ lastLogin: 1 });
 		this.tryEnsureIndex({ status: 1 });
 		this.tryEnsureIndex({ active: 1 }, { sparse: 1 });
+		this.tryEnsureIndex({ active: 1, name: 1 });
+		this.tryEnsureIndex({ name: 1, active: 1 });
 		this.tryEnsureIndex({ statusConnection: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ type: 1 });
+		this.tryEnsureIndex({ 'visitorEmails.address': 1 });
+		this.tryEnsureIndex({ deactivatedUntil: 1 });
+		this.loadSettings();
+	}
+
+	loadSettings() {
+		Meteor.startup(async() => {
+			const { settings } = await import('meteor/rocketchat:settings');
+			this.settings = settings;
+		});
+	}
+
+	getLoginTokensByUserId(userId) {
+		const query = {
+			'services.resume.loginTokens.type': {
+				$exists: true,
+				$eq: 'personalAccessToken',
+			},
+			_id: userId,
+		};
+
+		return this.find(query, { fields: { 'services.resume.loginTokens': 1 } });
+	}
+
+	addPersonalAccessTokenToUser({ userId, loginTokenObject }) {
+		return this.update(userId, {
+			$push: {
+				'services.resume.loginTokens': loginTokenObject,
+			},
+		});
+	}
+
+	removePersonalAccessTokenOfUser({ userId, loginTokenObject }) {
+		return this.update(userId, {
+			$pull: {
+				'services.resume.loginTokens': loginTokenObject,
+			},
+		});
+	}
+
+	findPersonalAccessTokenByTokenNameAndUserId({ userId, tokenName }) {
+		const query = {
+			'services.resume.loginTokens': {
+				$elemMatch: { name: tokenName, type: 'personalAccessToken' },
+			},
+			_id: userId,
+		};
+
+		return this.findOne(query);
+	}
+
+	setOperator(_id, operator) {
+		const update = {
+			$set: {
+				operator,
+			},
+		};
+
+		return this.update(_id, update);
+	}
+
+	findOnlineAgents() {
+		const query = {
+			status: {
+				$exists: true,
+				$ne: 'offline',
+			},
+			statusLivechat: 'available',
+			roles: 'livechat-agent',
+		};
+
+		return this.find(query);
+	}
+
+	findOneOnlineAgentByUsername(username) {
+		const query = {
+			username,
+			status: {
+				$exists: true,
+				$ne: 'offline',
+			},
+			statusLivechat: 'available',
+			roles: 'livechat-agent',
+		};
+
+		return this.findOne(query);
+	}
+
+	findOneOnlineAgentById(_id) {
+		const query = {
+			_id,
+			status: {
+				$exists: true,
+				$ne: 'offline',
+			},
+			statusLivechat: 'available',
+			roles: 'livechat-agent',
+		};
+
+		return this.findOne(query);
+	}
+
+	findAgents() {
+		const query = {
+			roles: 'livechat-agent',
+		};
+
+		return this.find(query);
+	}
+
+	findOnlineUserFromList(userList) {
+		const query = {
+			status: {
+				$exists: true,
+				$ne: 'offline',
+			},
+			statusLivechat: 'available',
+			roles: 'livechat-agent',
+			username: {
+				$in: [].concat(userList),
+			},
+		};
+
+		return this.find(query);
+	}
+
+	getNextAgent() {
+		const query = {
+			status: {
+				$exists: true,
+				$ne: 'offline',
+			},
+			statusLivechat: 'available',
+			roles: 'livechat-agent',
+		};
+
+		const collectionObj = this.model.rawCollection();
+		const findAndModify = Meteor.wrapAsync(collectionObj.findAndModify, collectionObj);
+
+		const sort = {
+			livechatCount: 1,
+			username: 1,
+		};
+
+		const update = {
+			$inc: {
+				livechatCount: 1,
+			},
+		};
+
+		const user = findAndModify(query, sort, update);
+		if (user && user.value) {
+			return {
+				agentId: user.value._id,
+				username: user.value.username,
+			};
+		} else {
+			return null;
+		}
+	}
+
+	setLivechatStatus(userId, status) {
+		const query = {
+			_id: userId,
+		};
+
+		const update = {
+			$set: {
+				statusLivechat: status,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	closeOffice() {
+		self = this;
+		self.findAgents().forEach(function(agent) {
+			self.setLivechatStatus(agent._id, 'not-available');
+		});
+	}
+
+	openOffice() {
+		self = this;
+		self.findAgents().forEach(function(agent) {
+			self.setLivechatStatus(agent._id, 'available');
+		});
+	}
+
+	getAgentInfo(agentId) {
+		const query = {
+			_id: agentId,
+		};
+
+		const options = {
+			fields: {
+				name: 1,
+				username: 1,
+				phone: 1,
+				customFields: 1,
+				status: 1,
+			},
+		};
+
+		if (this.settings.get('Livechat_show_agent_email')) {
+			options.fields.emails = 1;
+		}
+
+		return this.findOne(query, options);
+	}
+
+	setTokenpassTcaBalances(_id, tcaBalances) {
+		const update = {
+			$set: {
+				'services.tokenpass.tcaBalances': tcaBalances,
+			},
+		};
+
+		return this.update(_id, update);
+	}
+
+	getTokenBalancesByUserId(userId) {
+		const query = {
+			_id: userId,
+		};
+
+		const options = {
+			fields: {
+				'services.tokenpass.tcaBalances': 1,
+			},
+		};
+
+		return this.findOne(query, options);
 	}
 
 	roleBaseQuery(userId) {
@@ -32,6 +266,21 @@ export class Users extends Base {
 		});
 	}
 
+	rocketMailUnsubscribe(_id, createdAt) {
+		const query = {
+			_id,
+			createdAt: new Date(parseInt(createdAt)),
+		};
+		const update = {
+			$set: {
+				'mailer.unsubscribed': true,
+			},
+		};
+		const affectedRows = this.update(query, update);
+		console.log('[Mailer:Unsubscribe]', _id, createdAt, new Date(parseInt(createdAt)), affectedRows);
+		return affectedRows;
+	}
+
 	fetchKeysByUserId(userId) {
 		const user = this.findOne({ _id: userId }, { fields: { e2e: 1 } });
 
@@ -43,6 +292,56 @@ export class Users extends Base {
 			public_key: user.e2e.public_key,
 			private_key: user.e2e.private_key,
 		};
+	}
+
+	disable2FAAndSetTempSecretByUserId(userId, tempToken) {
+		return this.update({
+			_id: userId,
+		}, {
+			$set: {
+				'services.totp': {
+					enabled: false,
+					tempSecret: tempToken,
+				},
+			},
+		});
+	}
+
+	enable2FAAndSetSecretAndCodesByUserId(userId, secret, backupCodes) {
+		return this.update({
+			_id: userId,
+		}, {
+			$set: {
+				'services.totp.enabled': true,
+				'services.totp.secret': secret,
+				'services.totp.hashedBackup': backupCodes,
+			},
+			$unset: {
+				'services.totp.tempSecret': 1,
+			},
+		});
+	}
+
+	disable2FAByUserId(userId) {
+		return this.update({
+			_id: userId,
+		}, {
+			$set: {
+				'services.totp': {
+					enabled: false,
+				},
+			},
+		});
+	}
+
+	update2FABackupCodesByUserId(userId, backupCodes) {
+		return this.update({
+			_id: userId,
+		}, {
+			$set: {
+				'services.totp.hashedBackup': backupCodes,
+			},
+		});
 	}
 
 	findByIdsWithPublicE2EKey(ids, options) {
@@ -80,9 +379,14 @@ export class Users extends Base {
 		return this.findOne({ importIds: _id }, options);
 	}
 
+	findOneByAnonymId(anonymId, options) {
+		const query = { 'customFields.anonym_id': parseInt(anonymId, 10) };
+		return this.findOne(query, options);
+	}
+
 	findOneByUsername(username, options) {
 		if (typeof username === 'string') {
-			username = new RegExp(`^${ username }$`, 'i');
+			username = new RegExp(`^${ s.escapeRegExp(username) }$`, 'i');
 		}
 
 		const query = { username };
@@ -117,6 +421,18 @@ export class Users extends Base {
 		return this.findOne(query, options);
 	}
 
+	findOneByIdWithCustomFields(userId) {
+		const query = { _id: userId };
+		const options = {
+			fields: {
+				username: 1,
+				name: 1,
+				customFields: 1,
+			},
+		};
+		return this.findOne(query, options);
+	}
+
 	// FIND
 	findById(userId) {
 		const query = { _id: userId };
@@ -124,8 +440,8 @@ export class Users extends Base {
 		return this.find(query);
 	}
 
-	findByIds(users, options) {
-		const query = { _id: { $in: users } };
+	findByIds(userIds, options) {
+		const query = { _id: { $in: userIds } };
 		return this.find(query, options);
 	}
 
@@ -191,7 +507,7 @@ export class Users extends Base {
 		return this.find(query, options);
 	}
 
-	findByActiveUsersExcept(searchTerm, exceptions, options) {
+	findByActiveUsersExcept(searchTerm, exceptions, options, forcedSearchFields) {
 		if (exceptions == null) { exceptions = []; }
 		if (options == null) { options = {}; }
 		if (!_.isArray(exceptions)) {
@@ -200,7 +516,9 @@ export class Users extends Base {
 
 		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');
 
-		const orStmt = _.reduce(settings.get('Accounts_SearchFields').trim().split(','), function(acc, el) {
+		const searchFields = forcedSearchFields || this.settings.get('Accounts_SearchFields').trim().split(',');
+
+		const orStmt = _.reduce(searchFields, function(acc, el) {
 			acc.push({ [el.trim()]: termRegex });
 			return acc;
 		}, []);
@@ -466,9 +784,46 @@ export class Users extends Base {
 				active,
 			},
 		};
+		if (active) {
+			update.$unset = {
+				deactivatedUntil: 1,
+			};
+		}
 
 		return this.update(_id, update);
 	}
+
+	deactivate(_id, until) {
+		const update = {
+			$set: {
+				active: false,
+			},
+		};
+		if (until) {
+			update.$set.deactivatedUntil = until;
+		}
+
+		return this.update(_id, update);
+	}
+
+	removeDeactivations() {
+		const query = {
+			deactivatedUntil: {
+				$lte: new Date(),
+			},
+		};
+		const update = {
+			$set: {
+				active: true,
+			},
+			$unset: {
+				deactivatedUntil: 1,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 
 	setAllUsersActive(active) {
 		const update = {
@@ -751,6 +1106,115 @@ Find users to send a message by email if:
 		};
 
 		return this.find(query, options);
+	}
+
+	findByNameAndRoomId(name, roomId, skip = 0, limit = 50) {
+		const timeLabel = `findByNameAndRoomId${ _.random(0, 1000) }`;
+		console.time(timeLabel);
+		console.log(timeLabel, name, roomId, skip, limit);
+
+		const query = {
+			rid: roomId,
+		};
+
+		const subscriptionsCount = Subscriptions.find(query).count();
+		const allUsersCount = this.find({}).count();
+
+		let users = [];
+		const sort = { name: 1 };
+		let timeLabel_Strategy;
+		if (subscriptionsCount < allUsersCount / 10) {
+			timeLabel_Strategy = `${ timeLabel }::thru_subs`;
+			console.time(timeLabel_Strategy);
+			users = Promise.await(
+				Subscriptions.model.rawCollection().aggregate([
+					{ $match: { rid: roomId } },
+					{ $lookup: {
+						from: 'users',
+						localField: 'u._id',
+						foreignField: '_id',
+						as: 'user',
+					},
+					},
+					{ $unwind: '$user' },
+					{ $match: { 'user.active': true, 'user.name': name } },
+					{ $facet: {
+						count: [{ $count: 'total' }],
+						data: [
+							{ $skip: skip },
+							{ $limit: limit },
+							{ $project: {
+								_id: '$user._id',
+								username: '$user.username',
+								name: '$user.name',
+								status: '$user.status',
+								utcOffset: '$user.utcOffset',
+								customFields: '$user.customFields',
+							},
+							},
+							{ $sort: sort },
+						],
+					},
+					},
+				]).next());
+		} else {
+			timeLabel_Strategy = `${ timeLabel }::thru_users`;
+			console.time(timeLabel_Strategy);
+			users = Promise.await(
+				this.model.rawCollection().aggregate([{
+					$match: {
+						active: true,
+						name,
+					},
+				}, {
+					$lookup: {
+						from: 'rocketchat_subscription',
+						let: {
+							userId: '$_id',
+							roomId,
+						},
+						pipeline: [{
+							$match: {
+								$expr: {
+									$and: [
+										{ $eq: ['$rid', '$$roomId'] },
+										{ $eq: ['$u._id', '$$userId'] },
+									],
+								},
+							},
+						}],
+						as: 'subscription',
+					},
+				},
+				{ $unwind: '$subscription' },
+				{ $match: { subscription : { $exists: true } } },
+				{ $facet: {
+					count: [{ $count: 'total' }],
+					data: [
+						{ $skip: skip },
+						{ $limit: limit },
+						{ $project: { username: 1, name: 1, status: 1, utcOffset:1, customFields: 1 } },
+						{ $sort: sort },
+					],
+				},
+				},
+				], { hint: { name: 1, active: 1 },
+				}).next());
+		}
+
+		console.timeEnd(timeLabel);
+		console.timeEnd(timeLabel_Strategy);
+		return users;
+	}
+
+	removeOlderResumeTokensByUserId(userId, fromDate) {
+		this.update(userId, {
+			$pull: {
+				'services.resume.loginTokens': {
+					when: { $lt: fromDate },
+				},
+			},
+		});
 	}
 }
 

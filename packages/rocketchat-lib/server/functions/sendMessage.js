@@ -1,5 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
+import { settings } from 'meteor/rocketchat:settings';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { Messages } from 'meteor/rocketchat:models';
+import { Markdown } from 'meteor/rocketchat:markdown';
+import { redis } from '../lib';
 
 const objectMaybeIncluding = (types) => Match.Where((value) => {
 	Object.keys(types).forEach((field) => {
@@ -83,7 +88,7 @@ const validateAttachment = (attachment) => {
 
 const validateBodyAttachments = (attachments) => attachments.map(validateAttachment);
 
-RocketChat.sendMessage = function(user, message, room, upsert = false) {
+export const sendMessage = function(user, message, room, upsert = false) {
 	if (!user || !message || !room._id) {
 		return false;
 	}
@@ -121,43 +126,34 @@ RocketChat.sendMessage = function(user, message, room, upsert = false) {
 		message.ts = new Date();
 	}
 
-	if (RocketChat.settings.get('Message_Read_Receipt_Enabled')) {
+	if (settings.get('Message_Read_Receipt_Enabled')) {
 		message.unread = true;
-	}
-
-	// For the Rocket.Chat Apps :)
-	if (message && Apps && Apps.isLoaded()) {
-		const prevent = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentPrevent', message));
-		if (prevent) {
-			throw new Meteor.Error('error-app-prevented-sending', 'A Rocket.Chat App prevented the message sending.');
-		}
-
-		let result;
-		result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentExtend', message));
-		result = Promise.await(Apps.getBridges().getListenerBridge().messageEvent('IPreMessageSentModify', result));
-
-		if (typeof result === 'object') {
-			message = Object.assign(message, result);
-		}
 	}
 
 	if (message.parseUrls !== false) {
 		message.html = message.msg;
-		message = RocketChat.Markdown.code(message);
+		message = Markdown.code(message);
 
 		const urls = message.html.match(/([A-Za-z]{3,9}):\/\/([-;:&=\+\$,\w]+@{1})?([-A-Za-z0-9\.]+)+:?(\d+)?((\/[-\+=!:~%\/\.@\,\(\)\w]*)?\??([-\+=&!:;%@\/\.\,\w]+)?(?:#([^\s\)]+))?)?/g);
 		if (urls) {
 			message.urls = urls.map((url) => ({ url }));
 		}
 
-		message = RocketChat.Markdown.mountTokensBack(message, false);
+		message = Markdown.mountTokensBack(message, false);
 		message.msg = message.html;
 		delete message.html;
 		delete message.tokens;
 	}
 
-	message = RocketChat.callbacks.run('beforeSaveMessage', message);
+	message = callbacks.run('beforeSaveMessage', message);
 	if (message) {
+		let msgsInRedis = Promise.await(redis.incr(room._id));
+		if (msgsInRedis <= room.msgs) {
+			msgsInRedis = room.msgs + 1;
+			Promise.await(redis.set(room._id, msgsInRedis));
+		}
+		message.serverId = msgsInRedis;
+
 		// Avoid saving sandstormSessionId to the database
 		let sandstormSessionId = null;
 		if (message.sandstormSessionId) {
@@ -168,19 +164,13 @@ RocketChat.sendMessage = function(user, message, room, upsert = false) {
 		if (message._id && upsert) {
 			const { _id } = message;
 			delete message._id;
-			RocketChat.models.Messages.upsert({
+			Messages.upsert({
 				_id,
 				'u._id': message.u._id,
 			}, message);
 			message._id = _id;
 		} else {
-			message._id = RocketChat.models.Messages.insert(message);
-		}
-
-		if (Apps && Apps.isLoaded()) {
-			// This returns a promise, but it won't mutate anything about the message
-			// so, we don't really care if it is successful or fails
-			Apps.getBridges().getListenerBridge().messageEvent('IPostMessageSent', message);
+			message._id = Messages.insert(message);
 		}
 
 		/*
@@ -189,7 +179,7 @@ RocketChat.sendMessage = function(user, message, room, upsert = false) {
 		Meteor.defer(() => {
 			// Execute all callbacks
 			message.sandstormSessionId = sandstormSessionId;
-			return RocketChat.callbacks.run('afterSaveMessage', message, room, user._id);
+			return callbacks.run('afterSaveMessage', message, room, user._id);
 		});
 		return message;
 	}

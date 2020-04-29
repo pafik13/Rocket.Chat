@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { ReadReceipt } from '../../imports/message-read-receipt/server/lib/ReadReceipt';
+import { callbacks } from 'meteor/rocketchat:callbacks';
+import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
 
 Meteor.methods({
 	readMessages(rid) {
@@ -14,13 +15,19 @@ Meteor.methods({
 			});
 		}
 
-		// this prevents cache from updating object reference/pointer
-		const userSubscription = Object.assign({}, RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(rid, userId));
+		callbacks.run('beforeReadMessages', rid, userId);
 
-		RocketChat.models.Subscriptions.setAsReadByRoomIdAndUserId(rid, userId);
+		// TODO: move this calls to an exported function
+		const userSubscription = Subscriptions.findOneByRoomIdAndUserId(rid, userId, { fields: { ls: 1 } });
+		if (userSubscription) {
+			Subscriptions.setAsReadByRoomIdAndUserId(rid, userId);
+			Rooms.setLastMessageRead(rid, userId);
 
-		Meteor.defer(() => {
-			ReadReceipt.markMessagesAsRead(rid, userId, userSubscription.ls);
-		});
+			Meteor.defer(() => {
+				callbacks.run('afterReadMessages', rid, { userId, lastSeen: userSubscription.ls });
+			});
+		} else {
+			console.warn('readMessages called by user without subscription: params [', rid, userId, ']');
+		}
 	},
 });

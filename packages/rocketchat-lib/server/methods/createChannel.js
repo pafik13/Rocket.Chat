@@ -1,5 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
+import { hasPermission } from 'meteor/rocketchat:authorization';
+import { createRoom } from '../functions';
+import { validateUrl } from 'meteor/rocketchat:utils';
 
 Meteor.methods({
 	createChannel(name, members, readOnly = false, customFields = {}, extraData = {}) {
@@ -10,9 +13,21 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'createChannel' });
 		}
 
-		if (!RocketChat.authz.hasPermission(Meteor.userId(), 'create-c')) {
+		if (!hasPermission(Meteor.userId(), 'create-c')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'createChannel' });
 		}
-		return RocketChat.createRoom('c', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, ...extraData });
+
+		customFields = {
+			// 			anonym_id: '',
+			photoUrl: '',
+			registeredAt: new Date().toISOString(),
+			...customFields,
+		};
+
+		if (customFields.photoUrl && !validateUrl(customFields.photoUrl)) {
+			throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', { method: 'createChannel' });
+		}
+
+		return createRoom('c', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, filesHidden: false, ...extraData });
 	},
 });

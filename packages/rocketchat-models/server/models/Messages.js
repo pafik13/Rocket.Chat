@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
-import { settings } from 'meteor/rocketchat:settings';
 import { Base } from './_Base';
 import Rooms from './Rooms';
 import Users from './Users';
@@ -24,6 +23,119 @@ export class Messages extends Base {
 		this.tryEnsureIndex({ snippeted: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ location: '2dsphere' });
 		this.tryEnsureIndex({ slackBotId: 1, slackTs: 1 }, { sparse: 1 });
+		this.tryEnsureIndex({ unread: 1 }, { sparse: true });
+		this.loadSettings();
+	}
+
+	loadSettings() {
+		Meteor.startup(async() => {
+			const { settings } = await import('meteor/rocketchat:settings');
+			this.settings = settings;
+		});
+	}
+
+	setReactions(messageId, reactions) {
+		return this.update({ _id: messageId }, { $set: { reactions } });
+	}
+
+	keepHistoryForToken(token) {
+		return this.update({
+			'navigation.token': token,
+			expireAt: {
+				$exists: true,
+			},
+		}, {
+			$unset: {
+				expireAt: 1,
+			},
+		}, {
+			multi: true,
+		});
+	}
+
+	setRoomIdByToken(token, rid) {
+		return this.update({
+			'navigation.token': token,
+			rid: null,
+		}, {
+			$set: {
+				rid,
+			},
+		}, {
+			multi: true,
+		});
+	}
+
+	createRoomsLimitReachedForMember(room, owner, member) {
+		return this.createWithTypeRoomIdMessageAndUser('rooms-limit-reached', room._id, member.username, owner);
+	}
+
+	createChannelCreatedByRoomAndUser(room, user) {
+		return this.createWithTypeRoomIdMessageAndUser('channel-created', room._id, room.fname, user);
+	}
+
+	createGroupCreatedByRoomAndUser(room, user) {
+		return this.createWithTypeRoomIdMessageAndUser('group-created', room._id, room.fname, user);
+	}
+
+	createRoomArchivedByRoomIdAndUser(roomId, user) {
+		return this.createWithTypeRoomIdMessageAndUser('room-archived', roomId, '', user);
+	}
+
+	createRoomUnarchivedByRoomIdAndUser(roomId, user) {
+		return this.createWithTypeRoomIdMessageAndUser('room-unarchived', roomId, '', user);
+	}
+
+	unsetReactions(messageId) {
+		return this.update({ _id: messageId }, { $unset: { reactions: 1 } });
+	}
+
+	deleteOldOTRMessages(roomId, ts) {
+		const query = { rid: roomId, t: 'otr', ts: { $lte: ts } };
+		return this.remove(query);
+	}
+
+	updateOTRAck(_id, otrAck) {
+		const query = { _id };
+		const update = { $set: { otrAck } };
+		return this.update(query, update);
+	}
+
+	setGoogleVisionData(messageId, visionData) {
+		const updateObj = {};
+		for (const index in visionData) {
+			if (visionData.hasOwnProperty(index)) {
+				updateObj[`attachments.0.${ index }`] = visionData[index];
+			}
+		}
+
+		return this.update({ _id: messageId }, { $set: updateObj });
+	}
+
+	createRoomSettingsChangedWithTypeRoomIdMessageAndUser(type, roomId, message, user, extraData) {
+		return this.createWithTypeRoomIdMessageAndUser(type, roomId, message, user, extraData);
+	}
+
+	createRoomRenamedWithRoomIdRoomNameAndUser(roomId, roomName, user, extraData) {
+		return this.createWithTypeRoomIdMessageAndUser('r', roomId, roomName, user, extraData);
+	}
+
+	addTranslations(messageId, translations) {
+		const updateObj = {};
+		Object.keys(translations).forEach((key) => {
+			const translation = translations[key];
+			updateObj[`translations.${ key }`] = translation;
+		});
+		return this.update({ _id: messageId }, { $set: updateObj });
+	}
+
+	addAttachmentTranslations = function(messageId, attachmentIndex, translations) {
+		const updateObj = {};
+		Object.keys(translations).forEach((key) => {
+			const translation = translations[key];
+			updateObj[`attachments.${ attachmentIndex }.translations.${ key }`] = translation;
+		});
+		return this.update({ _id: messageId }, { $set: updateObj });
 	}
 
 	countVisibleByRoomIdBetweenTimestampsInclusive(roomId, afterTimestamp, beforeTimestamp, options) {
@@ -54,6 +166,23 @@ export class Messages extends Base {
 			'file._id': { $exists: true },
 		};
 		return this.find(query, { fields: { 'file._id': 1 }, ...options });
+	}
+
+	findFilesByUserIdAndRoomId(userId, roomId, options = {}) {
+		const query = {
+			rid: roomId,
+			'u._id': userId,
+			'file._id': { $exists: true },
+		};
+		return this.find(query, { fields: { 'file._id': 1 }, ...options });
+	}
+
+	findByRoomIdAndUserId(roomId, userId, options = {}) {
+		const query = {
+			rid: roomId,
+			'u._id': userId,
+		};
+		return this.find(query, options);
 	}
 
 	findFilesByRoomIdPinnedTimestampAndUsers(rid, excludePinned, ts, users = [], options = {}) {
@@ -600,42 +729,14 @@ export class Messages extends Base {
 			groupable: false,
 		};
 
-		if (settings.get('Message_Read_Receipt_Enabled')) {
+		if (this.settings.get('Message_Read_Receipt_Enabled')) {
 			record.unread = true;
 		}
 
 		_.extend(record, extraData);
 
 		record._id = this.insertOrUpsert(record);
-		Rooms.incMsgCountById(room._id, 1);
-		return record;
-	}
-
-	createNavigationHistoryWithRoomIdMessageAndUser(roomId, message, user, extraData) {
-		const type = 'livechat_navigation_history';
-		const room = Rooms.findOneById(roomId, { fields: { sysMes: 1 } });
-		if ((room != null ? room.sysMes : undefined) === false) {
-			return;
-		}
-		const record = {
-			t: type,
-			rid: roomId,
-			ts: new Date,
-			msg: message,
-			u: {
-				_id: user._id,
-				username: user.username,
-			},
-			groupable: false,
-		};
-
-		if (settings.get('Message_Read_Receipt_Enabled')) {
-			record.unread = true;
-		}
-
-		_.extend(record, extraData);
-
-		record._id = this.insertOrUpsert(record);
+		Rooms.incMsgCountAndSetLastMessageById(room._id, 1, record.ts, record);
 		return record;
 	}
 
@@ -713,6 +814,16 @@ export class Messages extends Base {
 		return this.createWithTypeRoomIdMessageAndUser('subscription-role-removed', roomId, message, user, extraData);
 	}
 
+	createRejectedMessageByPeer(roomId, user, extraData) {
+		const message = user.username;
+		return this.createWithTypeRoomIdMessageAndUser('rejected-message-by-peer', roomId, message, user, extraData);
+	}
+
+	createPeerDoesNotExist(roomId, user, extraData) {
+		const message = user.username;
+		return this.createWithTypeRoomIdMessageAndUser('peer-does-not-exist', roomId, message, user, extraData);
+	}
+
 	// REMOVE
 	removeById(_id) {
 		const query =	{ _id };
@@ -777,6 +888,15 @@ export class Messages extends Base {
 		return this.remove(query);
 	}
 
+	removeByRoomIdAndUserId(roomId, userId) {
+		const query =	{
+			rid: roomId,
+			'u._id': userId,
+		};
+
+		return this.remove(query);
+	}
+
 	async removeFilesByRoomId(roomId) {
 		if (!this.FileUpload) {
 			const { FileUpload } = await import('meteor/rocketchat:file-upload');
@@ -794,8 +914,33 @@ export class Messages extends Base {
 		}).fetch().forEach((document) => this.FileUpload.getStore('Uploads').deleteById(document.file._id));
 	}
 
+	async removeFilesByRoomIdAndUserId(roomId, userId) {
+		if (!this.FileUpload) {
+			const { FileUpload } = await import('meteor/rocketchat:file-upload');
+			this.FileUpload = FileUpload;
+		}
+		this.find({
+			rid: roomId,
+			'file._id': {
+				$exists: true,
+			},
+			'u._id': userId,
+		}, {
+			fields: {
+				'file._id': 1,
+			},
+		}).fetch().forEach((document) => {
+			this.FileUpload.getStore('Uploads').deleteById(document.file._id);
+			this.removeById(document._id);
+		});
+	}
+
 	getMessageByFileId(fileID) {
 		return this.findOne({ 'file._id': fileID });
+	}
+
+	getMessageById(messageId) {
+		return this.findOne({ _id: messageId });
 	}
 
 	setAsRead(rid, until) {
@@ -803,6 +948,23 @@ export class Messages extends Base {
 			rid,
 			unread: true,
 			ts: { $lt: until },
+		}, {
+			$unset: {
+				unread: 1,
+			},
+		}, {
+			multi: true,
+		});
+	}
+
+
+	setAsRead2(rid, userId) {
+		return this.update({
+			rid,
+			unread: true,
+			'u._id': {
+				$ne: userId,
+			},
 		}, {
 			$unset: {
 				unread: 1,
