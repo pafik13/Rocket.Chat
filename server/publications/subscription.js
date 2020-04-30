@@ -46,7 +46,27 @@ const fields = {
 	isVideoFilesAllowed: 1,
 	isOtherFilesAllowed: 1,
 	E2EKey: 1,
+	lmServerId: 1,
 };
+
+function prepareSubscription(sub) {
+	try {
+		const roomOptions = { fields: { lastMessage: 1 } };
+		const { lastMessage } = Rooms.findOneById(sub.rid, roomOptions);
+
+		if (lastMessage && lastMessage.u) {
+			sub.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
+			if (lastMessage.serverId && sub.lmServerId) {
+				sub.unread = lastMessage.serverId - sub.lmServerId;
+			}
+		} else {
+			sub.lastMessage = null;
+		}
+	} catch (e) {
+		SystemLogger.error(`subscriptions/get::rid=${ sub.rid }::id=${ sub._id }`, e);
+		sub.lastMessage = null;
+	}
+}
 
 Meteor.methods({
 	'subscriptions/get'(updatedAt) {
@@ -66,19 +86,7 @@ Meteor.methods({
 		records.forEach(function(record) {
 			record.u = user;
 
-			try {
-				const roomOptions = { fields: { lastMessage: 1 } };
-				const { lastMessage } = Rooms.findOneById(record.rid, roomOptions);
-
-				if (lastMessage && lastMessage.u) {
-					record.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
-				} else {
-					record.lastMessage = null;
-				}
-			} catch (e) {
-				SystemLogger.error(`subscriptions/get::rid=${ record.rid }`, e);
-				record.lastMessage = null;
-			}
+			prepareSubscription(record);
 		});
 
 		if (updatedAt instanceof Date) {
@@ -115,6 +123,7 @@ Subscriptions.on('change', ({ clientAction, id, data }) => {
 	}
 
 	if (data && data.u && data._id) {
+		prepareSubscription(data);
 		Notifications.streamUser.__emit(data.u._id, clientAction, data);
 		Notifications.notifyUserInThisInstance(data.u._id, 'subscriptions-changed', clientAction, data);
 	} else {

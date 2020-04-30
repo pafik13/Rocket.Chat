@@ -154,6 +154,12 @@ export const sendMessage = function(user, message, room, upsert = false) {
 		}
 		message.serverId = msgsInRedis;
 
+		message.counters = {
+			members: room.usersCount,
+			views: 0,
+			deliveries: 0,
+		};
+
 		// Avoid saving sandstormSessionId to the database
 		let sandstormSessionId = null;
 		if (message.sandstormSessionId) {

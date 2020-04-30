@@ -770,7 +770,7 @@ export class Subscriptions extends Base {
 		return this.update(query, update);
 	}
 
-	setAsReadByRoomIdAndUserId(roomId, userId) {
+	setAsReadByRoomIdAndUserId(roomId, userId, msgSrvId) {
 		const query = {
 			rid: roomId,
 			'u._id': userId,
@@ -784,6 +784,7 @@ export class Subscriptions extends Base {
 				userMentions: 0,
 				groupMentions: 0,
 				ls: new Date,
+				lmServerId: msgSrvId,
 			},
 		};
 

@@ -493,18 +493,17 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
-
-	setLastMessageRead(roomId, userId) {
+	setLastMessageRead(roomId) {
 		const query = {
 			_id: roomId,
-			'lastMessage.u._id': {
-				$ne: userId,
-			},
 		};
 
 		const update = {
 			$unset: {
 				'lastMessage.unread': 1,
+			},
+			$inc: {
+				'lastMessage.counters.views': 1,
 			},
 		};
 

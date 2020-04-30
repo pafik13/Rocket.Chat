@@ -38,6 +38,10 @@ export class Messages extends Base {
 		return this.update({ _id: messageId }, { $set: { reactions } });
 	}
 
+	markMessageAsDeliveredById(messageId) {
+		return this.update({ _id: messageId }, { $inc: { 'counters.deliveries': 1 } });
+	}
+
 	keepHistoryForToken(token) {
 		return this.update({
 			'navigation.token': token,
@@ -943,20 +947,42 @@ export class Messages extends Base {
 		return this.findOne({ _id: messageId });
 	}
 
-	setAsRead(rid, until) {
-		return this.update({
-			rid,
-			unread: true,
-			ts: { $lt: until },
-		}, {
+	setAsRead(rid, fromSrvId, tillSrvId) {
+		const diff = tillSrvId - fromSrvId;
+		const max = 10;
+
+		const update = {
 			$unset: {
 				unread: 1,
 			},
-		}, {
-			multi: true,
-		});
-	}
+			$inc: {
+				'counters.views': 1,
+			},
+		};
 
+		const updateOpts = {
+			multi: true,
+		};
+		if (diff < max) {
+			return this.update({
+				rid,
+				serverId: { $gt: fromSrvId, $lt: tillSrvId },
+			}, update, updateOpts);
+		} else {
+			const midSrvId = tillSrvId - max;
+			const result = this.update({
+				rid,
+				serverId: { $gt: midSrvId, $lt: tillSrvId },
+			}, update, updateOpts);
+
+			this.model.rawCollection().update({
+				rid,
+				serverId: { $gt: fromSrvId, $lt: midSrvId },
+			}, update, updateOpts);
+
+			return result;
+		}
+	}
 
 	setAsRead2(rid, userId) {
 		return this.update({
