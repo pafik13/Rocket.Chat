@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import fs from 'fs';
+import path from 'path';
 import stream from 'stream';
 import streamBuffers from 'stream-buffers';
 import mime from 'mime-type/with-db';
@@ -11,7 +12,14 @@ import { settings } from 'meteor/rocketchat:settings';
 import * as Models from 'meteor/rocketchat:models';
 import { FileUpload as _FileUpload } from '../../lib/FileUpload';
 import { roomTypes } from 'meteor/rocketchat:utils';
-import * as probe from 'ffmpeg-probe';
+import { default as probe } from 'ffmpeg-probe';
+import { default as FfmpegCommand } from 'fluent-ffmpeg';
+
+// https://gist.github.com/jsturgis/3b19447b304616f18657
+
+function time(ms) {
+	return new Date(ms).toISOString().slice(11, -1);
+}
 
 const cookie = new Cookies();
 
@@ -141,12 +149,24 @@ export const FileUpload = Object.assign(_FileUpload, {
 		file = FileUpload.addExtensionTo(file);
 		const image = FileUpload.getStore('Uploads')._store.getReadStream(file._id, file);
 
+		return this.generatePreview(image);
+	},
+
+	resizeVideoPreview(preview) {
+		const { folder, filename } = preview;
+		const filePath = path.join(folder, `${ filename }.png`);
+		const image = fs.createReadStream(filePath);
+
+		return this.generatePreview(image);
+	},
+
+	generatePreview(imageReadStream) {
 		const transformer = sharp({ failOnError: false })
 			.resize({ width: 32, height: 32, fit: 'inside' })
 			.jpeg()
 			.blur();
 		const result = transformer.toBuffer().then((out) => out.toString('base64'));
-		image.pipe(transformer);
+		imageReadStream.pipe(transformer);
 		return result;
 	},
 
@@ -167,14 +187,54 @@ export const FileUpload = Object.assign(_FileUpload, {
 		const fut = new Future();
 
 		switch (fileType) {
-			case 'AUDIO':
-			case 'VIDEO':
-				probe.default(tmpFile)
+			case 'AUDIO': {
+				probe(tmpFile)
 					.then((identify) => {
 						this.getCollection().direct.update({ _id: file._id }, {
 							$set: { identify },
 						});
 						fut.return();
+					})
+					.catch((err) => {
+						console.error(err);
+						fut.return();
+					});
+				break;
+			}
+			case 'VIDEO':
+				probe(tmpFile)
+					.then((identify) => {
+						if (identify.duration) {
+							const randomOffset = Math.floor(identify.duration * 0.1 * Math.random()); // берем слуйчайный кадр из первых 10%
+							const timeFormatted = time(randomOffset);
+							const folder = path.dirname(tmpFile);
+							const filename = `${ path.basename(tmpFile) }-preview`;
+							identify.preview = {
+								randomOffset, timeFormatted, folder, filename,
+							};
+						}
+						this.getCollection().direct.update({ _id: file._id }, {
+							$set: { identify },
+						});
+						if (!identify.preview) {
+							fut.return();
+						} else {
+							console.log(identify.preview);
+							const { timeFormatted, folder, filename } = identify.preview;
+
+							const command = new FfmpegCommand();
+
+							command
+								.input(tmpFile)
+								.screenshots({
+									timestamps: [timeFormatted],
+									filename, folder,
+								})
+								.on('end', function() {
+									console.log('Screenshots taken');
+									fut.return();
+								});
+						}
 					})
 					.catch((err) => {
 						console.error(err);

@@ -80,6 +80,9 @@ Meteor.methods({
 				if (file.identify.fps) {
 					attachment.video_fps = file.identify.fps;
 				}
+				if (file.identify.preview) {
+					attachment.video_preview = await FileUpload.resizeVideoPreview(file.identify.preview);
+				}
 			}
 		}
 
