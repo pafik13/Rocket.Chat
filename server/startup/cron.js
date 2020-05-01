@@ -22,6 +22,10 @@ function generateStatistics() {
 // 	return Meteor.call('OEmbedCacheCleanup');
 // }
 
+function markInactiveRooms() {
+	return Meteor.call('markInactiveRooms');
+}
+
 function cleanupDeactivations() {
 	return Meteor.call('cleanupDeactivations');
 }
@@ -67,6 +71,14 @@ Meteor.startup(function() {
 				return parser.cron('*/1 * * * *');
 			},
 			job: resumeLongTask,
+		});
+
+		SyncedCron.add({
+			name: 'Mark Inactive Rooms',
+			schedule(parser) {
+				return parser.cron('0 1-6 * * *');
+			},
+			job: markInactiveRooms,
 		});
 
 		// SyncedCron.add({

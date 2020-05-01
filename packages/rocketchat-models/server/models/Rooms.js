@@ -33,6 +33,34 @@ export class Rooms extends Base {
 		return this.findOne(query, options);
 	}
 
+	markAsInactive(daysCount, roomsCount) {
+		const d = new Date();
+		d.setDate(d.getDate() - daysCount);
+		const query = {
+			lm: { $exists: false },
+			ts: { $lt: d },
+		};
+
+		let ids = [];
+		const ids1 = this.find(query, { fields: { _id: 1 }, limit: roomsCount }).fetch()
+			.map((item) => item._id);
+
+		if (ids1.length === roomsCount) {
+			ids = ids1;
+		} else {
+			const query2 = {
+				lm: { $lt: d },
+			};
+
+			const ids2 = this.find(query2, { fields: { _id: 1 }, limit: roomsCount - ids.length }).fetch()
+				.map((item) => item._id);
+
+			ids = ids1.concat(ids2);
+		}
+
+		return this.update({ _id: { $in: ids } }, { $set: { inactive: true } });
+	}
+
 	updateSurveyFeedbackById(_id, surveyFeedback) {
 		const query = {
 			_id,
@@ -811,6 +839,7 @@ export class Rooms extends Base {
 			},
 			fname: name,
 			blacklisted: { $exists: false },
+			inactive: { $exists: false },
 		};
 
 		// do not use cache

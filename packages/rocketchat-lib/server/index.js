@@ -76,5 +76,6 @@ import './methods/complainAboutRoom';
 import './methods/complainAboutUser';
 import './methods/getNearestChannels';
 import './methods/getPopularChannels';
+import './methods/markInactiveRooms';
 import './lib/elastic';
 import './lib/redis';

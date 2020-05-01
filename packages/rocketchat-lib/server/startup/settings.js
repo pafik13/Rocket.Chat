@@ -954,6 +954,16 @@ settings.addGroup('General', function() {
 			public: true,
 			i18nDescription: 'Rooms_Maximum_Count',
 		});
+		this.add('Rooms_Max_Days_For_Inactive', 180, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Max_Days_For_Inactive',
+		});
+		this.add('Rooms_Max_For_Mark_As_Inactive', 100, {
+			type: 'int',
+			public: true,
+			i18nDescription: 'Rooms_Max_For_Mark_As_Inactive',
+		});
 	});
 	this.section('Notifications', function() {
 		this.add('Notifications_Max_Room_Members', 100, {
