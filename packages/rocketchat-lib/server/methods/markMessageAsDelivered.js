@@ -13,7 +13,7 @@ Meteor.methods({
 			});
 		}
 		const originalMessage = Messages.findOneById(message._id, {});
-		if (originalMessage == null) {
+		if (!originalMessage) {
 			throw new Meteor.Error('error-action-not-allowed', 'Not allowed', {
 				method: 'markMessageAsDelivered',
 				action: 'Mark_As_Delivered',

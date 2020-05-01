@@ -521,10 +521,17 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
-	setLastMessageRead(roomId) {
+	setLastMessageRead(roomId, msgSrvId) {
 		const query = {
 			_id: roomId,
 		};
+
+		if (msgSrvId) {
+			query.$or = [
+				{ 'lastMessage.serverId': { $exists: false } },
+				{ 'lastMessage.serverId': { $lte: msgSrvId } },
+			];
+		}
 
 		const update = {
 			$unset: {
