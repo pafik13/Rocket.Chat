@@ -704,7 +704,7 @@ API.v1.addRoute('channels.list', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('channels.list.nearest', { authRequired: true }, {
+API.v1.addRoute('channels.list.nearest', { authRequired: false }, {
 	get() {
 		const { offset, count } = this.getPaginationItems();
 		const { lng, lat, maxDistInMeters, minDistInMeters } = this.requestParams();
@@ -715,10 +715,10 @@ API.v1.addRoute('channels.list.nearest', { authRequired: true }, {
 			coordinates: [Number(lng), Number(lat)],
 		};
 
-		let result;
-		Meteor.runAsUser(this.userId, () => {
-			result = Meteor.call('getNearestChannels', point, Number(maxDistInMeters), Number(minDistInMeters), offset, count);
-		});
+		// 		let result;
+		// 		Meteor.runAsUser(this.userId, () => {
+		const result = Meteor.call('getNearestChannels', point, Number(maxDistInMeters), Number(minDistInMeters), offset, count);
+		// 		});
 
 		const rooms = result.records;
 		return API.v1.success({
@@ -730,14 +730,14 @@ API.v1.addRoute('channels.list.nearest', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('channels.list.popular', { authRequired: true }, {
+API.v1.addRoute('channels.list.popular', { authRequired: false }, {
 	get() {
 		const { offset, count } = this.getPaginationItems();
 
-		let result;
-		Meteor.runAsUser(this.userId, () => {
-			result = Meteor.call('getPopularChannels', offset, count);
-		});
+		// 		let result;
+		// 		Meteor.runAsUser(this.userId, () => {
+		const result = Meteor.call('getPopularChannels', offset, count);
+		// 		});
 
 		const rooms = result.records;
 		return API.v1.success({

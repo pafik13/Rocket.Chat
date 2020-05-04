@@ -11,10 +11,10 @@ Meteor.methods({
 		check(offset, Number);
 		check(limit, Number);
 
-		const callerId = Meteor.userId();
-		if (!callerId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getNearestChannels' });
-		}
+		// 		const callerId = Meteor.userId();
+		// 		if (!callerId) {
+		// 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getNearestChannels' });
+		// 		}
 		const pointErrors = validateGeoJSON(point);
 		if (pointErrors) {
 			throw new Meteor.Error('error-invalid-point', pointErrors, { function: 'getNearestChannels' });

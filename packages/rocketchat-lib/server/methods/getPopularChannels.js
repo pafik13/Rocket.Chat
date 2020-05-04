@@ -7,10 +7,10 @@ Meteor.methods({
 		check(offset, Number);
 		check(limit, Number);
 
-		const callerId = Meteor.userId();
-		if (!callerId) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getPopularChannels' });
-		}
+		// 		const callerId = Meteor.userId();
+		// 		if (!callerId) {
+		// 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getPopularChannels' });
+		// 		}
 
 		const query = {
 			t: 'c',
