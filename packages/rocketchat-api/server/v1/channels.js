@@ -802,7 +802,7 @@ API.v1.addRoute('channels.members', { authRequired: true }, {
 					sort: { username: sort.username != null ? sort.username : 1 },
 				}).fetch();
 			} else {
-				const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`, 'i');
+				const nameRE = new RegExp(`^${ s.escapeRegExp(name) }`);
 				const result = Users.findByNameAndRoomId(nameRE, findResult._id, offset, count);
 				if (result.count && result.count[0]) {
 					total = result.count[0].total;

@@ -50,9 +50,13 @@ const fields = {
 };
 
 function prepareSubscription(sub) {
-	try {
-		const roomOptions = { fields: { lastMessage: 1 } };
-		const { lastMessage } = Rooms.findOneById(sub.rid, roomOptions);
+	const roomOptions = { fields: { lastMessage: 1 } };
+	const room = Rooms.findOneById(sub.rid, roomOptions);
+	if (!room) {
+		SystemLogger.error(`subscriptions/get::rid=${ sub.rid }::id=${ sub._id }`);
+		sub.lastMessage = null;
+	} else {
+		const { lastMessage } = room;
 
 		if (lastMessage && lastMessage.u) {
 			sub.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
@@ -62,9 +66,6 @@ function prepareSubscription(sub) {
 		} else {
 			sub.lastMessage = null;
 		}
-	} catch (e) {
-		SystemLogger.error(`subscriptions/get::rid=${ sub.rid }::id=${ sub._id }`, e);
-		sub.lastMessage = null;
 	}
 }
 

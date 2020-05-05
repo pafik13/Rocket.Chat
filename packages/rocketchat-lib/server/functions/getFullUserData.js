@@ -80,6 +80,5 @@ export const getFullUserData = function({ userId, filter, limit: l }) {
 	if (limit === 1) {
 		return Users.findByUsername(username, options);
 	}
-	const usernameReg = new RegExp(s.escapeRegExp(username), 'i');
-	return Users.findByUsernameNameOrEmailAddress(usernameReg, options);
+	return Users.findByUsernameNameOrEmailAddress(username, options);
 };
