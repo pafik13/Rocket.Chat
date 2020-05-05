@@ -385,17 +385,13 @@ export class Users extends Base {
 	}
 
 	findOneByUsername(username, options) {
-		if (typeof username === 'string') {
-			username = new RegExp(`^${ s.escapeRegExp(username) }$`, 'i');
-		}
-
 		const query = { username };
 
 		return this.findOne(query, options);
 	}
 
 	findOneByEmailAddress(emailAddress, options) {
-		const query = { 'emails.address': new RegExp(`^${ s.escapeRegExp(emailAddress) }$`, 'i') };
+		const query = { 'emails.address': emailAddress };
 
 		return this.findOne(query, options);
 	}
@@ -482,7 +478,7 @@ export class Users extends Base {
 			exceptions = [exceptions];
 		}
 
-		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');
+		const termRegex = new RegExp(s.escapeRegExp(searchTerm));
 		const query = {
 			$or: [{
 				username: termRegex,
@@ -514,7 +510,7 @@ export class Users extends Base {
 			exceptions = [exceptions];
 		}
 
-		const termRegex = new RegExp(s.escapeRegExp(searchTerm), 'i');
+		const termRegex = new RegExp(s.escapeRegExp(searchTerm));
 
 		const searchFields = forcedSearchFields || this.settings.get('Accounts_SearchFields').trim().split(',');
 

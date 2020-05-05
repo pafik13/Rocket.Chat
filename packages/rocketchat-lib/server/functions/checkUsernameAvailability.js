@@ -20,8 +20,6 @@ export const checkUsernameAvailability = function(username) {
 	}
 
 	return !Meteor.users.findOne({
-		username: {
-			$regex: toRegExp(username),
-		},
+		username,
 	}, { fields: { _id: 1 } });
 };
