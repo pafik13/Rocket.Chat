@@ -58,7 +58,6 @@ API.v1.addRoute('admin.elasticIndeces', { authRequired: false }, {
 	},
 });
 
-
 API.v1.addRoute('admin.getRoomsByAnonymId', { authRequired: true }, {
 	get() {
 		if (!hasRole(this.userId, 'admin')) {
@@ -207,6 +206,34 @@ API.v1.addRoute('admin.createDirectMessage', { authRequired: true }, {
 		return API.v1.success({
 			room,
 		});
+	},
+});
+
+API.v1.addRoute('admin.isDirectMessageExists', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userIds, usernames } = this.requestParams();
+		let room;
+		if (userIds && userIds.length === 2) {
+			const roomId = userIds.sort().join('');
+			room = Rooms.findOneById(roomId, { _id: 1 });
+		} else if (usernames && usernames.length === 2) {
+			const user1 = Users.findOneByUsername(usernames[0]);
+			const userId_1 = user1 ? user1._id : '';
+			const user2 = Users.findOneByUsername(usernames[1]);
+			const userId_2 = user2 ? user2._id : '';
+			const roomId = [userId_1, userId_2].sort().join('');
+			room = Rooms.findOneById(roomId, { _id: 1 });
+		} else {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userIds` or `usernames` with length equal 2!');
+		}
+
+		if (room) { return API.v1.success(); }
+
+		return API.v1.notFound();
 	},
 });
 

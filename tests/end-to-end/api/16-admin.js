@@ -45,7 +45,7 @@ describe('[Admin]', function() {
 
 	before((done) => getCredentials(done));
 
-	describe('createDirectMessage', () => {
+	describe('createDirectMessage/isDirectMessageExists', () => {
 		const username1 = `first_${ apiUsername }`;
 		const email1 = `first_${ apiEmail }`;
 		const username2 = `second_${ apiUsername }`;
@@ -111,6 +111,50 @@ describe('[Admin]', function() {
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
+				.end(done);
+		});
+
+		it('should exist for usernames', (done) => {
+			request.post(api('admin.isDirectMessageExists'))
+				.set(credentials)
+				.send({
+					usernames: [username1, 'rocket.cat'],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should exist for userIds', (done) => {
+			request.post(api('admin.isDirectMessageExists'))
+				.set(credentials)
+				.send({
+					userIds: [userId1, userId2],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should not exist for usernames', (done) => {
+			request.post(api('admin.isDirectMessageExists'))
+				.set(credentials)
+				.send({
+					usernames: [username1, 'rocket.cat1'],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(404)
+				.end(done);
+		});
+
+		it('should not exist for userIds', (done) => {
+			request.post(api('admin.isDirectMessageExists'))
+				.set(credentials)
+				.send({
+					userIds: [userId1, 'userId2'],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(404)
 				.end(done);
 		});
 	});
