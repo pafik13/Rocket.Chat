@@ -36,6 +36,10 @@ Meteor.methods({
 			} else {
 				const room = Rooms.findOneById(rid, { lm: 1, lastMessage: 1 });
 				const { lastMessage } = room;
+				if (!lastMessage) {
+					return Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, tillSrvId);
+				}
+
 				if (lastMessage.serverId) {
 					tillSrvId = lastMessage.serverId;
 				} else {
