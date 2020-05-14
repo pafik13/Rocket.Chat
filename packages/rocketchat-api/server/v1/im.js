@@ -94,7 +94,20 @@ API.v1.addRoute(['dm.setUploadsState', 'im.setUploadsState'], { authRequired: tr
 
 API.v1.addRoute(['dm.create', 'im.create'], { authRequired: true }, {
 	post() {
-		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+		const { username, userId } = this.requestParams();
+
+		const params = {};
+		if (username) {
+			params.username = username;
+		} else if (userId) {
+			const user = Users.findOneById(userId, { username: 1 });
+			if (!user) { throw new Meteor.Error('error-user-not-found', 'The required "userId" param provided does not match any user'); }
+			params.username = user.username;
+		} else {
+			throw new Meteor.Error('error-room-param-not-provided', 'Body param "userId" or "username" is required');
+		}
+
+		const findResult = findDirectMessageRoom(params, this.user);
 
 		return API.v1.success({
 			room: findResult.room,
