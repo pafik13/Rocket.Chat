@@ -291,7 +291,7 @@ describe('[Direct Messages]', function() {
 			request.post(api('im.create'))
 				.set(credentials)
 				.send({
-					 userId: 'rocket.cat',
+					userId: 'rocket.cat',
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
