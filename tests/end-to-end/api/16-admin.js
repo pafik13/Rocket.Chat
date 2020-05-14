@@ -310,5 +310,23 @@ describe('[Admin]', function() {
 				})
 				.end(done);
 		});
+		it('should return only channels for anonym_id', (done) => {
+			request.get(api('channels.getByAnonymId'))
+				.query({
+					anonym_id: 'xxx',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.nested.property('channels').and.to.be.an('array');
+					const { channels } = res.body;
+					for (let i = 0; i < channels.length; i++) {
+						const channel = channels[i];
+						expect(channel).to.have.nested.property('t', 'c');
+					}
+				})
+				.end(done);
+		});
 	});
 });

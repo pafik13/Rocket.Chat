@@ -1290,6 +1290,37 @@ API.v1.addRoute('channels.getAllUserMentionsByChannel', { authRequired: true }, 
 	},
 });
 
+API.v1.addRoute('channels.getByAnonymId', { authRequired: false }, {
+	get() {
+		const { anonym_id } = this.queryParams;
+
+		if (!anonym_id) {
+			return API.v1.failure('The \'anonym_id\' query param is required');
+		}
+
+		const roomsOpts = {
+			fields: {
+				name: 1,
+				fname: 1,
+				t: 1,
+				msgs: 1,
+				usersCount: 1,
+				customFields: 1,
+				broadcast: 1,
+				encrypted: 1,
+				ro: 1,
+			},
+		};
+		const rooms = Rooms.findByAnonymId(anonym_id, roomsOpts).fetch();
+		const channels = rooms.filter((it) => it.t === 'c');
+
+		return API.v1.success({
+			channels: channels.map((room) => this.composeRoomWithLastMessage(room, this.userId)),
+		});
+	},
+});
+
+
 API.v1.addRoute('channels.roles', { authRequired: true }, {
 	get() {
 		const findResult = findChannelByIdOrName({ params: this.requestParams() });
