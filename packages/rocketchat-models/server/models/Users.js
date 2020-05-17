@@ -789,10 +789,11 @@ export class Users extends Base {
 		return this.update(_id, update);
 	}
 
-	deactivate(_id, until) {
+	deactivate(_id, until, reason) {
 		const update = {
 			$set: {
 				active: false,
+				deactivationReason: reason,
 			},
 		};
 		if (until) {
@@ -814,6 +815,7 @@ export class Users extends Base {
 			},
 			$unset: {
 				deactivatedUntil: 1,
+				deactivationReason: 1,
 			},
 		};
 

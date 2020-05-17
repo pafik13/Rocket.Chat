@@ -870,6 +870,8 @@
   "complain-u": "Complain About Users",
   "complain-u_description": "Permission to complain about users",
   "Complaints": "Complaints",
+	"Complaints_Count_For_Auto_Deactivation": "Complaints count for auto deactivation",
+	"Complaints_Auto_Deactivation_Period": "Complaints auto deactivation period (seconds)",
   "create-personal-access-tokens": "Create Personal Access Tokens",
   "create-user": "Create User",
   "create-user_description": "Permission to create users",

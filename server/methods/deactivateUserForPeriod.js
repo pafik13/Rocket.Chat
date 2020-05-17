@@ -5,7 +5,7 @@ import { Users } from 'meteor/rocketchat:models';
 import moment from 'moment';
 
 Meteor.methods({
-	deactivateUserForPeriod(userId, seconds) {
+	deactivateUserForPeriod(userId, seconds, reason = '') {
 		check(userId, String);
 		check(seconds, Number);
 
@@ -36,11 +36,8 @@ Meteor.methods({
 			});
 		}
 
-		console.log('deactivateUserForPeriod', userId, seconds);
-		const now = moment();
 		const until = moment().add(seconds, 'seconds');
-		console.log('deactivateUserForPeriod', userId, now.toDate(), until.toDate());
-		Users.deactivate(userId, until.toDate());
+		Users.deactivate(userId, until.toDate(), reason);
 
 		// 		if (user.username) {
 		// 			Subscriptions.setArchivedByUsername(user.username, true);

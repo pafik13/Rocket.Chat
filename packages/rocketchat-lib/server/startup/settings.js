@@ -903,6 +903,14 @@ settings.addGroup('General', function() {
 		public: true,
 		i18nDescription: 'Complaint_Reasons_List_Description',
 	});
+	this.add('Complaints_Count_For_Auto_Deactivation', 10, {
+		type: 'int',
+		public: true,
+	});
+	this.add('Complaints_Auto_Deactivation_Period', -1, {
+		type: 'int',
+		public: true,
+	});
 	this.section('UTF8', function() {
 		this.add('UTF8_Names_Validation', '[0-9a-zA-Z-_.]+', {
 			type: 'string',

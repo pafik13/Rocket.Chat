@@ -26,6 +26,10 @@ function markInactiveRooms() {
 	return Meteor.call('markInactiveRooms');
 }
 
+function doDeactivationsDueToComplaints() {
+	return Meteor.call('doDeactivationsDueToComplaints');
+}
+
 function cleanupDeactivations() {
 	return Meteor.call('cleanupDeactivations');
 }
@@ -55,6 +59,14 @@ Meteor.startup(function() {
 				return parser.cron(`${ minutes } * * * *`);
 			},
 			job: generateStatistics,
+		});
+
+		SyncedCron.add({
+			name: 'Do Users Deactivations Due To Complaints',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: doDeactivationsDueToComplaints,
 		});
 
 		SyncedCron.add({

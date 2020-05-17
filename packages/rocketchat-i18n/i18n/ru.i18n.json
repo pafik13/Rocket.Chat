@@ -851,6 +851,8 @@
   "complain-u": "Пожаловаться на пользователей",
   "complain-u_description": "Разрешение жаловаться на пользователей",
   "Complaints": "Жалобы",
+	"Complaints_Count_For_Auto_Deactivation": "Количество жалоб для автоматической деактивации",
+	"Complaints_Auto_Deactivation_Period": "Период автоматической деактивации (секунды)",
   "create-personal-access-tokens": "Создание токенов персонального доступа",
   "create-user": "Создавать пользователей",
   "create-user_description": "Разрешение на создание пользователей",
