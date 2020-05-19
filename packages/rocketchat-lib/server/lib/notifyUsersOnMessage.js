@@ -84,7 +84,10 @@ function notifyUsersOnMessage(message, room) {
 		} else {
 			// Don't fetch all users if room exceeds max members
 			const maxMembersForNotification = settings.get('Notifications_Max_Room_Members');
-			const roomMembersCount = Subscriptions.findByRoomId(room._id).count();
+			let roomMembersCount = room.usersCount;
+			if (!roomMembersCount) {
+				roomMembersCount = Subscriptions.findByRoomId(room._id).count();
+			}
 			const disableIncUnread = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
 
 			if (!disableIncUnread) {
@@ -116,8 +119,8 @@ function notifyUsersOnMessage(message, room) {
 	// Update all other subscriptions to alert their owners but witout incrementing
 	// the unread counter, as it is only for mentions and direct messages
 	// We now set alert and open properties in two separate update commands. This proved to be more efficient on MongoDB - because it uses a more efficient index.
-	Subscriptions.setAlertForRoomIdExcludingUserId(message.rid, message.u._id);
-	Subscriptions.setOpenForRoomIdExcludingUserId(message.rid, message.u._id);
+	// 	Subscriptions.setAlertForRoomIdExcludingUserId(message.rid, message.u._id);
+	// 	Subscriptions.setOpenForRoomIdExcludingUserId(message.rid, message.u._id);
 
 	return message;
 }
