@@ -61,7 +61,11 @@ function prepareSubscription(sub) {
 		if (lastMessage && lastMessage.u) {
 			sub.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
 			if (lastMessage.serverId && sub.lmServerId) {
-				sub.unread = lastMessage.serverId - sub.lmServerId;
+				if (lastMessage.serverId > sub.lmServerId) {
+					sub.unread = lastMessage.serverId - sub.lmServerId;
+				} else {
+					console.warn('prepareSubscription-unread: counters [', lastMessage.serverId, sub.lmServerId, ']');
+				}
 			}
 		} else {
 			sub.lastMessage = null;
