@@ -31,7 +31,7 @@ Meteor.methods({
 				if (originalMessage.serverId) {
 					tillSrvId = originalMessage.serverId;
 				} else {
-					tillSrvId = Messages.find({ ts: { $lte: originalMessage.ts } }).count();
+					tillSrvId = Messages.find({ rid, ts: { $lte: originalMessage.ts } }).count();
 				}
 			} else {
 				const room = Rooms.findOneById(rid, { lm: 1, lastMessage: 1 });
@@ -43,20 +43,25 @@ Meteor.methods({
 				if (lastMessage.serverId) {
 					tillSrvId = lastMessage.serverId;
 				} else {
-					tillSrvId = Messages.find({ ts: { $lte: lastMessage.ts } }).count();
+					tillSrvId = Messages.find({ rid, ts: { $lte: lastMessage.ts } }).count();
 				}
 			}
 
 			if (userSubscription.lmServerId) {
 				fromSrvId = userSubscription.lmServerId;
 			} else {
-				fromSrvId = Messages.find({ ts: { $lte: userSubscription.ls } }).count();
+				fromSrvId = Messages.find({ rid, ts: { $lte: userSubscription.ls } }).count();
 			}
 
-			if (tillSrvId > fromSrvId) {
+			if (tillSrvId >= fromSrvId) {
 				Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, tillSrvId);
 				Rooms.setLastMessageRead(rid, tillSrvId);
 				Messages.setAsRead(rid, fromSrvId, tillSrvId);
+			} else {
+				console.warn('readMessages unknow error: params [', rid, userId, ']; counters: [', tillSrvId, fromSrvId, ']');
+				Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, fromSrvId);
+				Rooms.setLastMessageRead(rid, fromSrvId);
+				Messages.setAsRead(rid, fromSrvId, fromSrvId);
 			}
 		} else {
 			console.warn('readMessages called by user without subscription: params [', rid, userId, ']');
