@@ -11,7 +11,13 @@ export const composeMessageObjectWithUser = function(message, userId) {
 		let user;
 		if (message.u && message.u._id) {
 			user = getUser(message.u._id);
-			message.u = user;
+			if (user) {
+				message.u = user;
+			} else if (!message.u.customFields) {
+				message.u.customFields = {
+					anonym_id: -1, registeredAt: '', photoUrl: '',
+				};
+			}
 		}
 
 		if (message.t) {
