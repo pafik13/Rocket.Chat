@@ -512,6 +512,13 @@ export class Subscriptions extends Base {
 		return this.find(query, options);
 	}
 
+	findOpenedByUserId(userId, options) {
+		const query =
+			{ 'u._id': userId, open: true };
+
+		return this.find(query, options);
+	}
+
 	findByUserIdAndType(userId, type, options) {
 		const query = {
 			'u._id': userId,

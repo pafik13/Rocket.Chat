@@ -60,6 +60,26 @@ class Notifications {
 		this.streamAll = new Meteor.Streamer('notify-all');
 		this.streamLogged = new Meteor.Streamer('notify-logged');
 		this.streamRoom = new Meteor.Streamer('notify-room');
+		this.streamRoom.$sessionsMap = new WeakMap();
+		const originalPublish = this.streamRoom._publish.bind(this.streamRoom);
+		this.streamRoom._publish = (publication, eventName, options) => {
+			const e = eventName.split('/')[1];
+			if (e === 'typing' && publication._session && publication._session.userId) {
+				const session = publication._session;
+				if (!this.streamRoom.$sessionsMap.has(session)) {
+					// 					console.log('!this.streamRoom.$sessionsMap.has(session)');
+					const subs = Subscriptions.findOpenedByUserId(session.userId, { fields: { rid: 1 } }).fetch();
+					for (let s = 0; s < subs.length; s++) {
+						const sub = subs[s];
+						// 						console.log(sub);
+						originalPublish(publication, `${ sub.rid }/${ e }`, options);
+					}
+					this.streamRoom.$sessionsMap.set(session, true);
+					return;
+				}
+			}
+			originalPublish(publication, eventName, options);
+		};
 
 		// 		const rooms = Rooms.find({}, { name: 1 }).fetch();
 		// 		rooms.forEach((room) => {
