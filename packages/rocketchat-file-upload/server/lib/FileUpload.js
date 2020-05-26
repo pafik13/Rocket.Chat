@@ -152,6 +152,38 @@ export const FileUpload = Object.assign(_FileUpload, {
 		return this.generatePreview(image);
 	},
 
+	uploadVideoPreview(preview) {
+		const { folder, filename } = preview;
+		const filenameWithExt = `${ filename }.png`;
+		const filePath = path.join(folder, filenameWithExt);
+		const store = FileUpload.getStore('Uploads').getStore();
+		const fileStat = fs.statSync(filePath);
+
+		// Insert the file in database
+		const fileId = store.create({
+			size: fileStat.size,
+			type: 'image/png',
+			name: filenameWithExt,
+			extension: 'png',
+		});
+
+		const image = fs.createReadStream(filePath);
+
+		return new Promise((resolve, reject) => {
+			// Save the file to the store
+			store.write(image, fileId, function(err, file) {
+				if (err) {
+					console.error(err);
+					reject(err);
+				} else {
+					const fileUrl = `/file-upload/${ file._id }/${ encodeURI(file.name) }`;
+					resolve(fileUrl);
+					console.log('file saved to store');
+				}
+			});
+		});
+	},
+
 	resizeVideoPreview(preview) {
 		const { folder, filename } = preview;
 		const filePath = path.join(folder, `${ filename }.png`);
@@ -324,6 +356,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 		const isAuthorizedByRoom = rc_room_type && roomTypes.getConfig(rc_room_type).canAccessUploadedFile({ rc_uid, rc_rid, rc_token });
 		return isAuthorizedByCookies || isAuthorizedByHeaders || isAuthorizedByRoom;
 	},
+
 	addExtensionTo(file) {
 		if (mime.lookup(file.name) === file.type) {
 			return file;

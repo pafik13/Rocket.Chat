@@ -81,7 +81,9 @@ Meteor.methods({
 					attachment.video_fps = file.identify.fps;
 				}
 				if (file.identify.preview) {
-					attachment.video_preview = await FileUpload.resizeVideoPreview(file.identify.preview);
+					const results = await Promise.all([FileUpload.uploadVideoPreview(file.identify.preview), FileUpload.resizeVideoPreview(file.identify.preview)]);
+					attachment.video_preview_url = results[0] ;
+					attachment.video_preview = results[1];
 				}
 			}
 		}
