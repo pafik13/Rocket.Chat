@@ -419,6 +419,31 @@ API.v1.addRoute('groups.delete', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('groups.deleteMany', { authRequired: true }, {
+	post() {
+		const { groups } = this.requestParams();
+
+		if (!groups) {
+			return API.v1.failure('The \'groups\' param is required');
+		}
+
+		if (!Array.isArray(groups)) {
+			return API.v1.failure('The \'groups\' must be an array');
+		}
+
+		for (let i = 0; i < groups.length; i++) {
+			const item = groups[i];
+			const findResult = findPrivateGroupByIdOrName({ params: item, userId: this.userId, checkedArchived: false });
+
+			Meteor.runAsUser(this.userId, () => {
+				Meteor.call('eraseRoom', findResult.rid);
+			});
+		}
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('groups.files', { authRequired: true }, {
 	get() {
 		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId, checkedArchived: false });

@@ -85,6 +85,62 @@ describe('[Rooms]', function() {
 		});
 	});
 
+	describe('/rooms.saveNotificationMany', () => {
+		let publicChannel; let privateChannel;
+		it('create a public channel', (done) => {
+			createRoom({ type: 'c', name: `testeChannel${ + new Date() }` })
+				.end((err, res) => {
+					publicChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a private channel', (done) => {
+			createRoom({ type: 'p', name: `testPrivateChannel${ + new Date() }` })
+				.end((err, res) => {
+					privateChannel = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.saveNotificationMany', (done) => {
+			request.post(api('rooms.saveNotificationMany'))
+				.set(credentials)
+				.send({
+					rooms: [
+						{
+							roomId: publicChannel._id,
+							notifications: {
+								disableNotifications: '0',
+								emailNotifications: 'nothing',
+								audioNotificationValue: 'beep',
+								desktopNotifications: 'nothing',
+								desktopNotificationDuration: '2',
+								audioNotifications: 'all',
+								mobilePushNotifications: 'mentions',
+							},
+						},
+						{
+							roomId: privateChannel._id,
+							notifications: {
+								disableNotifications: '0',
+								emailNotifications: 'nothing',
+								audioNotificationValue: 'beep',
+								desktopNotifications: 'nothing',
+								desktopNotificationDuration: '2',
+								audioNotifications: 'all',
+								mobilePushNotifications: 'mentions',
+							},
+						},
+					],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
+
 	describe('/rooms.favorite', () => {
 		let testChannel;
 		const testChannelName = `channel.test.${ Date.now() }`;
@@ -160,6 +216,65 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', false);
 					expect(res.body).to.have.property('error');
+				})
+				.end(done);
+		});
+	});
+
+	describe('/rooms.markAsFavorite', () => {
+		let publicChannel;
+		it('create a public channel', (done) => {
+			createRoom({ type: 'c', name: `testeChannel${ + new Date() }` })
+				.end((err, res) => {
+					publicChannel = res.body.channel;
+					done();
+				});
+		});
+		it('/rooms.markAsFavorite', (done) => {
+			request.post(api('rooms.markAsFavorite'))
+				.set(credentials)
+				.send({
+					roomName: publicChannel.name,
+					favorite: true,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
+
+	describe('/rooms.markAsFavoriteMany', () => {
+		let publicChannel; let privateChannel;
+		it('create a public channel', (done) => {
+			createRoom({ type: 'c', name: `testeChannel${ + new Date() }` })
+				.end((err, res) => {
+					publicChannel = res.body.channel;
+					done();
+				});
+		});
+		it('create a private channel', (done) => {
+			createRoom({ type: 'p', name: `testPrivateChannel${ + new Date() }` })
+				.end((err, res) => {
+					privateChannel = res.body.group;
+					done();
+				});
+		});
+		it('/rooms.markAsFavorite', (done) => {
+			request.post(api('rooms.markAsFavoriteMany'))
+				.set(credentials)
+				.send({
+					rooms: [
+						{ roomName: publicChannel.name, favorite: true },
+						{ roomName: privateChannel.name, favorite: true },
+					],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
 				})
 				.end(done);
 		});

@@ -1144,6 +1144,77 @@ describe('[Channels]', function() {
 		});
 	});
 
+	describe('/channels.deleteMany:', () => {
+		let testChannel1;
+		let testChannel2;
+		it('/channels.create - 1', (done) => {
+			request.post(api('channels.create'))
+				.set(credentials)
+				.send({
+					name: `channel.test.${ Date.now() }`,
+				})
+				.end((err, res) => {
+					testChannel1 = res.body.channel;
+					done();
+				});
+		});
+		it('/channels.create - 2', (done) => {
+			request.post(api('channels.create'))
+				.set(credentials)
+				.send({
+					name: `channel.test.${ Date.now() }`,
+				})
+				.end((err, res) => {
+					testChannel2 = res.body.channel;
+					done();
+				});
+		});
+		it('/channels.deleteMany', (done) => {
+			request.post(api('channels.deleteMany'))
+				.set(credentials)
+				.send({
+					channels: [
+						{ roomName: testChannel1.name },
+						{ roomId: testChannel2._id },
+					],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('/channels.info - 1', (done) => {
+			request.get(api('channels.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel1._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-not-found');
+				})
+				.end(done);
+		});
+		it('/channels.info - 2', (done) => {
+			request.get(api('channels.info'))
+				.set(credentials)
+				.query({
+					roomId: testChannel2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-not-found');
+				})
+				.end(done);
+		});
+	});
+
 	describe('/channels.getAllUserMentionsByChannel', () => {
 		it('should return and array of mentions by channel', (done) => {
 			request.get(api('channels.getAllUserMentionsByChannel'))

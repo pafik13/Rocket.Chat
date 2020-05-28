@@ -277,15 +277,17 @@ API.v1.addRoute('rooms.uploadAvatar/:rid', { authRequired: true }, {
 	},
 });
 
+const saveNotifications = (userId, notifications, roomId) => {
+	Object.keys(notifications).forEach((notificationKey) =>
+		Meteor.runAsUser(userId, () =>
+			Meteor.call('saveNotificationSettings', roomId, notificationKey, notifications[notificationKey])
+		)
+	);
+};
+
 API.v1.addRoute('rooms.saveNotification', { authRequired: true }, {
 	post() {
-		const saveNotifications = (notifications, roomId) => {
-			Object.keys(notifications).forEach((notificationKey) =>
-				Meteor.runAsUser(this.userId, () =>
-					Meteor.call('saveNotificationSettings', roomId, notificationKey, notifications[notificationKey])
-				)
-			);
-		};
+
 		const { roomId, notifications } = this.bodyParams;
 
 		if (!roomId) {
@@ -296,7 +298,40 @@ API.v1.addRoute('rooms.saveNotification', { authRequired: true }, {
 			return API.v1.failure('The \'notifications\' param is required');
 		}
 
-		saveNotifications(notifications, roomId);
+		saveNotifications(this.userId, notifications, roomId);
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('rooms.saveNotificationMany', { authRequired: true }, {
+	post() {
+
+		const { rooms } = this.bodyParams;
+
+		if (!rooms) {
+			return API.v1.failure('The \'rooms\' param is required');
+		}
+
+		if (!Array.isArray(rooms)) {
+			return API.v1.failure('The \'rooms\' must be an array');
+		}
+
+		for (let r = 0; r < rooms.length; r++) {
+			const item = rooms[r];
+			const { roomId, notifications } = item;
+
+
+			if (!roomId) {
+				return API.v1.failure('The \'roomId\' param is required');
+			}
+
+			if (!notifications || Object.keys(notifications).length === 0) {
+				return API.v1.failure('The \'notifications\' param is required');
+			}
+
+			saveNotifications(this.userId, notifications, roomId);
+		}
 
 		return API.v1.success();
 	},
@@ -333,6 +368,45 @@ API.v1.addRoute('rooms.favorite', { authRequired: true }, {
 		const room = findRoomByIdOrName({ params: this.bodyParams });
 
 		Meteor.runAsUser(this.userId, () => Meteor.call('toggleFavorite', room._id, favorite));
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('rooms.markAsFavorite', { authRequired: true }, {
+	post() {
+		const { favorite } = this.bodyParams;
+
+		if (!this.bodyParams.hasOwnProperty('favorite')) {
+			return API.v1.failure('The \'favorite\' param is required');
+		}
+
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		Meteor.runAsUser(this.userId, () => Meteor.call('toggleFavorite', room._id, favorite));
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('rooms.markAsFavoriteMany', { authRequired: true }, {
+	post() {
+		const { rooms } = this.bodyParams;
+
+		if (!rooms) {
+			return API.v1.failure('The \'rooms\' param is required');
+		}
+
+		if (!Array.isArray(rooms)) {
+			return API.v1.failure('The \'rooms\' must be an array');
+		}
+
+		for (let r = 0; r < rooms.length; r++) {
+			const item = rooms[r];
+			const room = findRoomByIdOrName({ params: item });
+
+			Meteor.runAsUser(this.userId, () => Meteor.call('toggleFavorite', room._id, item.favorite));
+		}
 
 		return API.v1.success();
 	},
@@ -495,6 +569,32 @@ API.v1.addRoute('rooms.delete', { authRequired: true }, {
 		return API.v1.success();
 	},
 });
+
+API.v1.addRoute('rooms.deleteMany', { authRequired: true }, {
+	post() {
+		const { rooms } = this.bodyParams;
+
+		if (!rooms) {
+			return API.v1.failure('The \'rooms\' param is required');
+		}
+
+		if (!Array.isArray(rooms)) {
+			return API.v1.failure('The \'rooms\' must be an array');
+		}
+
+		for (let r = 0; r < rooms.length; r++) {
+			const item = rooms[r];
+			const room = findRoomByIdOrName({ params: item });
+
+			Meteor.runAsUser(this.userId, () => {
+				Meteor.call('eraseRoom', room._id);
+			});
+		}
+
+		return API.v1.success();
+	},
+});
+
 
 API.v1.addRoute('rooms.deleteFileMessage', { authRequired: true }, {
 	post() {

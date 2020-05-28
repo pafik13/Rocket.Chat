@@ -1036,6 +1036,77 @@ describe('[Groups]', function() {
 		});
 	});
 
+	describe('/groups.deleteMany', () => {
+		let testGroup1;
+		let testGroup2;
+		it('/groups.create - 1', (done) => {
+			request.post(api('groups.create'))
+				.set(credentials)
+				.send({
+					name: `group.test.${ Date.now() }`,
+				})
+				.end((err, res) => {
+					testGroup1 = res.body.group;
+					done();
+				});
+		});
+		it('/groups.create - 2', (done) => {
+			request.post(api('groups.create'))
+				.set(credentials)
+				.send({
+					name: `group.test.${ Date.now() }`,
+				})
+				.end((err, res) => {
+					testGroup2 = res.body.group;
+					done();
+				});
+		});
+		it('/groups.deleteMany', (done) => {
+			request.post(api('groups.deleteMany'))
+				.set(credentials)
+				.send({
+					groups: [
+						{ roomName: testGroup1.name },
+						{ roomId: testGroup2._id },
+					],
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('/groups.info - 1', (done) => {
+			request.get(api('groups.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-not-found');
+				})
+				.end(done);
+		});
+		it('/groups.info - 2', (done) => {
+			request.get(api('groups.info'))
+				.set(credentials)
+				.query({
+					roomId: testGroup2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-not-found');
+				})
+				.end(done);
+		});
+	});
+
 	describe('/groups.roles', () => {
 		let testGroup;
 		it('/groups.create', (done) => {

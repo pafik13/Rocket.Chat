@@ -426,7 +426,6 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 	},
 });
 
-
 API.v1.addRoute('channels.delete', { authRequired: true }, {
 	post() {
 		const findResult = findChannelByIdOrName({ params: this.requestParams(), checkedArchived: false });
@@ -434,6 +433,31 @@ API.v1.addRoute('channels.delete', { authRequired: true }, {
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('eraseRoom', findResult._id);
 		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('channels.deleteMany', { authRequired: true }, {
+	post() {
+		const { channels } = this.requestParams();
+
+		if (!channels) {
+			return API.v1.failure('The \'channels\' param is required');
+		}
+
+		if (!Array.isArray(channels)) {
+			return API.v1.failure('The \'channels\' must be an array');
+		}
+
+		for (let i = 0; i < channels.length; i++) {
+			const item = channels[i];
+			const findResult = findChannelByIdOrName({ params: item, checkedArchived: false });
+
+			Meteor.runAsUser(this.userId, () => {
+				Meteor.call('eraseRoom', findResult._id);
+			});
+		}
 
 		return API.v1.success();
 	},
