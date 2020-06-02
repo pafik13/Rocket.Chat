@@ -303,4 +303,4 @@ async function sendAllNotifications(message, room) {
 
 callbacks.add('afterSaveMessage', (message, room) => Promise.await(sendAllNotifications(message, room)), callbacks.priority.LOW, 'sendNotificationsOnMessage');
 
-export { sendNotification, sendAllNotifications };
+export { sendNotification, sendAllNotifications, project, lookup, filter };

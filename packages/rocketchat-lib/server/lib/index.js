@@ -6,6 +6,7 @@
 	library files.
 */
 export { sendNotification } from './sendNotificationsOnMessage';
+export { notifyUser } from './sendNotificationOnInviteOrKick';
 export { hostname } from '../../lib/startup/settingsOnLoadSiteUrl';
 export { passwordPolicy } from './passwordPolicy';
 export { validateEmailDomain } from './validateEmailDomain';
