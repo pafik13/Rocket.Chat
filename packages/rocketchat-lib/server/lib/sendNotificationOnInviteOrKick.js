@@ -1,4 +1,3 @@
-import { MessageTypes } from 'meteor/rocketchat:ui-utils';
 import { TAPi18n } from 'meteor/tap:i18n';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
@@ -12,9 +11,6 @@ async function notifyUser(subscriptionId, sender, message, room) {
 	const mentionIds = [];
 	const hasMentionToAll = false;
 	const hasMentionToHere = false;
-
-	const messageType = MessageTypes.getType(message);
-	const data = (typeof messageType.data === 'function' && messageType.data(message)) || {};
 
 	// Don't fetch all users if room exceeds max members
 	const maxMembersForNotification = settings.get('Notifications_Max_Room_Members');
@@ -44,13 +40,15 @@ async function notifyUser(subscriptionId, sender, message, room) {
 		// load one document from the resultset into memory
 		const subscription = await cursor.next();
 		logger.debug('subscription', subscription);
+		const userLng = subscription.receiver.language;
+		const room_type_name = room.t === 'c' ? TAPi18n.__('channel', {}, userLng) : TAPi18n.__('group', {}, userLng);
 		await sendNotification({
 			subscription,
 			sender,
 			hasMentionToAll,
 			hasMentionToHere,
 			message,
-			notificationMessage: TAPi18n.__(messageType.message, data, subscription.receiver.language),
+			notificationMessage: TAPi18n.__('You_are_invited_to_room', { room_type_name }, userLng),
 			room,
 			mentionIds,
 			disableAllMessageNotifications,
