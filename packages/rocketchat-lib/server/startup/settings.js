@@ -319,6 +319,16 @@ settings.addGroup('Accounts', function() {
 			public: true,
 			i18nLabel: 'Hide_Avatars',
 		});
+		this.add('Accounts_Default_User_Preferences_isRoomInviteAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Room_Invite_Allowed',
+		});
+		this.add('Accounts_Default_User_Preferences_isDirectMessagesAllowed', true, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Direct_Messages_Allowed',
+		});
 		this.add('Accounts_Default_User_Preferences_uploadsState', 'acceptedAll', {
 			type: 'select',
 			values: [

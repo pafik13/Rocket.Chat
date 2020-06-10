@@ -160,6 +160,8 @@ Template.accountPreferences.onCreated(function() {
 		data.messageViewMode = parseInt($('#messageViewMode').find('select').val());
 		data.hideFlexTab = JSON.parse($('#hideFlexTab').find('input:checked').val());
 		data.hideAvatars = JSON.parse($('#hideAvatars').find('input:checked').val());
+		data.isRoomInviteAllowed = JSON.parse($('#isRoomInviteAllowed').find('input:checked').val());
+		data.isDirectMessagesAllowed = JSON.parse($('#isDirectMessagesAllowed').find('input:checked').val());
 		data.uploadsState = $('select[name=uploadsState]').val();
 		data.isImageFilesAllowed = JSON.parse($('#isImageFilesAllowed').find('input:checked').val());
 		data.isAudioFilesAllowed = JSON.parse($('#isAudioFilesAllowed').find('input:checked').val());

@@ -85,7 +85,13 @@ Template.sidebarItem.onCreated(function() {
 			return this.renderedMessage = '******';
 		}
 
-		const otherUser = settings.get('UI_Use_Real_Name') ? currentData.lastMessage.u.name || currentData.lastMessage.u.username : currentData.lastMessage.u.username;
+		let otherUser = 'otherUser';
+		try {
+			otherUser = settings.get('UI_Use_Real_Name') ? currentData.lastMessage.u.name || currentData.lastMessage.u.username : currentData.lastMessage.u.username;
+		} catch (err) {
+			console.error(err);
+			console.log(currentData);
+		}
 		const renderedMessage = renderMessageBody(currentData.lastMessage).replace(/<br\s?\\?>/g, ' ');
 		const sender = this.user._id === currentData.lastMessage.u._id ? t('You') : otherUser;
 

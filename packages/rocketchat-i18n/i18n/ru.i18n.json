@@ -1564,6 +1564,8 @@
   "IRC_Port": "Порт для привязки к серверу IRC.",
   "IRC_Private_Message": "Вывод команды PRIVMSG",
   "IRC_Quit": "Вывод после закрытия сеанса IRC.",
+  "Is_Room_Invite_Allowed": "Разрешено ли приглашать в чаты?",
+  "Is_Direct_Messages_Allowed": "Разрешено ли незнакомым начинать диалог?",
   "Is_Image_Files_Allowed": "Разрешены ли изображения в личной переписке?",
   "Is_Audio_Files_Allowed": "Разрешены ли аудио-файлы в личной переписке?",
   "Is_Video_Files_Allowed": "Разрешены ли видео-файлы в личной переписке?",

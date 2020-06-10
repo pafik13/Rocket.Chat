@@ -1620,6 +1620,8 @@
   "IRC_Port": "The port to bind to on the IRC host server.",
   "IRC_Private_Message": "Output of the PRIVMSG command.",
   "IRC_Quit": "Output upon quitting an IRC session.",
+  "Is_Room_Invite_Allowed": "Is room invite allowed?",
+  "Is_Direct_Messages_Allowed": "Is direct messages allowed?",
   "Is_Image_Files_Allowed": "Is image files allowed in direct?",
   "Is_Audio_Files_Allowed": "Is audio files allowed in direct?",
   "Is_Video_Files_Allowed": "Is video files allowed in direct?",

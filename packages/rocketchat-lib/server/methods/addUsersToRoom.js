@@ -69,7 +69,9 @@ Meteor.methods({
 		// Validate each user, then add to room
 		const user = Meteor.user();
 		data.users.forEach((username) => {
-			const newUser = Users.findOneByUsername(username);
+			const newUser = Users.findOneByUsername(username, {
+				fields: { username: 1, name: 1, active: 1, 'settings.preferences': 1 },
+			});
 			if (!newUser) {
 				throw new Meteor.Error('error-invalid-username', 'Invalid username', {
 					method: 'addUsersToRoom',
@@ -79,6 +81,14 @@ Meteor.methods({
 				throw new Meteor.Error('error-user-is-banned', 'Banned user', {
 					method: 'addUsersToRoom',
 				});
+			}
+			if (newUser.settings && newUser.settings.preferences) {
+				const { isRoomInviteAllowed } = newUser.settings.preferences;
+				if (typeof isRoomInviteAllowed === 'boolean' && !isRoomInviteAllowed) {
+					throw new Meteor.Error('error-user-disallow-invite', 'Disallow invite', {
+						method: 'addUsersToRoom',
+					});
+				}
 			}
 			addUserToRoom(data.rid, newUser, user);
 		});
