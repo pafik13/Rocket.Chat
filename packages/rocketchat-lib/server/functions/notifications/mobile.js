@@ -86,10 +86,13 @@ export function shouldNotifyMobile({
 	}
 
 	if (!mobilePushNotifications) {
-		if (settings.get('Accounts_Default_User_Preferences_mobileNotifications') === 'all') {
+		const roomTypeName = roomTypes.getRoomTypeName(roomType);
+		const settingKey = `Accounts_Default_User_Preferences_mobileNotifications${ roomTypeName }`;
+		const settingVal = settings.get(settingKey);
+		if (settingVal === 'all') {
 			return true;
 		}
-		if (settings.get('Accounts_Default_User_Preferences_mobileNotifications') === 'nothing') {
+		if (settingVal === 'nothing') {
 			return false;
 		}
 	}

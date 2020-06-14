@@ -102,26 +102,74 @@
 								{{/if}}
 							</div>
 						</div>
-						<div class="input-line double-col" id="desktopNotifications">
-							<label class="setting-label">{{_ "Notification_Desktop_Default_For"}}</label>
+						<div class="input-line double-col" id="desktopNotificationsChannels">
+							<label class="setting-label">{{_ "Notification_Desktop_Default_Channels_For"}}</label>
 							<div class="rc-select setting-field">
-								<select class="input-monitor rc-select__element" name="desktopNotifications">
-									<option value="default" selected="{{selected 'desktopNotifications' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultDesktopNotification}})</option>
-									<option value="all" selected="{{selected 'desktopNotifications' 'all' 'default'}}">{{_ "All_messages"}}</option>
-									<option value="mentions" selected="{{selected 'desktopNotifications' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
-									<option value="nothing" selected="{{selected 'desktopNotifications' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								<select class="input-monitor rc-select__element" name="desktopNotificationsChannels">
+									<option value="default" selected="{{selected 'desktopNotificationsChannels' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultDesktopNotificationChannels}})</option>
+									<option value="all" selected="{{selected 'desktopNotificationsChannels' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'desktopNotificationsChannels' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'desktopNotificationsChannels' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
 								</select>
 								{{> icon block="rc-select__arrow" icon="arrow-down" }}
 							</div>
 						</div>
-						<div class="input-line double-col" id="mobileNotifications">
-							<label class="setting-label">{{_ "Notification_Mobile_Default_For"}}</label>
+						<div class="input-line double-col" id="desktopNotificationsGroups">
+							<label class="setting-label">{{_ "Notification_Desktop_Default_Groups_For"}}</label>
 							<div class="rc-select setting-field">
-								<select class="input-monitor rc-select__element" name="mobileNotifications">
-									<option value="default" selected="{{selected 'mobileNotifications' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultMobileNotification}})</option>
-									<option value="all" selected="{{selected 'mobileNotifications' 'all' 'default'}}">{{_ "All_messages"}}</option>
-									<option value="mentions" selected="{{selected 'mobileNotifications' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
-									<option value="nothing" selected="{{selected 'mobileNotifications' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								<select class="input-monitor rc-select__element" name="desktopNotificationsGroups">
+									<option value="default" selected="{{selected 'desktopNotificationsGroups' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultDesktopNotificationGroups}})</option>
+									<option value="all" selected="{{selected 'desktopNotificationsGroups' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'desktopNotificationsGroups' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'desktopNotificationsGroups' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								</select>
+								{{> icon block="rc-select__arrow" icon="arrow-down" }}
+							</div>
+						</div>
+						<div class="input-line double-col" id="desktopNotificationsDirects">
+							<label class="setting-label">{{_ "Notification_Desktop_Default_Directs_For"}}</label>
+							<div class="rc-select setting-field">
+								<select class="input-monitor rc-select__element" name="desktopNotificationsDirects">
+									<option value="default" selected="{{selected 'desktopNotificationsDirects' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultDesktopNotificationDirects}})</option>
+									<option value="all" selected="{{selected 'desktopNotificationsDirects' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'desktopNotificationsDirects' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'desktopNotificationsDirects' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								</select>
+								{{> icon block="rc-select__arrow" icon="arrow-down" }}
+							</div>
+						</div>
+						<div class="input-line double-col" id="mobileNotificationsChannels">
+							<label class="setting-label">{{_ "Notification_Mobile_Default_Channels_For"}}</label>
+							<div class="rc-select setting-field">
+								<select class="input-monitor rc-select__element" name="mobileNotificationsChannels">
+									<option value="default" selected="{{selected 'mobileNotificationsChannels' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultMobileNotificationChannels}})</option>
+									<option value="all" selected="{{selected 'mobileNotificationsChannels' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'mobileNotificationsChannels' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'mobileNotificationsChannels' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								</select>
+								{{> icon block="rc-select__arrow" icon="arrow-down" }}
+							</div>
+						</div>
+						<div class="input-line double-col" id="mobileNotificationsGroups">
+							<label class="setting-label">{{_ "Notification_Mobile_Default_Groups_For"}}</label>
+							<div class="rc-select setting-field">
+								<select class="input-monitor rc-select__element" name="mobileNotificationsGroups">
+									<option value="default" selected="{{selected 'mobileNotificationsGroups' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultMobileNotificationGroups}})</option>
+									<option value="all" selected="{{selected 'mobileNotificationsGroups' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'mobileNotificationsGroups' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'mobileNotificationsGroups' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
+								</select>
+								{{> icon block="rc-select__arrow" icon="arrow-down" }}
+							</div>
+						</div>
+						<div class="input-line double-col" id="mobileNotificationsDirects">
+							<label class="setting-label">{{_ "Notification_Mobile_Default_Directs_For"}}</label>
+							<div class="rc-select setting-field">
+								<select class="input-monitor rc-select__element" name="mobileNotificationsDirects">
+									<option value="default" selected="{{selected 'mobileNotificationsDirects' 'default' 'default'}}">{{_ "Default"}} ({{_ defaultMobileNotificationDirects}})</option>
+									<option value="all" selected="{{selected 'mobileNotificationsDirects' 'all' 'default'}}">{{_ "All_messages"}}</option>
+									<option value="mentions" selected="{{selected 'mobileNotificationsDirects' 'mentions' 'default'}}">{{_ "Mentions"}}</option>
+									<option value="nothing" selected="{{selected 'mobileNotificationsDirects' 'nothing' 'default'}}">{{_ "Nothing"}}</option>
 								</select>
 								{{> icon block="rc-select__arrow" icon="arrow-down" }}
 							</div>

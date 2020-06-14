@@ -17,8 +17,12 @@ Meteor.methods({
 			emailNotificationMode: Match.Optional(String),
 			unreadAlert: Match.Optional(Boolean),
 			notificationsSoundVolume: Match.Optional(Number),
-			desktopNotifications: Match.Optional(String),
-			mobileNotifications: Match.Optional(String),
+			desktopNotificationsChannels: Match.Optional(String),
+			mobileNotificationsGroups: Match.Optional(String),
+			desktopNotificationsDirects: Match.Optional(String),
+			mobileNotificationsChannels: Match.Optional(String),
+			desktopNotificationsGroups: Match.Optional(String),
+			mobileNotificationsDirects: Match.Optional(String),
 			enableAutoAway: Match.Optional(Boolean),
 			highlights: Match.Optional([String]),
 			desktopNotificationDuration: Match.Optional(Number),
@@ -50,8 +54,12 @@ Meteor.methods({
 		}
 
 		const {
-			desktopNotifications: oldDesktopNotifications,
-			mobileNotifications: oldMobileNotifications,
+			desktopNotificationsChannels: oldDesktopNotificationsChannels,
+			mobileNotificationsChannels: oldMobileNotificationsChannels,
+			desktopNotificationsGroups: oldDesktopNotificationsGroups,
+			mobileNotificationsGroups: oldMobileNotificationsGroups,
+			desktopNotificationsDirects: oldDesktopNotificationsDirects,
+			mobileNotificationsDirects: oldMobileNotificationsDirects,
 			emailNotificationMode: oldEmailNotifications,
 		} = (user.settings && user.settings.preferences) || {};
 
@@ -78,19 +86,51 @@ Meteor.methods({
 
 		// propagate changed notification preferences
 		Meteor.defer(() => {
-			if (settings.desktopNotifications && oldDesktopNotifications !== settings.desktopNotifications) {
-				if (settings.desktopNotifications === 'default') {
-					Subscriptions.clearDesktopNotificationUserPreferences(user._id);
+			if (settings.desktopNotificationsChannels && oldDesktopNotificationsChannels !== settings.desktopNotificationsChannels) {
+				if (settings.desktopNotificationsChannels === 'default') {
+					Subscriptions.clearDesktopNotificationUserPreferences(user._id, 'c');
 				} else {
-					Subscriptions.updateDesktopNotificationUserPreferences(user._id, settings.desktopNotifications);
+					Subscriptions.updateDesktopNotificationUserPreferences(user._id, settings.desktopNotificationsChannels, 'c');
 				}
 			}
 
-			if (settings.mobileNotifications && oldMobileNotifications !== settings.mobileNotifications) {
-				if (settings.mobileNotifications === 'default') {
-					Subscriptions.clearMobileNotificationUserPreferences(user._id);
+			if (settings.mobileNotificationsChannels && oldMobileNotificationsChannels !== settings.mobileNotificationsChannels) {
+				if (settings.mobileNotificationsChannels === 'default') {
+					Subscriptions.clearMobileNotificationUserPreferences(user._id, 'c');
 				} else {
-					Subscriptions.updateMobileNotificationUserPreferences(user._id, settings.mobileNotifications);
+					Subscriptions.updateMobileNotificationUserPreferences(user._id, settings.mobileNotificationsChannels, 'c');
+				}
+			}
+
+			if (settings.desktopNotificationsGroups && oldDesktopNotificationsGroups !== settings.desktopNotificationsGroups) {
+				if (settings.desktopNotificationsGroups === 'default') {
+					Subscriptions.clearDesktopNotificationUserPreferences(user._id, 'p');
+				} else {
+					Subscriptions.updateDesktopNotificationUserPreferences(user._id, settings.desktopNotificationsGroups, 'p');
+				}
+			}
+
+			if (settings.mobileNotificationsGroups && oldMobileNotificationsGroups !== settings.mobileNotificationsGroups) {
+				if (settings.mobileNotificationsGroups === 'default') {
+					Subscriptions.clearMobileNotificationUserPreferences(user._id, 'p');
+				} else {
+					Subscriptions.updateMobileNotificationUserPreferences(user._id, settings.mobileNotificationsGroups, 'p');
+				}
+			}
+
+			if (settings.desktopNotificationsDirects && oldDesktopNotificationsDirects !== settings.desktopNotificationsDirects) {
+				if (settings.desktopNotificationsDirects === 'default') {
+					Subscriptions.clearDesktopNotificationUserPreferences(user._id);
+				} else {
+					Subscriptions.updateDesktopNotificationUserPreferences(user._id, settings.desktopNotificationsDirects);
+				}
+			}
+
+			if (settings.mobileNotificationsDirects && oldMobileNotificationsDirects !== settings.mobileNotificationsDirects) {
+				if (settings.mobileNotificationsDirects === 'default') {
+					Subscriptions.clearMobileNotificationUserPreferences(user._id, 'd');
+				} else {
+					Subscriptions.updateMobileNotificationUserPreferences(user._id, settings.mobileNotificationsDirects, 'd');
 				}
 			}
 

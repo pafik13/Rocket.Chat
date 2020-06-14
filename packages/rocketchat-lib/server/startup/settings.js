@@ -233,7 +233,7 @@ settings.addGroup('Accounts', function() {
 			],
 			public: true,
 		});
-		this.add('Accounts_Default_User_Preferences_desktopNotifications', 'mentions', {
+		this.add('Accounts_Default_User_Preferences_desktopNotificationsChannels', 'all', {
 			type: 'select',
 			values: [
 				{
@@ -251,7 +251,79 @@ settings.addGroup('Accounts', function() {
 			],
 			public: true,
 		});
-		this.add('Accounts_Default_User_Preferences_mobileNotifications', 'mentions', {
+		this.add('Accounts_Default_User_Preferences_mobileNotificationsChannels', 'all', {
+			type: 'select',
+			values: [
+				{
+					key : 'all',
+					i18nLabel : 'All_messages',
+				},
+				{
+					key : 'mentions',
+					i18nLabel : 'Mentions',
+				},
+				{
+					key : 'nothing',
+					i18nLabel : 'Nothing',
+				},
+			],
+			public: true,
+		});
+		this.add('Accounts_Default_User_Preferences_desktopNotificationsGroups', 'all', {
+			type: 'select',
+			values: [
+				{
+					key: 'all',
+					i18nLabel: 'All_messages',
+				},
+				{
+					key: 'mentions',
+					i18nLabel: 'Mentions',
+				},
+				{
+					key: 'nothing',
+					i18nLabel: 'Nothing',
+				},
+			],
+			public: true,
+		});
+		this.add('Accounts_Default_User_Preferences_mobileNotificationsGroups', 'all', {
+			type: 'select',
+			values: [
+				{
+					key : 'all',
+					i18nLabel : 'All_messages',
+				},
+				{
+					key : 'mentions',
+					i18nLabel : 'Mentions',
+				},
+				{
+					key : 'nothing',
+					i18nLabel : 'Nothing',
+				},
+			],
+			public: true,
+		});
+		this.add('Accounts_Default_User_Preferences_desktopNotificationsDirects', 'all', {
+			type: 'select',
+			values: [
+				{
+					key: 'all',
+					i18nLabel: 'All_messages',
+				},
+				{
+					key: 'mentions',
+					i18nLabel: 'Mentions',
+				},
+				{
+					key: 'nothing',
+					i18nLabel: 'Nothing',
+				},
+			],
+			public: true,
+		});
+		this.add('Accounts_Default_User_Preferences_mobileNotificationsDirects', 'all', {
 			type: 'select',
 			values: [
 				{

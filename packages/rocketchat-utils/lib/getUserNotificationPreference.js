@@ -1,15 +1,17 @@
 import { settings } from 'meteor/rocketchat:settings';
 import { Users } from 'meteor/rocketchat:models';
+import { roomTypes } from 'meteor/rocketchat:utils';
 
-export const getUserNotificationPreference = (user, pref) => {
+export const getUserNotificationPreference = (user, pref, roomType) => {
 	if (typeof user === 'string') {
 		user = Users.findOneById(user);
 	}
 
 	let preferenceKey;
+	const roomTypeName = roomTypes.getRoomTypeName(roomType);
 	switch (pref) {
-		case 'desktop': preferenceKey = 'desktopNotifications'; break;
-		case 'mobile': preferenceKey = 'mobileNotifications'; break;
+		case 'desktop': preferenceKey = `desktopNotifications${ roomTypeName }`; break;
+		case 'mobile': preferenceKey = `mobileNotifications${ roomTypeName }`; break;
 		case 'email': preferenceKey = 'emailNotificationMode'; break;
 	}
 

@@ -450,8 +450,12 @@ API.v1.addRoute('users.setPreferences', { authRequired: true }, {
 				emailNotificationMode: Match.Maybe(String),
 				unreadAlert: Match.Maybe(Boolean),
 				notificationsSoundVolume: Match.Maybe(Number),
-				desktopNotifications: Match.Maybe(String),
-				mobileNotifications: Match.Maybe(String),
+				desktopNotificationsChannels: Match.Maybe(String),
+				mobileNotificationsChannels: Match.Maybe(String),
+				desktopNotificationsGroups: Match.Maybe(String),
+				mobileNotificationsGroups: Match.Maybe(String),
+				desktopNotificationsDirects: Match.Maybe(String),
+				mobileNotificationsDirects: Match.Maybe(String),
 				enableAutoAway: Match.Maybe(Boolean),
 				highlights: Match.Maybe(Array),
 				desktopNotificationDuration: Match.Maybe(Number),
@@ -474,6 +478,8 @@ API.v1.addRoute('users.setPreferences', { authRequired: true }, {
 				sidebarHideAvatar: Match.Optional(Boolean),
 				sidebarGroupByType: Match.Optional(Boolean),
 				muteFocusedConversations: Match.Optional(Boolean),
+				isDirectMessagesAllowed: Match.Optional(Boolean),
+				isRoomInviteAllowed: Match.Optional(Boolean),
 			}),
 		});
 		const userId = this.bodyParams.userId ? this.bodyParams.userId : this.userId;

@@ -2,6 +2,13 @@ import { Meteor } from 'meteor/meteor';
 import { RoomTypesCommon } from '../../lib/RoomTypesCommon';
 
 export const roomTypes = new class roomTypesServer extends RoomTypesCommon {
+	getRoomTypeName(roomType) {
+		switch (roomType) {
+			case 'd': return 'Directs';
+			case 'p': return 'Groups';
+			case 'c': return 'Channels';
+		}
+	}
 	/**
 	 * Add a publish for a room type
 	 *

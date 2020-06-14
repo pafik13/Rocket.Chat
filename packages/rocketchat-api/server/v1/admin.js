@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Match, check } from 'meteor/check';
 import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { hasRole } from 'meteor/rocketchat:authorization';
@@ -6,6 +7,7 @@ import { API } from '../api';
 import * as heapdump from 'heapdump';
 import { existsSync, mkdirSync } from 'fs';
 import { elastic } from 'meteor/rocketchat:utils';
+import { settings } from 'meteor/rocketchat:settings';
 
 API.v1.addRoute('admin.truncateSubscriptions', { authRequired: true }, {
 	post() {
@@ -258,6 +260,91 @@ API.v1.addRoute('admin.createHeapdump', { authRequired: true }, {
 				console.log('dump written to', location);
 				return API.v1.success();
 			}
+		});
+	},
+});
+
+
+API.v1.addRoute('admin.setUserNotificationsPreference', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+		const params = this.requestParams();
+		check(params, Match.ObjectIncluding({
+			userId: Match.Maybe(String),
+			username: Match.Maybe(String),
+			isChannelNotificationsEnabled: Match.Maybe(Boolean),
+			isGroupNotificationsEnabled: Match.Maybe(Boolean),
+			isDirectNotificationsEnabled: Match.Maybe(Boolean),
+		}),
+		);
+		const { userId, username, isChannelNotificationsEnabled, isGroupNotificationsEnabled, isDirectNotificationsEnabled } = params;
+		if (!userId && !username) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId` or `username`!');
+		}
+		if (typeof isChannelNotificationsEnabled === 'undefined' && typeof isGroupNotificationsEnabled === 'undefined' && typeof isDirectNotificationsEnabled === 'undefined') {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `isChannelNotificationsEnabled` or `isGroupNotificationsEnabled` or `isGroupNotificationsEnabled`!');
+		}
+
+		let user;
+		if (userId) {
+			user = Users.findOneById(userId, {
+				fields: {
+					_id: 1,
+				},
+			});
+		} else {
+			user = Users.findOneByUsername(username, {
+				fields: {
+					_id: 1,
+				},
+			});
+		}
+
+		const userData = {};
+		if (typeof isChannelNotificationsEnabled === 'boolean') {
+			const value = isChannelNotificationsEnabled ? 'all' : 'nothing';
+			const desktopGlobalDefault = settings.get('Accounts_Default_User_Preferences_desktopNotificationsChannels');
+			const mobileGlobalDefault = settings.get('Accounts_Default_User_Preferences_mobileNotificationsChannels');
+
+			userData.desktopNotificationsChannels = value === desktopGlobalDefault ? 'default' : value;
+			userData.mobileNotificationsChannels = value === mobileGlobalDefault ? 'default' : value;
+		}
+		if (typeof isGroupNotificationsEnabled === 'boolean') {
+			const value = isGroupNotificationsEnabled ? 'all' : 'nothing';
+			const desktopGlobalDefault = settings.get('Accounts_Default_User_Preferences_desktopNotificationsGroups');
+			const mobileGlobalDefault = settings.get('Accounts_Default_User_Preferences_mobileNotificationsGroups');
+
+			userData.desktopNotificationsGroups = value === desktopGlobalDefault ? 'default' : value;
+			userData.mobileNotificationsGroups = value === mobileGlobalDefault ? 'default' : value;
+		}
+		if (typeof isDirectNotificationsEnabled === 'boolean') {
+			const value = isDirectNotificationsEnabled ? 'all' : 'nothing';
+			const desktopGlobalDefault = settings.get('Accounts_Default_User_Preferences_desktopNotificationsDirects');
+			const mobileGlobalDefault = settings.get('Accounts_Default_User_Preferences_mobileNotificationsDirects');
+
+			userData.desktopNotificationsDirects = value === desktopGlobalDefault ? 'default' : value;
+			userData.mobileNotificationsDirects = value === mobileGlobalDefault ? 'default' : value;
+		}
+		Meteor.runAsUser(user._id, () => Meteor.call('saveUserPreferences', userData));
+		user = Users.findOneById(user._id, {
+			fields: {
+				'settings.preferences': 1,
+				language: 1,
+			},
+		});
+
+		return API.v1.success({
+			user: {
+				_id: user._id,
+				settings: {
+					preferences: {
+						...user.settings.preferences,
+						language: user.language,
+					},
+				},
+			},
 		});
 	},
 });

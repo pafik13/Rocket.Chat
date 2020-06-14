@@ -92,11 +92,23 @@ Template.accountPreferences.helpers({
 	defaultIdleTimeLimit() {
 		return settings.get('Accounts_Default_User_Preferences_idleTimeLimit');
 	},
-	defaultDesktopNotification() {
-		return notificationLabels[settings.get('Accounts_Default_User_Preferences_desktopNotifications')];
+	defaultDesktopNotificationChannels() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_desktopNotificationsChannels')];
 	},
-	defaultMobileNotification() {
-		return notificationLabels[settings.get('Accounts_Default_User_Preferences_mobileNotifications')];
+	defaultDesktopNotificationGroups() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_desktopNotificationsGroups')];
+	},
+	defaultDesktopNotificationDirects() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_desktopNotificationsDirects')];
+	},
+	defaultMobileNotificationChannels() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_mobileNotificationsChannels')];
+	},
+	defaultMobileNotificationGroups() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_mobileNotificationsGroups')];
+	},
+	defaultMobileNotificationDirects() {
+		return notificationLabels[settings.get('Accounts_Default_User_Preferences_mobileNotificationsDirects')];
 	},
 	defaultEmailNotification() {
 		return emailLabels[settings.get('Accounts_Default_User_Preferences_emailNotificationMode')];
@@ -171,8 +183,12 @@ Template.accountPreferences.onCreated(function() {
 		data.autoImageLoad = JSON.parse($('input[name=autoImageLoad]:checked').val());
 		data.emailNotificationMode = $('select[name=emailNotificationMode]').val();
 		data.desktopNotificationDuration = $('input[name=desktopNotificationDuration]').val() === '' ? settings.get('Accounts_Default_User_Preferences_desktopNotificationDuration') : parseInt($('input[name=desktopNotificationDuration]').val());
-		data.desktopNotifications = $('#desktopNotifications').find('select').val();
-		data.mobileNotifications = $('#mobileNotifications').find('select').val();
+		data.desktopNotificationsChannels = $('#desktopNotificationsChannels').find('select').val();
+		data.mobileNotificationsChannels = $('#mobileNotificationsChannels').find('select').val();
+		data.desktopNotificationsGroups = $('#desktopNotificationsGroups').find('select').val();
+		data.mobileNotificationsGroups = $('#mobileNotificationsGroups').find('select').val();
+		data.desktopNotificationsDirects = $('#desktopNotificationsDirects').find('select').val();
+		data.mobileNotificationsDirects = $('#mobileNotificationsDirects').find('select').val();
 		data.unreadAlert = JSON.parse($('#unreadAlert').find('input:checked').val());
 		data.notificationsSoundVolume = parseInt($('#notificationsSoundVolume').val());
 		data.roomCounterSidebar = JSON.parse($('#roomCounterSidebar').find('input:checked').val());

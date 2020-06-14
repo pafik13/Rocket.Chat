@@ -19,7 +19,7 @@ Meteor.methods({
 			desktopNotifications: {
 				updateMethod: (subscription, value) => {
 					if (value === 'default') {
-						const userPref = getUserNotificationPreference(Meteor.userId(), 'desktop');
+						const userPref = getUserNotificationPreference(Meteor.userId(), 'desktop', subscription.t);
 						Subscriptions.updateDesktopNotificationsById(subscription._id, userPref.origin === 'server' ? null : userPref);
 					} else {
 						Subscriptions.updateDesktopNotificationsById(subscription._id, { value, origin: 'subscription' });
@@ -29,7 +29,7 @@ Meteor.methods({
 			mobilePushNotifications: {
 				updateMethod: (subscription, value) => {
 					if (value === 'default') {
-						const userPref = getUserNotificationPreference(Meteor.userId(), 'mobile');
+						const userPref = getUserNotificationPreference(Meteor.userId(), 'mobile', subscription.t);
 						Subscriptions.updateMobilePushNotificationsById(subscription._id, userPref.origin === 'server' ? null : userPref);
 					} else {
 						Subscriptions.updateMobilePushNotificationsById(subscription._id, { value, origin: 'subscription' });
@@ -39,7 +39,7 @@ Meteor.methods({
 			emailNotifications: {
 				updateMethod: (subscription, value) => {
 					if (value === 'default') {
-						const userPref = getUserNotificationPreference(Meteor.userId(), 'email');
+						const userPref = getUserNotificationPreference(Meteor.userId(), 'email', subscription.t);
 						Subscriptions.updateEmailNotificationsById(subscription._id, userPref.origin === 'server' ? null : userPref);
 					} else {
 						Subscriptions.updateEmailNotificationsById(subscription._id, { value, origin: 'subscription' });

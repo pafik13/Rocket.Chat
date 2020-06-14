@@ -1,13 +1,13 @@
 import { settings } from 'meteor/rocketchat:settings';
+import { roomTypes } from 'meteor/rocketchat:utils';
 
-export const getDefaultSubscriptionPref = (userPref) => {
+export const getDefaultSubscriptionPref = (user, roomType) => {
 	const getDefaultValue = (key) => settings.get(`Accounts_Default_User_Preferences_${ key }`);
 
 	const subscription = {};
 
+	const preferences = (user.settings && user.settings.preferences) || {};
 	const {
-		desktopNotifications,
-		mobileNotifications,
 		emailNotificationMode,
 		highlights,
 		uploadsState,
@@ -15,17 +15,21 @@ export const getDefaultSubscriptionPref = (userPref) => {
 		isAudioFilesAllowed,
 		isVideoFilesAllowed,
 		isOtherFilesAllowed,
-	} = (userPref.settings && userPref.settings.preferences) || {};
+	} = preferences;
 
 	if (Array.isArray(highlights) && highlights.length) {
 		subscription.userHighlights = highlights;
 	}
 
+	const roomTypeName = roomTypes.getRoomTypeName(roomType);
+
+	const desktopNotifications = preferences[`desktopNotifications${ roomTypeName }`];
 	if (desktopNotifications && desktopNotifications !== 'default') {
 		subscription.desktopNotifications = desktopNotifications;
 		subscription.desktopPrefOrigin = 'user';
 	}
 
+	const mobileNotifications = preferences[`mobileNotifications${ roomTypeName }`];
 	if (mobileNotifications && mobileNotifications !== 'default') {
 		subscription.mobilePushNotifications = mobileNotifications;
 		subscription.mobilePrefOrigin = 'user';
@@ -36,34 +40,36 @@ export const getDefaultSubscriptionPref = (userPref) => {
 		subscription.emailPrefOrigin = 'user';
 	}
 
-	if (typeof isImageFilesAllowed !== 'undefined') {
-		subscription.isImageFilesAllowed = isImageFilesAllowed;
-	} else {
-		subscription.isImageFilesAllowed = getDefaultValue('isImageFilesAllowed');
-	}
+	if (roomType === 'd') {
+		if (typeof isImageFilesAllowed !== 'undefined') {
+			subscription.isImageFilesAllowed = isImageFilesAllowed;
+		} else {
+			subscription.isImageFilesAllowed = getDefaultValue('isImageFilesAllowed');
+		}
 
-	if (typeof isAudioFilesAllowed !== 'undefined') {
-		subscription.isAudioFilesAllowed = isAudioFilesAllowed;
-	} else {
-		subscription.isAudioFilesAllowed = getDefaultValue('isAudioFilesAllowed');
-	}
+		if (typeof isAudioFilesAllowed !== 'undefined') {
+			subscription.isAudioFilesAllowed = isAudioFilesAllowed;
+		} else {
+			subscription.isAudioFilesAllowed = getDefaultValue('isAudioFilesAllowed');
+		}
 
-	if (typeof isVideoFilesAllowed !== 'undefined') {
-		subscription.isVideoFilesAllowed = isVideoFilesAllowed;
-	} else {
-		subscription.isVideoFilesAllowed = getDefaultValue('isVideoFilesAllowed');
-	}
+		if (typeof isVideoFilesAllowed !== 'undefined') {
+			subscription.isVideoFilesAllowed = isVideoFilesAllowed;
+		} else {
+			subscription.isVideoFilesAllowed = getDefaultValue('isVideoFilesAllowed');
+		}
 
-	if (typeof isOtherFilesAllowed !== 'undefined') {
-		subscription.isOtherFilesAllowed = isOtherFilesAllowed;
-	} else {
-		subscription.isOtherFilesAllowed = getDefaultValue('isOtherFilesAllowed');
-	}
+		if (typeof isOtherFilesAllowed !== 'undefined') {
+			subscription.isOtherFilesAllowed = isOtherFilesAllowed;
+		} else {
+			subscription.isOtherFilesAllowed = getDefaultValue('isOtherFilesAllowed');
+		}
 
-	if (typeof uploadsState !== 'undefined') {
-		subscription.uploadsState = uploadsState;
-	} else {
-		subscription.uploadsState = getDefaultValue('uploadsState');
+		if (typeof uploadsState !== 'undefined') {
+			subscription.uploadsState = uploadsState;
+		} else {
+			subscription.uploadsState = getDefaultValue('uploadsState');
+		}
 	}
 
 	return subscription;

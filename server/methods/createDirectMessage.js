@@ -93,7 +93,7 @@ Meteor.methods({
 			// Как такое вышло: я вышел из диалога (пожаловавшись или заблокировав)
 			if (!result) {
 				const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
-				const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
+				const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me, 'd');
 				if (!isNeedAcceptUploads) {
 					myDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 				}
@@ -154,7 +154,7 @@ Meteor.methods({
 		});
 
 		const isNeedAcceptUploads = settings.get('Message_Need_Accept_Uploads');
-		const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me);
+		const myDefaultSubscriptionPref = getDefaultSubscriptionPref(me, 'd');
 		if (!isNeedAcceptUploads) {
 			myDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}
@@ -183,7 +183,7 @@ Meteor.methods({
 			...myDefaultSubscriptionPref,
 		});
 
-		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to);
+		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to, 'd');
 		if (!isNeedAcceptUploads) {
 			toDefaultSubscriptionPref.uploadsState = 'acceptedAll';
 		}

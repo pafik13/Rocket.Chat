@@ -194,6 +194,8 @@ async function sendAllNotifications(message, room) {
 		}],
 	};
 
+
+	const roomTypeName = roomTypes.getRoomTypeName(room.t);
 	['audio', 'desktop', 'mobile', 'email'].forEach((kind) => {
 		const notificationField = `${ kind === 'mobile' ? 'mobilePush' : kind }Notifications`;
 
@@ -216,8 +218,23 @@ async function sendAllNotifications(message, room) {
 			});
 		}
 
-		const serverField = kind === 'email' ? 'emailNotificationMode' : `${ kind }Notifications`;
+		let serverField;
+		switch (kind) {
+			case 'email': {
+				serverField = 'emailNotificationMode';
+				break;
+			}
+			case 'audio': {
+				serverField = `${ kind }Notifications`;
+				break;
+			}
+			default: {
+				serverField = `${ kind }Notifications${ roomTypeName }`;
+				break;
+			}
+		}
 		const serverPreference = settings.get(`Accounts_Default_User_Preferences_${ serverField }`);
+		console.log('serverField', serverField);
 		if ((room.t === 'd' && serverPreference !== 'nothing') || (!disableAllMessageNotifications && (serverPreference === 'all' || hasMentionToAll || hasMentionToHere))) {
 			query.$or.push({
 				[notificationField]: { $exists: false },

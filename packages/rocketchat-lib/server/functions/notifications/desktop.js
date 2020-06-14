@@ -61,10 +61,13 @@ export function shouldNotifyDesktop({
 	}
 
 	if (!desktopNotifications) {
-		if (settings.get('Accounts_Default_User_Preferences_desktopNotifications') === 'all') {
+		const roomTypeName = roomTypes.getRoomTypeName(roomType);
+		const settingKey = `Accounts_Default_User_Preferences_desktopNotifications${ roomTypeName }`;
+		const settingVal = settings.get(settingKey);
+		if (settingVal === 'all') {
 			return true;
 		}
-		if (settings.get('Accounts_Default_User_Preferences_desktopNotifications') === 'nothing') {
+		if (settingVal === 'nothing') {
 			return false;
 		}
 	}

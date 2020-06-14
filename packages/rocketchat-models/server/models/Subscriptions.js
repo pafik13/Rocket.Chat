@@ -1146,8 +1146,9 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	clearDesktopNotificationUserPreferences(userId) {
+	clearDesktopNotificationUserPreferences(userId, roomType) {
 		const query = {
+			t: roomType,
 			'u._id': userId,
 			desktopPrefOrigin: 'user',
 		};
@@ -1162,8 +1163,9 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	updateDesktopNotificationUserPreferences(userId, desktopNotifications) {
+	updateDesktopNotificationUserPreferences(userId, desktopNotifications, roomType) {
 		const query = {
+			t: roomType,
 			'u._id': userId,
 			desktopPrefOrigin: {
 				$ne: 'subscription',
@@ -1180,8 +1182,9 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	clearMobileNotificationUserPreferences(userId) {
+	clearMobileNotificationUserPreferences(userId, roomType) {
 		const query = {
+			t: roomType,
 			'u._id': userId,
 			mobilePrefOrigin: 'user',
 		};
@@ -1196,8 +1199,9 @@ export class Subscriptions extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
-	updateMobileNotificationUserPreferences(userId, mobilePushNotifications) {
+	updateMobileNotificationUserPreferences(userId, mobilePushNotifications, roomType) {
 		const query = {
+			t: roomType,
 			'u._id': userId,
 			mobilePrefOrigin: {
 				$ne: 'subscription',
@@ -1283,14 +1287,7 @@ export class Subscriptions extends Base {
 			const Utils = await import('meteor/rocketchat:utils');
 			this.getDefaultSubscriptionPref = Utils.getDefaultSubscriptionPref;
 		}
-		const defSubPref = this.getDefaultSubscriptionPref(user);
-		if (room.t !== 'd') {
-			delete defSubPref.uploadsState;
-			delete defSubPref.isImageFilesAllowed;
-			delete defSubPref.isAudioFilesAllowed;
-			delete defSubPref.isVideoFilesAllowed;
-			delete defSubPref.isOtherFilesAllowed;
-		}
+		const defSubPref = this.getDefaultSubscriptionPref(user, room.t);
 
 		const subscription = {
 			open: false,
