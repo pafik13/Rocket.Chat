@@ -101,8 +101,6 @@ callbacks.run = function(hook, item, constant) {
 					let stack = callback.stack && typeof callback.stack.split === 'function' && callback.stack.split('\n');
 					stack = stack && stack[2] && (stack[2].match(/\(.+\)/) || [])[0];
 					console.log(String(currentTime), hook, callback.id, stack);
-				} else {
-					console.info(String(currentTime), hook, callback.id, {});
 				}
 			}
 		}

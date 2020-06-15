@@ -234,7 +234,6 @@ async function sendAllNotifications(message, room) {
 			}
 		}
 		const serverPreference = settings.get(`Accounts_Default_User_Preferences_${ serverField }`);
-		console.log('serverField', serverField);
 		if ((room.t === 'd' && serverPreference !== 'nothing') || (!disableAllMessageNotifications && (serverPreference === 'all' || hasMentionToAll || hasMentionToHere))) {
 			query.$or.push({
 				[notificationField]: { $exists: false },

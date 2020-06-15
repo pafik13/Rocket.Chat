@@ -329,4 +329,140 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 	});
+
+	describe('createDirectMessage/isDirectMessageExists', () => {
+		const username = `${ apiUsername }_${ Date.now() }`;
+		const email = `${ Date.now() }_${ apiEmail }`;
+		let userId;
+
+		before((done) => {
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({
+					email,
+					name: username,
+					username,
+					password,
+					active: true,
+					roles: ['user'],
+					joinDefaultChannels: true,
+					verified: true,
+				})
+				.expect(200)
+				.expect((res) => {
+					userId = res.body.user._id;
+				})
+				.end(done);
+		});
+
+		it('should return error if not provided userId or username', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					isChannelNotificationsEnabled: false,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+
+		it('should disable notifications from channels', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					username,
+					isChannelNotificationsEnabled: false,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsChannels', 'nothing');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsChannels', 'nothing');
+				})
+				.end(done);
+		});
+
+		it('should disable notifications from groups', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					username,
+					isGroupNotificationsEnabled: false,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsGroups', 'nothing');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsGroups', 'nothing');
+				})
+				.end(done);
+		});
+
+		it('should disable notifications from directs', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					username,
+					isDirectNotificationsEnabled: false,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsDirects', 'nothing');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsDirects', 'nothing');
+				})
+				.end(done);
+		});
+
+		it('should enable notifications from channels', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					userId,
+					isChannelNotificationsEnabled: true,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsChannels', 'default');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsChannels', 'default');
+				})
+				.end(done);
+		});
+
+		it('should enable notifications from groups', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					userId,
+					isGroupNotificationsEnabled: true,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsGroups', 'default');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsGroups', 'default');
+				})
+				.end(done);
+		});
+
+		it('should enable notifications from directs', (done) => {
+			request.post(api('admin.setUserNotificationsPreference'))
+				.set(credentials)
+				.send({
+					userId,
+					isDirectNotificationsEnabled: true,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.nested.property('user.settings.preferences.desktopNotificationsDirects', 'default');
+					expect(res.body).to.have.nested.property('user.settings.preferences.mobileNotificationsDirects', 'default');
+				})
+				.end(done);
+		});
+	});
 });
