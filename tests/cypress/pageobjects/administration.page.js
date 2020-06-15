@@ -165,12 +165,24 @@ class Administration extends Page {
 	get accountsAudioNotifications() { return browser.element('[name="Accounts_Default_User_Preferences_audioNotifications"]'); }
 	get accountsAudioNotificationsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_audioNotifications"]'); }
 
-	get accountsDesktopNotifications() { return browser.element('[name="Accounts_Default_User_Preferences_desktopNotifications"]'); }
-	get accountsDesktopNotificationsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_desktopNotifications"]'); }
+	get accountsDesktopNotificationsChannels() { return browser.element('[name="Accounts_Default_User_Preferences_desktopNotificationsChannels"]'); }
+	get accountsDesktopNotificationsChannelsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_desktopNotificationsChannels"]'); }
+	
+	get accountsDesktopNotificationsGroups() { return browser.element('[name="Accounts_Default_User_Preferences_desktopNotificationsGroups"]'); }
+	get accountsDesktopNotificationsGroupsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_desktopNotificationsGroups"]'); }
+	
+	get accountsDesktopNotificationsDirects() { return browser.element('[name="Accounts_Default_User_Preferences_desktopNotificationsDirects"]'); }
+	get accountsDesktopNotificationsDirectsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_desktopNotificationsDirects"]'); }
+	
+	get accountsMobileNotificationsChannels() { return browser.element('[name="Accounts_Default_User_Preferences_mobileNotificationsChannels"]'); }
+	get accountsMobileNotificationsChannelsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_mobileNotificationsChannels"]'); }
 
-	get accountsMobileNotifications() { return browser.element('[name="Accounts_Default_User_Preferences_mobileNotifications"]'); }
-	get accountsMobileNotificationsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_mobileNotifications"]'); }
+	get accountsMobileNotificationsGroups() { return browser.element('[name="Accounts_Default_User_Preferences_mobileNotificationsGroups"]'); }
+	get accountsMobileNotificationsGroupsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_mobileNotificationsGroups"]'); }
 
+	get accountsMobileNotificationsDirects() { return browser.element('[name="Accounts_Default_User_Preferences_mobileNotificationsDirects"]'); }
+	get accountsMobileNotificationsDirectsReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_mobileNotificationsDirects"]'); }
+	
 	get accountsUnreadAlertTrue() { return browser.element('label:nth-of-type(1) [name="Accounts_Default_User_Preferences_unreadAlert"]'); }
 	get accountsUnreadAlertFalse() { return browser.element('label:nth-of-type(2) [name="Accounts_Default_User_Preferences_unreadAlert"]'); }
 	get accountsUnreadAlertReset() { return browser.element('.reset-setting[data-setting="Accounts_Default_User_Preferences_unreadAlert"]'); }

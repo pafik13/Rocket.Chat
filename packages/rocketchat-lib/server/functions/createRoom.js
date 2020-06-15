@@ -197,7 +197,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		});
 	}
 	Meteor.defer(() => {
-		callbacks.run('afterCreateRoom', { owner, room }, subs);
+		callbacks.run('afterCreateRoom', room, { owner, subs });
 	});
 
 	for (const member of whoReachLimit) {

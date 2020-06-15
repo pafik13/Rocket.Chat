@@ -113,7 +113,8 @@ describe('miscellaneous', function() {
 			.expect(200)
 			.expect((res) => {
 				const allUserPreferencesKeys = ['enableAutoAway', 'idleTimeLimit', 'desktopNotificationDuration', 'audioNotifications',
-					'desktopNotifications', 'mobileNotifications', 'unreadAlert', 'useEmojis', 'convertAsciiEmoji', 'autoImageLoad',
+					'desktopNotificationsChannels', 'desktopNotificationsGroups', 'desktopNotificationsDirects', 'unreadAlert', 'useEmojis',
+					'mobileNotificationsChannels', 'mobileNotificationsGroups', 'mobileNotificationsDirects', 'convertAsciiEmoji', 'autoImageLoad',
 					'saveMobileBandwidth', 'collapseMediaByDefault', 'hideUsernames', 'hideRoles', 'hideFlexTab', 'hideAvatars',
 					'sidebarViewMode', 'sidebarHideAvatar', 'sidebarShowUnread', 'sidebarShowFavorites', 'sidebarGroupByType',
 					'sendOnEnter', 'messageViewMode', 'emailNotificationMode', 'roomCounterSidebar', 'newRoomNotification', 'newMessageNotification',

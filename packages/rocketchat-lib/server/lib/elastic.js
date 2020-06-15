@@ -155,7 +155,7 @@ const findUsersInRoom = async(text, roomId, skip = 0, limit = 50) => {
 };
 
 
-callbacks.add('afterCreateRoom', async({ owner, room }, subs) => {
+callbacks.add('afterCreateRoom', async(room, { owner, subs }) => {
 	logger.debug('afterCreateRoom', owner, room, subs);
 	if (subs && subs.length) {
 		for (let i = 0; i < subs.length; i++) {
@@ -181,6 +181,7 @@ callbacks.add('afterCreateRoom', async({ owner, room }, subs) => {
 			}
 		}
 	}
+	return room;
 });
 
 callbacks.add('afterAddedToRoom', async(obj, room) => {

@@ -57,11 +57,10 @@ async function notifyUser(subscriptionId, sender, message, room) {
 	}
 	// 	console.timeEnd(timeToken);
 	// 	console.log(`${ timeToken }::count=${ count }`);
-
 	return message;
 }
 
-callbacks.add('afterCreateRoom', async({ owner, room }, subs) => {
+callbacks.add('afterCreateRoom', async(room, { owner, subs }) => {
 	logger.debug('afterCreateRoom', owner, room, subs);
 	const now = new Date();
 	if (subs && subs.length) {
@@ -98,6 +97,7 @@ callbacks.add('afterCreateRoom', async({ owner, room }, subs) => {
 			}
 		}
 	}
+	return room;
 });
 
 export { notifyUser };

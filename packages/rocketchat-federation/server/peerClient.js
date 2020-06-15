@@ -320,7 +320,7 @@ class PeerClient {
 		FederationEvents.directRoomCreated(federatedRoom, { skipPeers: [localPeerDomain] });
 	}
 
-	afterCreateRoom({ owner: roomOwner, room }) {
+	afterCreateRoom(room, { owner: roomOwner }) {
 		this.log('afterCreateRoom');
 
 		const { _id: ownerId } = roomOwner;
@@ -328,14 +328,14 @@ class PeerClient {
 		const { peer: { domain: localPeerDomain } } = this;
 
 		// Check if room is federated
-		if (!FederatedRoom.isFederated(localPeerDomain, room, { checkUsingUsers: true })) { return roomOwner; }
+		if (!FederatedRoom.isFederated(localPeerDomain, room, { checkUsingUsers: true })) { return room; }
 
 		const owner = Users.findOneById(ownerId);
 
 		const federatedRoom = new FederatedRoom(localPeerDomain, room, { owner });
 
 		// Check if this should be skipped
-		if (this.skipCallbackIfNeeded('afterCreateRoom', federatedRoom.getLocalRoom())) { return roomOwner; }
+		if (this.skipCallbackIfNeeded('afterCreateRoom', federatedRoom.getLocalRoom())) { return room; }
 
 		// Load federated users
 		federatedRoom.loadUsers();
@@ -344,6 +344,8 @@ class PeerClient {
 		federatedRoom.refreshFederation();
 
 		FederationEvents.roomCreated(federatedRoom, { skipPeers: [localPeerDomain] });
+
+		return room;
 	}
 
 	afterSaveRoomSettings(/* room */) {

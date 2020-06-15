@@ -712,18 +712,41 @@ describe('[Administration]', () => {
 					admin.accountsAudioNotifications.should('have.value', 'mentions');
 				});
 
-				it('it should show the desktop audio notifications select field', () => {
-					admin.accountsDesktopNotifications.scrollIntoView();
-					admin.accountsDesktopNotifications.should('be.visible');
+				it('it should show the desktop notifications from channels select field', () => {
+					admin.accountsDesktopNotificationsChannels.scrollIntoView();
+					admin.accountsDesktopNotificationsChannels.should('be.visible');
+					admin.accountsDesktopNotificationsChannels.should('have.value', 'all');
 				});
 
-				it('the desktop audio notifications field value should be mentions', () => {
-					admin.accountsDesktopNotifications.should('have.value', 'mentions');
+				it('it should show the desktop notifications from groups select field', () => {
+					admin.accountsDesktopNotificationsGroups.scrollIntoView();
+					admin.accountsDesktopNotificationsGroups.should('be.visible');
+					admin.accountsDesktopNotificationsGroups.should('have.value', 'all');
 				});
 
-				it('it should show the mobile notifications select field', () => {
-					admin.accountsMobileNotifications.scrollIntoView();
-					admin.accountsMobileNotifications.should('be.visible');
+				it('it should show the desktop notifications from directs select field', () => {
+					admin.accountsDesktopNotificationsDirects.scrollIntoView();
+					admin.accountsDesktopNotificationsDirects.should('be.visible');
+					admin.accountsDesktopNotificationsDirects.should('have.value', 'all');
+				});
+
+
+				it('it should show the mobile notifications from channels select field', () => {
+					admin.accountsMobileNotificationsChannels.scrollIntoView();
+					admin.accountsMobileNotificationsChannels.should('be.visible');
+					admin.accountsMobileNotificationsChannels.should('have.value', 'all');
+				});
+
+				it('it should show the mobile notifications from groups select field', () => {
+					admin.accountsMobileNotificationsGroups.scrollIntoView();
+					admin.accountsMobileNotificationsGroups.should('be.visible');
+					admin.accountsMobileNotificationsGroups.should('have.value', 'all');
+				});
+
+				it('it should show the mobile notifications from directs select field', () => {
+					admin.accountsMobileNotificationsDirects.scrollIntoView();
+					admin.accountsMobileNotificationsDirects.should('be.visible');
+					admin.accountsMobileNotificationsDirects.should('have.value', 'all');
 				});
 
 				it('the mobile notifications field value should be mentions', () => {
