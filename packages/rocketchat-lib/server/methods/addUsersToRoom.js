@@ -22,6 +22,13 @@ Meteor.methods({
 
 		// Get user and room details
 		const room = Rooms.findOneById(data.rid);
+
+		if (room.blocked) {
+			throw new Meteor.Error('error-not-allowed', 'Room is blocked', {
+				method: 'addUsersToRoom',
+			});
+		}
+
 		const userId = Meteor.userId();
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(data.rid, userId, { fields: { _id: 1 } });
 		const userInRoom = subscription != null;

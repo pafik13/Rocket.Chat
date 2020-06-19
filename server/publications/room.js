@@ -53,6 +53,7 @@ const fields = {
 	isOtherFilesAllowed: 1,
 	membersHidden: 1,
 	filesHidden: 1,
+	blocked: 1,
 };
 
 const roomMap = (record) => {

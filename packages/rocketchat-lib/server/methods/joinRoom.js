@@ -23,6 +23,12 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'joinRoom' });
 		}
 
+		if (room.blocked) {
+			throw new Meteor.Error('error-not-allowed', 'Room is blocked', {
+				method: 'joinRoom',
+			});
+		}
+
 		// TODO we should have a 'beforeJoinRoom' call back so external services can do their own validations
 		const user = Meteor.user();
 		if (room.tokenpass && user && user.services && user.services.tokenpass) {

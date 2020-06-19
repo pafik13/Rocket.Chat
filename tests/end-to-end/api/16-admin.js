@@ -465,4 +465,74 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 	});
+
+	describe('block channel or group', () => {
+		let testChannel; let testGroup;
+		it('/admin.blockChannel', async() => {
+			testChannel = await getChannelInfo(apiPublicChannelName);
+
+			return request.post(api('admin.blockChannel'))
+				.set(credentials)
+				.send({
+					channelId: testChannel._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200);
+		});
+
+		it('should throw an error when the channel is blocked', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						rid: testChannel._id,
+						text: 'Sample message',
+						alias: 'Gruggy',
+						emoji: ':smirk:',
+						avatar: 'http://res.guggy.com/logo_128.png',
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-blocked');
+				})
+				.end(done);
+		});
+
+		it('/admin.blockGroup', async() => {
+			testGroup = await getGroupInfo(apiPrivateChannelName);
+
+			return request.post(api('admin.blockGroup'))
+				.set(credentials)
+				.send({
+					groupId: testGroup._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200);
+		});
+
+		it('should throw an error when the group is blocked', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						rid: testGroup._id,
+						text: 'Sample message',
+						alias: 'Gruggy',
+						emoji: ':smirk:',
+						avatar: 'http://res.guggy.com/logo_128.png',
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-room-blocked');
+				})
+				.end(done);
+		});
+	});
+
 });

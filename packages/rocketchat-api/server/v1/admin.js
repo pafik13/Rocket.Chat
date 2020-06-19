@@ -264,7 +264,6 @@ API.v1.addRoute('admin.createHeapdump', { authRequired: true }, {
 	},
 });
 
-
 API.v1.addRoute('admin.setUserNotificationsPreference', { authRequired: true }, {
 	post() {
 		if (!hasRole(this.userId, 'admin')) {
@@ -348,3 +347,52 @@ API.v1.addRoute('admin.setUserNotificationsPreference', { authRequired: true }, 
 		});
 	},
 });
+
+API.v1.addRoute('admin.blockChannel', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { channelId } = this.requestParams();
+
+		if (!channelId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `channelId`!');
+		}
+
+		const room = Rooms.findOneById(channelId, { _id: 1 });
+
+		if (!room || room.t !== 'c') { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', room._id, 'blocked', true);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('admin.blockGroup', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { groupId } = this.requestParams();
+
+		if (!groupId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `groupId`!');
+		}
+
+		const room = Rooms.findOneById(groupId, { _id: 1 });
+
+		if (!room || room.t !== 'p') { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', room._id, 'blocked', true);
+		});
+
+		return API.v1.success();
+	},
+});
+

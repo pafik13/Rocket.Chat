@@ -1303,6 +1303,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	setBlockedById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				blocked: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	saveRetentionEnabledById(_id, value) {
 		const query = { _id };
 

@@ -479,6 +479,30 @@ Template.channelSettingsEditing.onCreated(function() {
 				);
 			},
 		},
+		blocked: {
+			type: 'boolean',
+			label: 'Block_room',
+			isToggle: true,
+			processing: new ReactiveVar(false),
+			canView() {
+				return room.t !== 'd';
+			},
+			getValue() {
+				return room.blocked;
+			},
+			canEdit() {
+				return hasAllPermission('edit-room', room._id);
+			},
+			save(value) {
+				return call('saveRoomSettings', room._id, 'blocked', value).then(
+					() => {
+						toastr.success(
+							t('Files_hidden_setting_changed_successfully')
+						);
+					}
+				);
+			},
+		},
 		archived: {
 			type: 'boolean',
 			label: 'Room_archivation_state_true',

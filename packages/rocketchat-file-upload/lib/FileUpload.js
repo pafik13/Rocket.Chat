@@ -32,14 +32,22 @@ export const FileUpload = {
 				isAudioFilesAllowed: 1,
 				isVideoFilesAllowed: 1,
 				isOtherFilesAllowed: 1,
+				blocked: 1,
 			},
 		});
+
 		const directMessageAllow = settings.get('FileUpload_Enabled_Direct');
 		const fileUploadAllowed = settings.get('FileUpload_Enabled');
 		if (canAccessRoom(room, user, file) !== true) {
 			return false;
 		}
 		const language = (user && user.language) || settings.get('Language') || 'en';
+
+		if (room.blocked) {
+			throw new Meteor.Error('error-room-blocked', TAPi18n.__('You_cant_upload_file_because_room_blcoked', {}, language), {
+				method: 'validateFileUpload',
+			});
+		}
 
 		if (user.deactivatedUntil) {
 			const datetime = moment(user.deactivatedUntil).locale(language).format('LLL');

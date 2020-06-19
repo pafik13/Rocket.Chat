@@ -19,7 +19,7 @@ import { saveRoomSystemMessages } from '../functions/saveRoomSystemMessages';
 import { saveRoomTokenpass } from '../functions/saveRoomTokens';
 import { saveStreamingOptions } from '../functions/saveStreamingOptions';
 
-const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden', 'location', 'filesHidden'];
+const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden', 'location', 'filesHidden', 'blocked'];
 Meteor.methods({
 	saveRoomSettings(rid, settings, value) {
 		const userId = Meteor.userId();
@@ -64,6 +64,13 @@ Meteor.methods({
 
 		if (room.broadcast && (settings.readOnly || settings.reactWhenReadOnly)) {
 			throw new Meteor.Error('error-action-not-allowed', 'Editing readOnly/reactWhenReadOnly are not allowed for broadcast rooms', {
+				method: 'saveRoomSettings',
+				action: 'Editing_room',
+			});
+		}
+
+		if (room.blocked) {
+			throw new Meteor.Error('error-action-not-allowed', 'Editing room are not allowed due to block', {
 				method: 'saveRoomSettings',
 				action: 'Editing_room',
 			});
@@ -152,6 +159,12 @@ Meteor.methods({
 			}
 			if (setting === 'filesHidden' && !hasPermission(userId, 'edit-room', rid)) {
 				throw new Meteor.Error('error-action-not-allowed', 'Editing room files visibility is not allowed', {
+					method: 'saveRoomSettings',
+					action: 'Editing_room',
+				});
+			}
+			if (setting === 'blocked' && !hasPermission(userId, 'edit-room', rid)) {
+				throw new Meteor.Error('error-action-not-allowed', 'Editing room blocked state is not allowed', {
 					method: 'saveRoomSettings',
 					action: 'Editing_room',
 				});
@@ -253,6 +266,9 @@ Meteor.methods({
 					break;
 				case 'location':
 					Rooms.setLocationById(rid, value);
+					break;
+				case 'blocked':
+					Rooms.setBlockedById(rid, value);
 					break;
 			}
 		});

@@ -91,6 +91,12 @@ Meteor.methods({
 			return false;
 		}
 
+		if (room.blocked) {
+			throw new Meteor.Error('error-room-blocked', 'You can\'t send messages because room are blocked', {
+				method: 'sendMessage',
+			});
+		}
+
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(message.rid, callerId);
 		if (!subscription) {
 			Notifications.notifyUser(callerId, 'message', {
