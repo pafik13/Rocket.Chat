@@ -274,8 +274,8 @@ class APIClass extends Restivus {
 						}
 
 
-// 						console.log('this.userId', this.userId);
-// 						console.log('this.user', this.user);
+						// 						console.log('this.userId', this.userId);
+						// 						console.log('this.user', this.user);
 
 						if (this.user && this.user.disabled) {
 							this.response.setHeader('X-Restricted-Access', true);

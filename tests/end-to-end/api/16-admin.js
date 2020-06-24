@@ -550,7 +550,6 @@ describe('[Admin]', function() {
 		});
 
 		let userCredentials;
-		let testChannel;
 		before((done) => {
 			request.post(api('login'))
 				.send({
