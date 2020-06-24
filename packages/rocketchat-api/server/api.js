@@ -96,9 +96,10 @@ class APIClass extends Restivus {
 				result.errorType = errorType;
 			}
 		}
-
+		
+		const statusCode = result.errorType === 'error-user-disabled' ? 403 : 400
 		result = {
-			statusCode: 400,
+			statusCode,
 			body: result,
 		};
 

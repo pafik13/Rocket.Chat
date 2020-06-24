@@ -595,7 +595,11 @@ describe('[Admin]', function() {
 			request.get(api('subscriptions.get'))
 				.set(userCredentials)
 				.expect('Content-Type', 'application/json')
-				.expect(400)
+				.expect(403)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-user-disabled');
+				})
 				.end(done);
 		});
 
