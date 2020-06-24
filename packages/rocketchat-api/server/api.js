@@ -273,6 +273,15 @@ class APIClass extends Restivus {
 							});
 						}
 
+
+// 						console.log('this.userId', this.userId);
+// 						console.log('this.user', this.user);
+
+						if (this.user && this.user.disabled) {
+							this.response.setHeader('X-Restricted-Access', true);
+							throw new Meteor.Error('error-user-disabled', 'User is disabled', {});
+						}
+
 						result = originalAction.apply(this);
 					} catch (e) {
 						logger.debug(`${ method } ${ route } threw an error:`, e.stack);

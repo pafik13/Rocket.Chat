@@ -535,4 +535,88 @@ describe('[Admin]', function() {
 		});
 	});
 
+	describe('disableUser/enableUser', () => {
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		let testChannel;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+
+		it('should get subscritions', (done) => {
+			request.get(api('subscriptions.get'))
+				.set(userCredentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should disable user', (done) => {
+			request.post(api('admin.disableUser'))
+				.set(credentials)
+				.send({
+					userId: user._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should not get subscritions', (done) => {
+			request.get(api('subscriptions.get'))
+				.set(userCredentials)
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.end(done);
+		});
+
+		it('should enable user', (done) => {
+			request.post(api('admin.enableUser'))
+				.set(credentials)
+				.send({
+					userId: user._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should get subscritions', (done) => {
+			request.get(api('subscriptions.get'))
+				.set(userCredentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+	});
 });

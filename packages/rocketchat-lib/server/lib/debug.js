@@ -58,7 +58,13 @@ const wrapMethods = function(name, originalHandler, methodsMap) {
 			has_user: this.userId != null,
 		});
 		const args = name === 'ufsWrite' ? Array.prototype.slice.call(originalArgs, 1) : originalArgs;
-		logger.method(name, '-> userId:', Meteor.userId(), ', arguments: ', args);
+		const userId = Meteor.userId();
+		const user = Meteor.user();
+		logger.method(name, '-> userId:', userId, ', arguments: ', args);
+
+		if (user && user.disabled) {
+			throw new Meteor.Error('error-user-disabled', 'User is disabled', {});
+		}
 
 		// Temporary solution for a hotfix while we investigate the underlying issue.
 		const methodBlackList = [
@@ -76,7 +82,7 @@ const wrapMethods = function(name, originalHandler, methodsMap) {
 
 		const duration = Date.now() - start;
 		if (duration > 1000) {
-			logger.error('SLOW_METHOD_CALL', duration, name, '-> userId:', Meteor.userId(), ', arguments: ', args);
+			logger.error('SLOW_METHOD_CALL', duration, name, '-> userId:', userId, ', arguments: ', args);
 		}
 
 		return result;

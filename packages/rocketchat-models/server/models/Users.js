@@ -1214,6 +1214,15 @@ Find users to send a message by email if:
 			},
 		});
 	}
+
+	disableById(userId) {
+		this.update({ _id: userId }, { $set: { disabled: true } });
+	}
+
+	enableById(userId) {
+		this.update({ _id: userId }, { $unset: { disabled: true } });
+	}
+
 }
 
 export default new Users(Meteor.users, true);

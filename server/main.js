@@ -31,6 +31,8 @@ import './methods/createDirectMessage';
 import './methods/deactivateUserForPeriod';
 import './methods/deleteFileMessage';
 import './methods/deleteUser';
+import './methods/disableUser';
+import './methods/enableUser';
 import './methods/doDeactivationsDueToComplaints';
 import './methods/eraseRoom';
 import './methods/getAvatarSuggestion';

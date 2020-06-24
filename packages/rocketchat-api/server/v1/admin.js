@@ -396,3 +396,51 @@ API.v1.addRoute('admin.blockGroup', { authRequired: true }, {
 	},
 });
 
+API.v1.addRoute('admin.disableUser', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		const user = Users.findOneById(userId, { _id: 1 });
+
+		if (!user) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('disableUser', user._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
+
+API.v1.addRoute('admin.enableUser', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		const user = Users.findOneById(userId, { _id: 1 });
+
+		if (!user) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('enableUser', user._id);
+		});
+
+		return API.v1.success();
+	},
+});
