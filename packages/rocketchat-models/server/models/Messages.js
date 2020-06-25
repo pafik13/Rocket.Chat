@@ -507,13 +507,13 @@ export class Messages extends Base {
 		const record = this.findOneById(_id);
 		record._hidden = true;
 		record.parent = record._id;
-		record.editedAt = new Date;
+		record.editedAt = new Date();
 		record.editedBy = {
 			_id: Meteor.userId(),
 			username: me.username,
 		};
-		delete record._id;
-		return this.insert(record);
+
+		return this.trashUpsert(record);
 	}
 
 	// UPDATE

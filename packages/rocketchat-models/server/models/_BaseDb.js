@@ -310,7 +310,7 @@ export class BaseDb extends EventEmitter {
 		for (const record of records) {
 			ids.push(record._id);
 
-			record._deletedAt = new Date;
+			record._deletedAt = new Date();
 			record.__collection__ = this.name;
 
 			trash.upsert({ _id: record._id }, _.omit(record, '_id'));
@@ -388,6 +388,13 @@ export class BaseDb extends EventEmitter {
 		} catch (e) {
 			console.error('Error dropping index:', this.name, '->', ...args, e);
 		}
+	}
+
+	trashUpsert(record) {
+		record._deletedAt = new Date();
+		record.__collection__ = this.name;
+
+		trash.upsert({ _id: record._id }, _.omit(record, '_id'));
 	}
 
 	trashFind(query, options) {

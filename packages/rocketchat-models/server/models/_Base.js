@@ -178,6 +178,10 @@ export class Base {
 		return this._db.tryDropIndex(...args);
 	}
 
+	trashUpsert(...args) {
+		return this._db.trashUpsert(...args);
+	}
+
 	trashFind(...args/* query, options*/) {
 		return this._db.trashFind(...args);
 	}
