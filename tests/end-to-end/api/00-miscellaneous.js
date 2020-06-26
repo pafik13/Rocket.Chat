@@ -135,7 +135,6 @@ describe('miscellaneous', function() {
 
 	it('/ping', (done) => {
 		request.get(api('ping'))
-			.set(credentials)
 			.expect('Content-Type', 'application/json')
 			.expect(200)
 			.expect((res) => {

@@ -25,7 +25,7 @@ API.v1.addRoute('info', { authRequired: false }, {
 	},
 });
 
-API.v1.addRoute('ping', { authRequired: true }, {
+API.v1.addRoute('ping', { authRequired: false }, {
 	get() {
 		return API.v1.success();
 	},
