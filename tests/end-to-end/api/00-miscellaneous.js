@@ -133,6 +133,17 @@ describe('miscellaneous', function() {
 			.end(done);
 	});
 
+	it('/ping', (done) => {
+		request.get(api('ping'))
+			.set(credentials)
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done);
+	});
+
 	describe('/directory', () => {
 		let user;
 		let testChannel;

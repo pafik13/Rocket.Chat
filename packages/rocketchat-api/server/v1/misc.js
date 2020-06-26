@@ -25,6 +25,12 @@ API.v1.addRoute('info', { authRequired: false }, {
 	},
 });
 
+API.v1.addRoute('ping', { authRequired: true }, {
+	get() {
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('me', { authRequired: true }, {
 	get() {
 		return API.v1.success(this.getUserInfo(Users.findOneById(this.userId)));
