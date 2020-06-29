@@ -25,10 +25,12 @@ const eventService = new EventService();
  */
 callbacks.add('afterSaveMessage', function(m) {
 	eventService.promoteEvent('message.save', m._id, m);
+	return m;
 });
 
 callbacks.add('afterDeleteMessage', function(m) {
 	eventService.promoteEvent('message.delete', m._id);
+	return m;
 });
 
 /**

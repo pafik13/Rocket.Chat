@@ -1067,6 +1067,34 @@ export class Rooms extends Base {
 		return this.update(query, update, { multi: true });
 	}
 
+	incMessageEventsCountById(_id, inc = 1) {
+		const query = { _id };
+
+		const update = {
+			$inc: {
+				messageEventsCount: inc,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	incMessageEventsCountByIds(ids, inc = 1) {
+		const query = {
+			_id: {
+				$in: ids,
+			},
+		};
+
+		const update = {
+			$inc: {
+				messageEventsCount: inc,
+			},
+		};
+
+		return this.update(query, update, { multi: true });
+	}
+
 	setLastMessageById(_id, lastMessage) {
 		const query = { _id };
 
