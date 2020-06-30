@@ -56,7 +56,9 @@ function prepareSubscription(sub) {
 		SystemLogger.error(`subscriptions/get::rid=${ sub.rid }::id=${ sub._id }`);
 		sub.lastMessage = null;
 	} else {
-		const { lastMessage } = room;
+		const { lastMessage, messageEventsCount } = room;
+
+		sub.messageEventsCount = messageEventsCount;
 
 		if (lastMessage && lastMessage.u) {
 			sub.lastMessage = composeMessageObjectWithUser(lastMessage, lastMessage.u._id);
