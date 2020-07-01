@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
-import { TAPi18n } from 'meteor/tap:i18n';
 import { Users, Subscriptions } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
@@ -421,16 +420,12 @@ API.v1.addRoute('users.createToken', { authRequired: true }, {
 API.v1.addRoute('users.getPreferences', { authRequired: true }, {
 	get() {
 		const user = Users.findOneById(this.userId);
-		if (user.settings) {
-			const { preferences } = user.settings;
-			preferences.language = user.language;
+		const { preferences = {} } = user.settings;
+		preferences.language = user.language;
 
-			return API.v1.success({
-				preferences,
-			});
-		} else {
-			return API.v1.failure(TAPi18n.__('Accounts_Default_User_Preferences_not_available').toUpperCase());
-		}
+		return API.v1.success({
+			preferences,
+		});
 	},
 });
 
