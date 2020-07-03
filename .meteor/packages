@@ -39,7 +39,6 @@ standard-minifier-js@2.6.0
 tracker@1.2.0
 
 rocketchat:action-links
-rocketchat:accounts
 rocketchat:api
 rocketchat:assets
 rocketchat:authorization
@@ -67,7 +66,6 @@ rocketchat:importer
 rocketchat:importer-csv
 rocketchat:issuelinks
 rocketchat:lib
-rocketchat:livestream
 rocketchat:logger
 rocketchat:login-token
 rocketchat:mailer
@@ -136,7 +134,6 @@ dispatch:run-as-user
 francocatena:status
 jalik:ufs
 jalik:ufs-gridfs
-jparker:gravatar
 kadira:blaze-layout
 kadira:flow-router
 keepnox:perfect-scrollbar

@@ -26,7 +26,6 @@ export { _setUsername, setUsername } from './setUsername';
 export { unarchiveRoom } from './unarchiveRoom';
 export { updateMessage } from './updateMessage';
 export { validateCustomFields } from './validateCustomFields';
-export { getAvatarSuggestionForUser } from './getAvatarSuggestionForUser';
 export { isUserBanned } from './isUserBanned';
 export { getRecordAboutBlock } from './getRecordAboutBlock';
 

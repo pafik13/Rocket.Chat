@@ -67,7 +67,9 @@ function prepareSubscription(sub) {
 					sub.unread = lastMessage.serverId - sub.lmServerId;
 				} else {
 					sub.unread = 0;
-					console.warn('prepareSubscription-unread: counters [', lastMessage.serverId, sub.lmServerId, ']');
+					if (lastMessage.serverId < sub.lmServerId) {
+						console.warn('prepareSubscription-unread: counters [', lastMessage.serverId, sub.lmServerId, ']');
+					}
 				}
 			}
 		} else {

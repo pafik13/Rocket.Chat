@@ -3,11 +3,10 @@ import { Accounts } from 'meteor/accounts-base';
 import _ from 'underscore';
 import s from 'underscore.string';
 import * as Mailer from 'meteor/rocketchat:mailer';
-import { Gravatar } from 'meteor/jparker:gravatar';
 import { getRoles, hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 import PasswordPolicy from '../lib/PasswordPolicyClass';
-import { checkEmailAvailability, checkUsernameAvailability, setUserAvatar, setEmail, setRealName, setUsername } from '.';
+import { checkEmailAvailability, checkUsernameAvailability, setEmail, setRealName, setUsername } from '.';
 import { validateEmailDomain } from '../lib';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Users } from 'meteor/rocketchat:models';
@@ -223,16 +222,6 @@ export const saveUser = function(userId, userData) {
 		}
 
 		userData._id = _id;
-
-		if (settings.get('Accounts_SetDefaultAvatar') === true && userData.email) {
-			const gravatarUrl = Gravatar.imageUrl(userData.email, { default: '404', size: 200, secure: true });
-
-			try {
-				setUserAvatar(userData, gravatarUrl, '', 'url');
-			} catch (e) {
-				// Ignore this error for now, as it not being successful isn't bad
-			}
-		}
 
 		return _id;
 	}
