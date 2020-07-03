@@ -157,7 +157,6 @@ tap:i18n
 underscore@1.0.10
 rocketchat:bigbluebutton
 rocketchat:mailmessages
-juliancwirko:postcss
 littledata:synced-cron
 rocketchat:utils
 rocketchat:settings
@@ -170,3 +169,4 @@ rocketchat:ui-utils
 rocketchat:ui-cached-collection
 minifier-js@2.6.0
 facts-base
+juliancwirko:postcss
