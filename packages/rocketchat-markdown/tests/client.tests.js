@@ -211,12 +211,12 @@ const inlinecode = {
 
 const code = {
 	'```code```': codeWrapper('<span class="hljs-keyword">code</span>', 'clean'),
-	'```code': codeWrapper('<span class="hljs-selector-tag">code</span>\n', 'stylus'),
-	'```code\n': codeWrapper('<span class="hljs-selector-tag">code</span>\n', 'stylus'),
-	'```\ncode\n```': codeWrapper('<span class="hljs-selector-tag">code</span>\n', 'stylus'),
-	'```code\n```': codeWrapper('<span class="hljs-selector-tag">code</span>\n', 'stylus'),
+	'```code': codeWrapper('<span class="hljs-keyword">code</span>\n', 'clean'),
+	'```code\n': codeWrapper('<span class="hljs-keyword">code</span>\n', 'clean'),
+	'```\ncode\n```': codeWrapper('<span class="hljs-keyword">code</span>\n', 'clean'),
+	'```code\n```': codeWrapper('<span class="hljs-keyword">code</span>\n', 'clean'),
 	'```\ncode```': codeWrapper('<span class="hljs-keyword">code</span>', 'clean'),
-	'```javascript\nvar a = \'log\';\nconsole.log(a);```': codeWrapper('<span class="hljs-keyword">var</span> a = <span class="hljs-string">\'log\'</span>;\n<span class="hljs-built_in">console</span>.log(a);', 'javascript'),
+	'```javascript\nvar a = \'log\';\nconsole.log(a);```': codeWrapper('<span class="hljs-keyword">var</span> a = <span class="hljs-string">&#x27;log&#x27;</span>;\n<span class="hljs-built_in">console</span>.log(a);', 'javascript'),
 	'```*code*```': codeWrapper('*<span class="hljs-meta">code</span>*', 'armasm'),
 	'```**code**```': codeWrapper('**<span class="hljs-meta">code</span>**', 'armasm'),
 	'```_code_```': codeWrapper('<span class="hljs-variable">_code_</span>', 'sqf'),
