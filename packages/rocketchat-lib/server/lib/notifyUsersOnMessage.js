@@ -113,6 +113,7 @@ function notifyUsersOnMessage(message, room) {
 		}
 	}
 
+	Subscriptions.setAsReadByRoomIdAndUserId(message.rid, message.u._id, message.serverId);
 	// Update all the room activity tracker fields
 	// This method take so long to execute on gient rooms cuz it will trugger the cache rebuild for the releations of that room
 	Rooms.incMsgCountAndSetLastMessageById(message.rid, 1, message.ts, settings.get('Store_Last_Message') && message);

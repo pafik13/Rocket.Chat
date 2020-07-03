@@ -908,6 +908,9 @@ export class Subscriptions extends Base {
 			'u._id': {
 				$ne: userId,
 			},
+			lmServerId: {
+				$exists: false,
+			},
 		};
 
 		const update = {

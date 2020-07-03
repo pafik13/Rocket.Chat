@@ -1013,6 +1013,7 @@ export class Rooms extends Base {
 		const update = {
 			$inc: {
 				msgs: inc,
+				messageEventsCount: inc,
 			},
 		};
 
@@ -1029,6 +1030,7 @@ export class Rooms extends Base {
 			},
 			$inc: {
 				msgs: inc,
+				messageEventsCount: inc,
 			},
 		};
 

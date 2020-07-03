@@ -717,10 +717,11 @@ export class Messages extends Base {
 
 	// INSERT
 	createWithTypeRoomIdMessageAndUser(type, roomId, message, user, extraData) {
-		const room = Rooms.findOneById(roomId, { fields: { sysMes: 1 } });
+		const room = Rooms.findOneById(roomId, { fields: { sysMes: 1, msgs: 1 } });
 		if ((room != null ? room.sysMes : undefined) === false) {
 			return;
 		}
+
 		const record = {
 			t: type,
 			rid: roomId,
@@ -731,6 +732,7 @@ export class Messages extends Base {
 				username: user.username,
 			},
 			groupable: false,
+			serverId: room.msgs + 1,
 		};
 
 		if (this.settings.get('Message_Read_Receipt_Enabled')) {
