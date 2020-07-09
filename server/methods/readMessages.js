@@ -54,6 +54,7 @@ Meteor.methods({
 			}
 
 			if (tillSrvId >= fromSrvId) {
+				console.info('readMessages: params [', rid, userId, ']; counters: [', tillSrvId, fromSrvId, ']');
 				Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, tillSrvId);
 				Rooms.setLastMessageRead(rid, tillSrvId);
 				Messages.setAsRead(rid, fromSrvId, tillSrvId);

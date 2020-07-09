@@ -968,18 +968,18 @@ export class Messages extends Base {
 		if (diff < max) {
 			return this.update({
 				rid,
-				serverId: { $gt: fromSrvId, $lt: tillSrvId },
+				serverId: { $gte: fromSrvId, $lte: tillSrvId },
 			}, update, updateOpts);
 		} else {
 			const midSrvId = tillSrvId - max;
 			const result = this.update({
 				rid,
-				serverId: { $gt: midSrvId, $lt: tillSrvId },
+				serverId: { $gt: midSrvId, $lte: tillSrvId },
 			}, update, updateOpts);
 
 			this.model.rawCollection().update({
 				rid,
-				serverId: { $gt: fromSrvId, $lt: midSrvId },
+				serverId: { $gte: fromSrvId, $lte: midSrvId },
 			}, update, updateOpts);
 
 			return result;
