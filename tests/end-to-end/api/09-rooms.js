@@ -962,7 +962,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('should delete rooms by id or name', (done) => {
-			request.get(api('rooms.deleteMany'))
+			request.post(api('rooms.deleteMany'))
 				.set(credentials)
 				.query({
 					rooms: [{
