@@ -835,7 +835,7 @@ describe('[Rooms]', function() {
 		});
 	});
 
-	describe('[/rooms.update (channel/group)]', () => {
+	describe('[/rooms.update (channel/group) and deleteMany]', () => {
 		let testChannel;
 		let testGroup;
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
@@ -957,6 +957,23 @@ describe('[Rooms]', function() {
 					expect(res.body.room).to.have.property('description', groupNewDesc);
 					expect(res.body.room).to.have.property('customFields').and.to.be.an('object');
 					expect(res.body.room.customFields).to.have.property('photoUrl').and.to.be.equal('');
+				})
+				.end(done);
+		});
+
+		it('should delete rooms by id or name', (done) => {
+			request.get(api('rooms.deleteMany'))
+				.set(credentials)
+				.query({
+					rooms: [{
+						roomId: testGroup._id,
+					}, {
+						roomName: channelNewName,
+					}],
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
 				})
 				.end(done);
 		});

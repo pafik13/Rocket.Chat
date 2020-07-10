@@ -585,10 +585,27 @@ API.v1.addRoute('rooms.deleteMany', { authRequired: true }, {
 		for (let r = 0; r < rooms.length; r++) {
 			const item = rooms[r];
 			const room = findRoomByIdOrName({ params: item });
-
-			Meteor.runAsUser(this.userId, () => {
-				Meteor.call('eraseRoom', room._id);
-			});
+			if (room.t === 'd') {
+				Meteor.runAsUser(this.userId, () => {
+					Meteor.call('leaveRoom', room._id);
+				});
+			} else {
+				const options = {
+					fields: {
+						t: 1, roles: 1,
+					},
+				};
+				const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
+				if (subscription.roles && subscription.roles.includes('owner')) {
+					Meteor.runAsUser(this.userId, () => {
+						Meteor.call('eraseRoom', room._id);
+					});
+				} else {
+					Meteor.runAsUser(this.userId, () => {
+						Meteor.call('leaveRoom', room._id);
+					});
+				}
+			}
 		}
 
 		return API.v1.success();
