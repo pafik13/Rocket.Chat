@@ -66,6 +66,8 @@ describe('[Channels]', function() {
 			.expect(200)
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.property('channel');
+				expect(res.body).to.have.property('s3_result');
 			})
 			.end(done);
 	});

@@ -381,10 +381,11 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			ACL: 'public-read',
 		};
 
-		customFields.photoUrl = `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`,
+		customFields.photoUrl = `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`;
 
+		let s3_result;
 		Meteor.runAsUser(userId, () => {
-			const result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
+			s3_result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
 
 			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
 			if (fields.topic) {
@@ -397,11 +398,11 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
+		});
 
-			return API.v1.success({
-				group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
-				s3_result: result,
-			});
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+			s3_result,
 		});
 	},
 });
