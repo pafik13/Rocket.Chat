@@ -521,9 +521,12 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
-	setLastMessageRead(roomId, msgSrvId) {
+	setLastMessageRead(roomId, userId, msgSrvId) {
 		const query = {
 			_id: roomId,
+			'lastMessage.u._id': {
+				$ne: userId,
+			},
 		};
 
 		if (msgSrvId) {

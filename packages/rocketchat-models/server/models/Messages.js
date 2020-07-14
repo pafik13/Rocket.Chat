@@ -949,7 +949,7 @@ export class Messages extends Base {
 		return this.findOne({ _id: messageId });
 	}
 
-	setAsRead(rid, fromSrvId, tillSrvId) {
+	setAsRead(rid, userId, fromSrvId, tillSrvId) {
 		const diff = tillSrvId - fromSrvId;
 		const max = 10;
 
@@ -969,6 +969,9 @@ export class Messages extends Base {
 			return this.update({
 				rid,
 				serverId: { $gte: fromSrvId, $lte: tillSrvId },
+				'u._id': {
+					$ne: userId,
+				},
 			}, update, updateOpts);
 		} else {
 			const midSrvId = tillSrvId - max;
