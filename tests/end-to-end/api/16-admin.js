@@ -290,7 +290,7 @@ describe('[Admin]', function() {
 	});
 
 	describe('getRoomsByAnonymId', () => {
-		it('should return the channel and the group for anonym_id', (done) => {
+		it('should return channels and groups for anonym_id', (done) => {
 			request.get(api('admin.getRoomsByAnonymId'))
 				.set(credentials)
 				.query({
@@ -311,6 +311,37 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 		it('should return only channels for anonym_id', (done) => {
+			request.get(api('admin.getRoomsByAnonymId'))
+				.set(credentials)
+				.query({
+					anonym_id: 'xxx',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.nested.property('rooms').and.to.be.an('array');
+					const { rooms } = res.body;
+					for (let i = 0; i < rooms.length; i++) {
+						const room = rooms[i];
+						expect(room).to.have.nested.property('t', 'c');
+					}
+				})
+				.end(done);
+		});
+		it('should return error for empty anonym_id', (done) => {
+			request.get(api('admin.getRoomsByAnonymId'))
+				.set(credentials)
+				.query({})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('error', "The 'anonym_id' query param is required");
+				})
+				.end(done);
+		});
+		it('should return only channels: channels.getByAnonymId', (done) => {
 			request.get(api('channels.getByAnonymId'))
 				.query({
 					anonym_id: 'xxx',
