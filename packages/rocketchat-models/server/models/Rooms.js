@@ -1264,6 +1264,15 @@ export class Rooms extends Base {
 		return this.find(query, options);
 	}
 
+	findChannelsByAnonymId(anonymId, options) {
+		const query = {
+			t: 'c',
+			'customFields.anonym_id': `${ anonymId }`,
+		};
+
+		return this.find(query, options);
+	}
+
 	muteUsernameByRoomId(_id, username) {
 		const query = { _id };
 
