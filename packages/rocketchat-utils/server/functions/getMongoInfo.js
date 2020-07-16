@@ -5,7 +5,9 @@ export function getOplogInfo() {
 
 	const oplogEnabled = Boolean(mongo._oplogHandle && mongo._oplogHandle.onOplogEntry);
 
-	return { oplogEnabled, mongo };
+	const npmModuleMongodbVersion = MongoInternals.NpmModules.mongodb.version;
+
+	return { oplogEnabled, mongo, npmModuleMongodbVersion };
 }
 
 function fallbackMongoInfo() {

@@ -72,6 +72,7 @@ metrics.oplogEvents = new client.Counter({
 	help: 'Oplog events',
 	labelNames: ['collection', 'op'],
 });
+metrics.npmModuleMongodbVersion = new client.Gauge({ name: 'rocketchat_npm_module_mongodb_version', labelNames: ['version'], help: 'npm module mongodb version' });
 
 // User statistics
 metrics.totalUsers = new client.Gauge({ name: 'rocketchat_users_total', help: 'total of users' });
@@ -196,7 +197,8 @@ const setPrometheusData = async() => {
 	metrics.totalDirectMessages.set(statistics.totalDirectMessages, date);
 	metrics.totalLivechatMessages.set(statistics.totalLivechatMessages, date);
 
-	const { mongo } = getOplogInfo();
+	const { mongo, npmModuleMongodbVersion } = getOplogInfo();
+	metrics.npmModuleMongodbVersion.set({ version: npmModuleMongodbVersion }, 1, date);
 
 	let oplogQueue = 0;
 	if (mongo._oplogHandle && mongo._oplogHandle._entryQueue) {
