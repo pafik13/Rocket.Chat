@@ -56,13 +56,13 @@ Meteor.methods({
 			if (tillSrvId >= fromSrvId) {
 				console.info('readMessages: params [', rid, userId, ']; counters: [', tillSrvId, fromSrvId, ']');
 				Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, tillSrvId);
-				Rooms.setLastMessageRead(rid, tillSrvId);
-				Messages.setAsRead(rid, fromSrvId, tillSrvId);
+				Rooms.setLastMessageRead(rid, userId, tillSrvId);
+				Messages.setAsRead(rid, userId, fromSrvId, tillSrvId);
 			} else {
 				console.warn('readMessages unknow error: params [', rid, userId, ']; counters: [', tillSrvId, fromSrvId, ']');
 				Subscriptions.setAsReadByRoomIdAndUserId(rid, userId, fromSrvId);
-				Rooms.setLastMessageRead(rid, fromSrvId);
-				Messages.setAsRead(rid, fromSrvId, fromSrvId);
+				Rooms.setLastMessageRead(rid, userId, fromSrvId);
+				Messages.setAsRead(rid, userId, fromSrvId, fromSrvId);
 			}
 		} else {
 			console.warn('readMessages called by user without subscription: params [', rid, userId, ']');
