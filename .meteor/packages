@@ -39,7 +39,6 @@ standard-minifier-js@2.6.0
 tracker@1.2.0
 
 rocketchat:action-links
-rocketchat:accounts
 rocketchat:api
 rocketchat:assets
 rocketchat:authorization
