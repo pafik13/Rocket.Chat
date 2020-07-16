@@ -82,9 +82,6 @@
 		"webpack": "^4.29.3"
 	},
 	"dependencies": {
-		"@accounts/graphql-api": "^0.2.3",
-		"@accounts/mongo": "0.0.12",
-		"@accounts/server": "0.0.18",
 		"@babel/runtime": "^7.8.7",
 		"@elastic/elasticsearch": "^7.5.0",
 		"@google-cloud/storage": "^2.3.1",
