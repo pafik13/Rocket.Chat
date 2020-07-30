@@ -4,7 +4,7 @@ import '../lib/RegExp';
 import '../lib/francocatena_fix';
 
 import './lib/accounts';
-import './lib/cordova';
+import './lib/pushConfig';
 import './lib/roomFiles';
 import './startup/migrations';
 import './startup/appcache';

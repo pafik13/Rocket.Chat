@@ -61,6 +61,7 @@ export async function sendSinglePush({ room, message, userId, receiverUsername, 
 			userId,
 		},
 		category: canSendMessageToRoom(room, receiverUsername) ? CATEGORY_MESSAGE : CATEGORY_MESSAGE_NOREPLY,
+		pushType: message.t && message.t === 'p2p-call' ? 'voip' : 'alert',
 	});
 }
 

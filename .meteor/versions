@@ -112,7 +112,6 @@ pauli:accounts-linkedin@5.0.0
 pauli:linkedin-oauth@5.0.0
 promise@0.11.2
 raix:eventemitter@0.1.3
-raix:eventstate@0.0.4
 raix:handlebar-helpers@0.2.5
 raix:ui-dropped-event@0.0.7
 random@1.2.0
@@ -178,8 +177,9 @@ rocketchat:oauth2-server@2.1.0
 rocketchat:oauth2-server-config@1.0.0
 rocketchat:oembed@0.0.1
 rocketchat:otr@0.0.1
+rocketchat:p2p-calls@0.0.1
 rocketchat:promises@0.0.1
-rocketchat:push@3.3.2
+rocketchat:push@4.0.0
 rocketchat:push-notifications@0.0.1
 rocketchat:reactions@0.0.1
 rocketchat:retention-policy@0.0.1

@@ -86,6 +86,8 @@ export class AmazonS3Store extends UploadFS.Store {
 		 * @return {string}
 		 */
 		this.create = function(file, callback) {
+			console.log('create(file', file);
+
 			check(file, Object);
 
 			if (file._id == null) {

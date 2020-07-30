@@ -70,6 +70,10 @@ export class Messages extends Base {
 		});
 	}
 
+	createP2PCallStarted(room, user) {
+		return this.createWithTypeRoomIdMessageAndUser('p2p-call', room._id, 'started', user);
+	}
+
 	createRoomsLimitReachedForMember(room, owner, member) {
 		return this.createWithTypeRoomIdMessageAndUser('rooms-limit-reached', room._id, member.username, owner);
 	}
@@ -502,6 +506,22 @@ export class Messages extends Base {
 		return this.findOne(query, options);
 	}
 
+	getLastStartedP2PCall(rid) {
+		const query = {
+			rid,
+			t: 'p2p-call',
+			msg: { $in: ['started', 'accepted'] },
+		};
+
+		const options = {
+			sort: {
+				ts: -1,
+			},
+		};
+
+		return this.findOne(query, options);
+	}
+
 	cloneAndSaveAsHistoryById(_id) {
 		const me = Users.findOneById(Meteor.userId());
 		const record = this.findOneById(_id);
@@ -517,6 +537,42 @@ export class Messages extends Base {
 	}
 
 	// UPDATE
+	setP2PCallEndedById(_id) {
+		const query =	{ _id };
+
+		const update = {
+			$set: {
+				msg: 'ended',
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	setP2PCallAcceptedById(_id) {
+		const query =	{ _id };
+
+		const update = {
+			$set: {
+				msg: 'accepted',
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	setP2PCallDeclinedById(_id) {
+		const query =	{ _id };
+
+		const update = {
+			$set: {
+				msg: 'declined',
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	setHiddenById(_id, hidden) {
 		if (hidden == null) { hidden = true; }
 		const query =	{ _id };

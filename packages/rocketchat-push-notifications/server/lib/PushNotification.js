@@ -22,7 +22,7 @@ export class PushNotification {
 		return hash;
 	}
 
-	send({ roomName, roomId, username, message, usersTo, payload, badge = 1, category }) {
+	send({ roomName, roomId, username, message, usersTo, payload, badge = 1, category, pushType = 'alert' }) {
 		SystemLogger.log('PushNotification:message_in', message);
 		// message = message.replace(/^\[.+\) /g, '');
 		message = message.replace(/\[ \]\(https:\/\/chat\.apianon\.ru\/(d|c|g|p|channel|direct|group|private|public)\/(.)+\)/gm, '');
@@ -50,12 +50,13 @@ export class PushNotification {
 				summaryText: '%n% new messages',
 				image: RocketChatAssets.getURL('Assets_favicon_192'),
 			},
+			apn: {
+				pushType,
+			},
 		};
 
-		if (category !== '') {
-			config.apn = {
-				category,
-			};
+		if (category) {
+			config.apn.category = category;
 		}
 
 		SystemLogger.log('PushNotification:config', config);

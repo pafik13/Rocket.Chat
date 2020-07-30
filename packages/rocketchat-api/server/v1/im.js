@@ -78,6 +78,62 @@ API.v1.addRoute(['dm.accept.uploads', 'im.accept.uploads'], { authRequired: true
 	},
 });
 
+API.v1.addRoute(['dm.p2pCallStart', 'im.p2pCallStart'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		const { room } = findResult;
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('p2pCallStart', room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute(['dm.p2pCallAccept', 'im.p2pCallAccept'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		const { room } = findResult;
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('p2pCallAccept', room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute(['dm.p2pCallDecline', 'im.p2pCallDecline'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		const { room } = findResult;
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('p2pCallDecline', room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute(['dm.p2pCallEnd', 'im.p2pCallEnd'], { authRequired: true }, {
+	post() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+
+		const { room } = findResult;
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('p2pCallEnd', room._id);
+		});
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute(['dm.setUploadsState', 'im.setUploadsState'], { authRequired: true }, {
 	post() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
