@@ -53,6 +53,10 @@ Meteor.methods({
 			throw new Meteor.Error('You can\'t start call because you are blocked');
 		}
 
+		const lastMsg = Messages.getLastStartedP2PCall(room._id);
+		if (lastMsg && ['started', 'accepted'].includes(lastMsg.msg)) {
+			throw new Meteor.Error('You can\'t start call because last one isn\'t ended');
+		}
 		const message = Messages.createP2PCallStarted(room, caller);
 
 		return callbacks.run('afterSaveMessage', message, room, caller._id);

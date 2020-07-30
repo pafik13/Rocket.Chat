@@ -138,6 +138,146 @@ describe('[Direct Messages]', function() {
 	});
 
 
+	describe('[/im.p2pCalls}]', () => {
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
+		let testDM = {};
+		before((done) => {
+			request.post(api('im.create'))
+				.set(credentials)
+				.send({
+					username: user.username,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('room');
+					expect(res.body).to.have.nested.property('room._id');
+					expect(res.body).to.have.nested.property('room.ts');
+					expect(res.body).to.have.nested.property('room.t', 'd');
+					expect(res.body).to.have.nested.property('room.msgs', 0);
+					expect(res.body).to.have.nested.property('room.usernames').and.to.have.lengthOf(2);
+					testDM = res.body.room;
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+		it('should start p2p call', (done) => {
+			request.post(api('im.p2pCallStart'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should raise if start again', (done) => {
+			request.post(api('im.p2pCallStart'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('error');
+					expect(res.body).to.have.property('errorType');
+				})
+				.end(done);
+		});
+		it('should decline p2p call', (done) => {
+			request.post(api('im.p2pCallDecline'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should start p2p call', (done) => {
+			request.post(api('im.p2pCallStart'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should accept p2p call', (done) => {
+			request.post(api('im.p2pCallAccept'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		it('should end p2p call', (done) => {
+			request.post(api('im.p2pCallEnd'))
+				.set(userCredentials)
+				.send({
+					roomId: testDM._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
+
 	describe('Testing DM info', () => {
 		let testDM = {};
 		let dmMessage = {};
