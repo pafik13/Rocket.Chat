@@ -22,7 +22,7 @@ export class PushNotification {
 		return hash;
 	}
 
-	send({ roomName, roomId, username, message, usersTo, payload, badge = 1, category, pushType = 'alert' }) {
+	send({ roomName, roomId, username, message, userId, payload, badge = 1, category, pushType = 'alert' }) {
 		SystemLogger.log('PushNotification:message_in', message);
 		// message = message.replace(/^\[.+\) /g, '');
 		message = message.replace(/\[ \]\(https:\/\/chat\.apianon\.ru\/(d|c|g|p|channel|direct|group|private|public)\/(.)+\)/gm, '');
@@ -43,7 +43,7 @@ export class PushNotification {
 			title,
 			text: message,
 			payload,
-			query: usersTo,
+			userId,
 			notId: this.getNotificationId(roomId),
 			gcm: {
 				style: 'inbox',

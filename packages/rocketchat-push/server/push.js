@@ -116,9 +116,10 @@ export class PushClass {
 		}
 
 		try {
+			this._validateDocument(notification);
 			nats.publish('notifications', notification);
 		} catch (error) {
-			logger.debug(`Could not send notification id: "${ notification._id }", Error: ${ error.message }`);
+			logger.debug(`Could not send notification, Error: ${ error.message }`);
 			logger.debug(error.stack);
 		}
 	}
