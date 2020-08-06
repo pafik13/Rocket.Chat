@@ -653,4 +653,101 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 	});
+
+	describe('set user visibility', () => {
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+
+		it('error if empty body', (done) => {
+			request.post(api('admin.setUserVisibility'))
+				.set(credentials)
+				.send({})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-invalid-params');
+				})
+				.end(done);
+		});
+
+		it('error if only userId', (done) => {
+			request.post(api('admin.setUserVisibility'))
+				.set(credentials)
+				.send({
+					userId: user._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-invalid-params');
+				})
+				.end(done);
+		});
+
+		it('should set invisible', (done) => {
+			request.post(api('admin.setUserVisibility'))
+				.set(credentials)
+				.send({
+					userId: user._id,
+					isVisible: false,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should set visible', (done) => {
+			request.post(api('admin.setUserVisibility'))
+				.set(credentials)
+				.send({
+					userId: user._id,
+					isVisible: true,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+	});
 });

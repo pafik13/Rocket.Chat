@@ -447,3 +447,31 @@ API.v1.addRoute('admin.enableUser', { authRequired: true }, {
 		return API.v1.success();
 	},
 });
+
+API.v1.addRoute('admin.setUserVisibility', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId, isVisible } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		if (typeof isVisible !== 'boolean') {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `isVisible`!');
+		}
+
+		const user = Users.findOneById(userId, { _id: 1 });
+
+		if (!user) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('UserPresence:setDefaultStatus', isVisible ? 'online' : 'offline');
+		});
+
+		return API.v1.success();
+	},
+});
