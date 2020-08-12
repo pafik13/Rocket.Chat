@@ -3,7 +3,9 @@ import { Logger } from 'meteor/rocketchat:logger';
 import { SyncedCron } from 'meteor/littledata:synced-cron';
 import { statistics } from 'meteor/rocketchat:statistics';
 import { randomInteger } from 'meteor/rocketchat:utils';
-import { LongTasks } from 'meteor/rocketchat:models';
+import { LongTasks, Rooms } from 'meteor/rocketchat:models';
+import { elastic } from 'meteor/rocketchat:lib';
+
 
 const logger = new Logger('SyncedCron');
 
@@ -21,6 +23,15 @@ function generateStatistics() {
 // function cleanupOEmbedCache() {
 // 	return Meteor.call('OEmbedCacheCleanup');
 // }
+
+const MS_PER_MINUTE = 60000;
+function updateRoomsInElastic() {
+	const till = new Date();
+	const from = new Date(till.valueOf() - MS_PER_MINUTE * 1.1);
+	logger.debug('updateRoomsInElastic', from, till);
+	const rooms = Rooms.findChangedBetweenDates(from, till).fetch();
+	elastic.updateRooms(rooms);
+}
 
 function markInactiveRooms() {
 	return Meteor.call('markInactiveRooms');
@@ -91,6 +102,14 @@ Meteor.startup(function() {
 				return parser.cron('0 1-6 * * *');
 			},
 			job: markInactiveRooms,
+		});
+
+		SyncedCron.add({
+			name: 'Update Rooms In Elastic',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: updateRoomsInElastic,
 		});
 
 		// SyncedCron.add({

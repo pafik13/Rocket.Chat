@@ -5,5 +5,6 @@ sudo docker exec -it rocket_mongo_1 mongo --eval 'rs.status()'
 
 .circleci/queries.sh check
 .circleci/queries.sh create
+.circleci/queries.sh create_room
 .circleci/queries.sh check
 .circleci/queries.sh indeces

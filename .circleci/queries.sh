@@ -19,6 +19,7 @@ help() {
   echo "  ptasks - pending_tasks"
   echo "  tasks"
   echo "  create"
+	echo "  create_room"
   echo "  delete"
   echo "  get"
   echo "  mapping"
@@ -127,6 +128,101 @@ create2() {
               }
           }
       }
+  }
+  '
+}
+
+create_room() {
+  curl -X PUT "$HOST/room" \
+    -H 'Content-Type: application/json' -d '
+  {
+     "settings":{
+        "analysis":{
+           "tokenizer":{
+             "edge_ngram_tokenizer":{
+               "type":"edge_ngram",
+               "min_gram":"1",
+               "max_gram":"20",
+               "token_chars":[
+                 "letter",
+                 "digit"
+               ]
+             }
+           },
+           "analyzer":{
+             "nGram_analyzer":{
+               "type":"custom",
+               "tokenizer":"edge_ngram_tokenizer",
+               "filter":[
+                 "lowercase",
+                 "asciifolding"
+               ]
+             }
+           }
+         }
+       },
+       "mappings" : {
+         "properties" : {
+           "fname"    : { "type" : "text" },
+           "name"   	: { "type" : "keyword" },
+           "fnameAndName" : {
+              "type" : "text",
+              "analyzer":"nGram_analyzer",
+              "search_analyzer": "standard"
+           },
+					 "_updatedAt": { "type": "date" },
+					 "customFields": {
+					 		"properties" : {
+								 "anonym_id"    : { "type" : "keyword" },
+								 "photoUrl"   	: { "type" : "keyword" },
+								 "registeredAt" : { "type": "date" }
+							}
+					 },
+					 "default"			   : { "type": "boolean" },
+					 "filesHidden"		   : { "type": "boolean" },
+					 "isAudioFilesAllowed" : { "type": "boolean" },
+					 "isImageFilesAllowed" : { "type": "boolean" },
+					 "isOtherFilesAllowed" : { "type": "boolean" },
+					 "isVideoFilesAllowed" : { "type": "boolean" },
+					 "lastMessage": {
+					   "properties" : {
+							 "_id" : { "type": "keyword" },
+							 "msg" : { "type": "text" },
+							 "rid" : { "type": "keyword" },
+							 "t"   : { "type": "keyword" },
+							 "ts"  : { "type": "keyword" },
+							 "u": {
+					   			"properties" : {
+										"_id" : { "type": "keyword" },
+										"username" : { "type": "keyword" }
+									}
+								},
+							 "counters": {
+					   			"properties" : {
+										"views": { "type": "integer" }
+									}
+								}
+						 }
+					 },
+					 "lm" : { "type": "date" },
+					 "location" : { "type": "geo_shape" },
+					 "membersHidden" : { "type": "boolean" },
+					 "messageEventsCount": { "type": "integer" },
+					 "msgs": { "type": "integer" },
+					 "ro" : { "type": "boolean" },
+					 "sysMes" : { "type": "boolean" },
+					 "t": { "type" : "keyword" },
+					 "ts" : { "type": "date" },
+					 "u": {
+							"properties" : {
+								"_id": { "type": "keyword" },
+								"username": { "type": "keyword" }
+							}
+						},
+						"usernames": { "type": "keyword" },
+						"usersCount": { "type": "integer" }
+         }
+       }
   }
   '
 }
@@ -286,6 +382,8 @@ case "$action" in
           tasks;;
      create)
           create;;
+     create_room)
+          create_room;;
      delete)
           delete;;
      get)

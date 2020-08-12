@@ -776,6 +776,18 @@ export class Rooms extends Base {
 		return this.find(query, options);
 	}
 
+	findChangedBetweenDates(from, till) {
+		const query = {
+			_updatedAt: {
+				$gte: from,
+				$lte: till,
+			},
+		};
+
+		return this.find(query);
+	}
+
+
 	findByNameContaining(name, options) {
 		const nameRegex = new RegExp(s.trim(s.escapeRegExp(name)), 'i');
 

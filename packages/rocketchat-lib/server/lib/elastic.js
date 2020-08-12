@@ -154,6 +154,47 @@ const findUsersInRoom = async(text, roomId, skip = 0, limit = 50) => {
 	}
 };
 
+/**
+  @param {[Room]} rooms
+*/
+const updateRooms = async(rooms) => {
+	if (!isUseElastic) { return; }
+	if (!Array.isArray(rooms)) {
+		logger.error('rooms must be a array!');
+		return;
+	}
+	logger.debug('updateRooms', rooms.length);
+	if (rooms.length)	{
+		logger.debug('updateRooms', rooms[0]);
+	} else {
+		return;
+	}
+
+	const actions = [];
+	for (let i = 0; i < rooms.length; i++) {
+		const room = rooms[i];
+
+		const { _id: roomId } = room;
+
+		delete room._id;
+
+		actions.push({ update : { _index : 'room', _id : roomId } });
+		actions.push({ doc: room, doc_as_upsert: true });
+	}
+
+	const result = await client.bulk(
+		{ refresh: true, body: actions }
+	);
+
+	if (result && result.body && result.body.items && Array.isArray(result.body.items)) {
+		for (const item of result.body.items) {
+			if (!['noop', 'created', 'updated'].includes(item.update.result)) { logger.warn('updateRooms', item); }
+		}
+	}
+
+	return result;
+};
+
 
 callbacks.add('afterCreateRoom', async(room, { owner, subs }) => {
 	logger.debug('afterCreateRoom', owner, room, subs);
@@ -259,4 +300,5 @@ export const elastic = {
 	delSubscription,
 	updateUser,
 	findUsersInRoom,
+	updateRooms,
 };
