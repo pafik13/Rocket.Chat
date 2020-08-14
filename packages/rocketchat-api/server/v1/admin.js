@@ -8,6 +8,7 @@ import * as heapdump from 'heapdump';
 import { existsSync, mkdirSync } from 'fs';
 import { elastic } from 'meteor/rocketchat:utils';
 import { settings } from 'meteor/rocketchat:settings';
+import { Notifications } from 'meteor/rocketchat:notifications';
 
 API.v1.addRoute('admin.truncateSubscriptions', { authRequired: true }, {
 	post() {
@@ -471,6 +472,36 @@ API.v1.addRoute('admin.setUserVisibility', { authRequired: true }, {
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('UserPresence:setDefaultStatus', isVisible ? 'online' : 'offline');
 		});
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('admin.notifyUser', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { userId, notifType, notifPayload } = this.requestParams();
+
+		if (!userId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `userId`!');
+		}
+
+		if (!notifType) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `notifType`!');
+		}
+
+		if (!notifPayload) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `notifPayload`!');
+		}
+
+		check(userId, String);
+		check(notifType, String);
+		check(notifPayload, Object);
+
+		Notifications.notifyUser(userId, notifType, notifPayload);
 
 		return API.v1.success();
 	},

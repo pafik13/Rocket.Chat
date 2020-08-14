@@ -750,4 +750,22 @@ describe('[Admin]', function() {
 		});
 
 	});
+
+	describe('notify user', () => {
+		it('should success', (done) => {
+			request.post(api('admin.notifyUser'))
+				.set(credentials)
+				.send({
+					userId: 'rocket.cat',
+					notifType: 'notifType',
+					notifPayload: {},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+	});
 });
