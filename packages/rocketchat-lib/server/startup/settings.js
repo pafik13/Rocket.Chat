@@ -1399,9 +1399,19 @@ settings.addGroup('Push', function() {
 		this.add('Push_gcm_api_key', '', {
 			type: 'string',
 		});
-		return this.add('Push_gcm_project_number', '', {
+		this.add('Push_gcm_project_number', '', {
 			type: 'string',
 			public: true,
+		});
+		this.add('Push_apn_token_key', '', {
+			type: 'string',
+			multiline: true,
+		});
+		this.add('Push_apn_token_key_id', '', {
+			type: 'string',
+		});
+		return this.add('Push_apn_token_team_id', '', {
+			type: 'string',
 		});
 	});
 	return this.section('Privacy', function() {
