@@ -955,6 +955,10 @@ settings.addGroup('General', function() {
 		public: true,
 		i18nDescription: 'Store_Last_Message_Sent_per_Room',
 	});
+	this.add('Main_backend_host', 'https://stage.apianon.ru/', {
+		type: 'string',
+		public: true,
+	});
 	this.add('Use_elastic', false, {
 		type: 'boolean',
 		public: true,

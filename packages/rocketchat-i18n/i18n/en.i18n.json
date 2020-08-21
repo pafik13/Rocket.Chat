@@ -1873,6 +1873,7 @@
   "Mailer": "Mailer",
   "Mailer_body_tags": "You <b>must</b> use [unsubscribe] for the unsubscription link.<br/>You may use [name], [fname], [lname] for the user's full name, first name or last name, respectively.<br/>You may use [email] for the user's email.",
   "Mailing": "Mailing",
+	"Main_backend_host": "Main backend host",
   "Make_Admin": "Make Admin",
   "Make_sure_you_have_a_copy_of_your_codes": "Make sure you have a copy of your codes: __codes__ If you lose access to your authenticator app, you can use one of these codes to log in.",
   "manage-apps": "Manage Apps",
