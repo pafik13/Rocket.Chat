@@ -1414,7 +1414,17 @@ settings.addGroup('Push', function() {
 		this.add('Push_apn_token_key_id', '', {
 			type: 'string',
 		});
-		return this.add('Push_apn_token_team_id', '', {
+		this.add('Push_apn_token_team_id', '', {
+			type: 'string',
+		});
+		this.add('Push_apn_token_dev_key', '', {
+			type: 'string',
+			multiline: true,
+		});
+		this.add('Push_apn_token_dev_key_id', '', {
+			type: 'string',
+		});
+		return this.add('Push_apn_token_dev_team_id', '', {
 			type: 'string',
 		});
 	});
