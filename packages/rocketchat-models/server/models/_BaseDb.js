@@ -270,7 +270,7 @@ export class BaseDb extends EventEmitter {
 
 		if (isHeavy) {
 			heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query) });
-			const findOptions = { fields: { _id: 1 } };
+			const findOptions = { fields: { _id: 1 }, sort: { _updatedAt: -1 } };
 			let records = this.find(query, findOptions).fetch() || [];
 			if (!Array.isArray(records)) {
 				records = [records];
@@ -361,7 +361,7 @@ export class BaseDb extends EventEmitter {
 			heavyQueries.insert({ model: this.name, action: 'remove', query: JSON.stringify(query) });
 		}
 
-		const records = this.model.find(query, { limit: 1000 }).fetch();
+		const records = this.model.find(query, { limit: 1000, sort: { _updatedAt: -1 } }).fetch();
 
 		const ids = [];
 		for (const record of records) {
