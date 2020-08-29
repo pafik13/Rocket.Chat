@@ -15,6 +15,14 @@ try {
 	console.log(e);
 }
 
+const heavyQueries = new Mongo.Collection(`${ baseName }_heavy_queries`);
+try {
+	heavyQueries._ensureIndex({ model: 1 });
+	heavyQueries._ensureIndex({ action: 1 });
+} catch (e) {
+	console.log(e);
+}
+
 const isOplogAvailable = MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle && !!MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry;
 
 let isOplogEnabled = isOplogAvailable;
@@ -22,6 +30,9 @@ let isOplogEnabled = isOplogAvailable;
 const excludedFromNATS = [
 	'settings', 'permissions', 'roles',
 ];
+
+const countMaxTimeMS = 50;
+const maxRecordForProcess = 1000;
 
 export class BaseDb extends EventEmitter {
 	constructor(model, baseModel) {
@@ -243,6 +254,35 @@ export class BaseDb extends EventEmitter {
 	}
 
 	update(query, update, options = {}) {
+		let isHeavy = false;
+		if (options.multi && options.upsert !== true && this.updateHasPositionalOperator(update) === false) {
+			const collectionObj = this.model.rawCollection();
+			const wrappedCount = Meteor.wrapAsync(collectionObj.count, collectionObj);
+			try {
+				const rewritedQuery = Mongo.Collection._rewriteSelector(query);
+				const count = wrappedCount(rewritedQuery, { maxTimeMs: countMaxTimeMS });
+				isHeavy = count > maxRecordForProcess;
+			} catch (e) {
+				isHeavy = true;
+				console.error(e);
+			}
+		}
+
+		if (isHeavy) {
+			heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query) });
+			const findOptions = { fields: { _id: 1 } };
+			let records = this.find(query, findOptions).fetch() || [];
+			if (!Array.isArray(records)) {
+				records = [records];
+			}
+			const ids = records.map((item) => item._id);
+			query = {
+				_id: {
+					$in: ids,
+				},
+			};
+		}
+
 		this.setUpdatedAt(update, true, query);
 
 		let ids = [];
@@ -304,7 +344,24 @@ export class BaseDb extends EventEmitter {
 	}
 
 	remove(query) {
-		const records = this.model.find(query).fetch();
+		let isHeavy = false;
+
+		const collectionObj = this.model.rawCollection();
+		const wrappedCount = Meteor.wrapAsync(collectionObj.count, collectionObj);
+		try {
+			const rewritedQuery = Mongo.Collection._rewriteSelector(query);
+			const count = wrappedCount(rewritedQuery, { maxTimeMs: countMaxTimeMS });
+			isHeavy = count > maxRecordForProcess;
+		} catch (e) {
+			isHeavy = true;
+			console.error(e);
+		}
+
+		if (isHeavy) {
+			heavyQueries.insert({ model: this.name, action: 'remove', query: JSON.stringify(query) });
+		}
+
+		const records = this.model.find(query, { limit: 1000 }).fetch();
 
 		const ids = [];
 		for (const record of records) {
