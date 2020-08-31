@@ -15,6 +15,7 @@ try {
 	console.log(e);
 }
 
+const isDisableRewriteHeavyQueries = !!process.env.DISABLE_REWRITE_HEAVY_QUERIES;
 const heavyQueries = new Mongo.Collection(`${ baseName }_heavy_queries`);
 try {
 	heavyQueries._ensureIndex({ model: 1 });
@@ -269,18 +270,20 @@ export class BaseDb extends EventEmitter {
 		}
 
 		if (isHeavy) {
-			heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query) });
-			const findOptions = { fields: { _id: 1 }, sort: { _updatedAt: -1 } };
-			let records = this.find(query, findOptions).fetch() || [];
-			if (!Array.isArray(records)) {
-				records = [records];
+			heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query), update: JSON.stringify(update) });
+			if (!isDisableRewriteHeavyQueries) {
+				const findOptions = { fields: { _id: 1 }, sort: { _updatedAt: -1 }, limit: maxRecordForProcess };
+				let records = this.find(query, findOptions).fetch() || [];
+				if (!Array.isArray(records)) {
+					records = [records];
+				}
+				const ids = records.map((item) => item._id);
+				query = {
+					_id: {
+						$in: ids,
+					},
+				};
 			}
-			const ids = records.map((item) => item._id);
-			query = {
-				_id: {
-					$in: ids,
-				},
-			};
 		}
 
 		this.setUpdatedAt(update, true, query);
@@ -357,11 +360,12 @@ export class BaseDb extends EventEmitter {
 			console.error(e);
 		}
 
+		let findOptions = {};
 		if (isHeavy) {
 			heavyQueries.insert({ model: this.name, action: 'remove', query: JSON.stringify(query) });
+			if (!isDisableRewriteHeavyQueries) { findOptions = { limit: maxRecordForProcess, sort: { _updatedAt: -1 } }; }
 		}
-
-		const records = this.model.find(query, { limit: 1000, sort: { _updatedAt: -1 } }).fetch();
+		const records = this.model.find(query, findOptions).fetch();
 
 		const ids = [];
 		for (const record of records) {
