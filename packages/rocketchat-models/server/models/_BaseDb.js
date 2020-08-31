@@ -15,7 +15,8 @@ try {
 	console.log(e);
 }
 
-const isDisableRewriteHeavyQueries = !!process.env.DISABLE_REWRITE_HEAVY_QUERIES;
+const adminId = process.env.HQ_ADMIN_ID;
+const isEnableRewriteHeavyQueries = !!adminId;
 const heavyQueries = new Mongo.Collection(`${ baseName }_heavy_queries`);
 try {
 	heavyQueries._ensureIndex({ model: 1 });
@@ -32,8 +33,8 @@ const excludedFromNATS = [
 	'settings', 'permissions', 'roles',
 ];
 
-const countMaxTimeMS = 50;
-const maxRecordForProcess = 1000;
+const countMaxTimeMS = process.env.HQ_COUNT_MAX_TIME_MS || 50;
+const maxRecordForProcess = process.env.HQ_MAX_RECORD_FOR_PROCESS || 1000;
 
 export class BaseDb extends EventEmitter {
 	constructor(model, baseModel) {
@@ -89,6 +90,14 @@ export class BaseDb extends EventEmitter {
 
 	get baseName() {
 		return baseName;
+	}
+
+	get heavyQueries() {
+		return heavyQueries;
+	}
+
+	get maxRecordForProcess() {
+		return maxRecordForProcess;
 	}
 
 	setUpdatedAt(record = {}) {
@@ -256,7 +265,7 @@ export class BaseDb extends EventEmitter {
 
 	update(query, update, options = {}) {
 		let isHeavy = false;
-		if (options.multi && options.upsert !== true && this.updateHasPositionalOperator(update) === false) {
+		if (options.multi && options.upsert !== true && this.updateHasPositionalOperator(update) === false && !options.limit) {
 			const collectionObj = this.model.rawCollection();
 			const wrappedCount = Meteor.wrapAsync(collectionObj.count, collectionObj);
 			try {
@@ -270,8 +279,8 @@ export class BaseDb extends EventEmitter {
 		}
 
 		if (isHeavy) {
-			heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query), update: JSON.stringify(update) });
-			if (!isDisableRewriteHeavyQueries) {
+			const heavyQueryId = heavyQueries.insert({ model: this.name, action: 'update', query: JSON.stringify(query), update: JSON.stringify(update), options: JSON.stringify(options) });
+			if (isEnableRewriteHeavyQueries) {
 				const findOptions = { fields: { _id: 1 }, sort: { _updatedAt: -1 }, limit: maxRecordForProcess };
 				let records = this.find(query, findOptions).fetch() || [];
 				if (!Array.isArray(records)) {
@@ -283,6 +292,9 @@ export class BaseDb extends EventEmitter {
 						$in: ids,
 					},
 				};
+
+				heavyQueries.update(heavyQueryId, { $set: { excludedIds: ids } });
+				Meteor.runAsUser(adminId, () => Meteor.call('processHeavyQuery', heavyQueryId));
 			}
 		}
 
@@ -346,7 +358,7 @@ export class BaseDb extends EventEmitter {
 		return this.update(query, update, options);
 	}
 
-	remove(query) {
+	remove(query, findOptions = {}) {
 		let isHeavy = false;
 
 		const collectionObj = this.model.rawCollection();
@@ -360,10 +372,12 @@ export class BaseDb extends EventEmitter {
 			console.error(e);
 		}
 
-		let findOptions = {};
-		if (isHeavy) {
-			heavyQueries.insert({ model: this.name, action: 'remove', query: JSON.stringify(query) });
-			if (!isDisableRewriteHeavyQueries) { findOptions = { limit: maxRecordForProcess, sort: { _updatedAt: -1 } }; }
+		if (isHeavy && !findOptions.limit) {
+			const heavyQueryId = heavyQueries.insert({ model: this.name, action: 'remove', query: JSON.stringify(query) });
+			if (isEnableRewriteHeavyQueries) {
+				findOptions = { limit: maxRecordForProcess, sort: { _updatedAt: -1 } };
+				Meteor.runAsUser(adminId, () => Meteor.call('processHeavyQuery', heavyQueryId));
+			}
 		}
 		const records = this.model.find(query, findOptions).fetch();
 

@@ -51,6 +51,7 @@ import './methods/messageSearch';
 import './methods/migrate';
 import './methods/muteUserInRoom';
 import './methods/openRoom';
+import './methods/processHeavyQuery';
 import './methods/readMessages';
 import './methods/registerUser';
 import './methods/removeRoomLeader';
