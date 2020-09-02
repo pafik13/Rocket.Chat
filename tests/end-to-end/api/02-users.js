@@ -195,7 +195,7 @@ describe('[Users]', function() {
 
 	describe('[/users.setStatus]', () => {
 		it('should change status to away', (done) => {
-			request.get(api('users.setStatus'))
+			request.post(api('users.setStatus'))
 				.set(credentials)
 				.query({
 					status: 'away',
@@ -209,7 +209,7 @@ describe('[Users]', function() {
 		});
 
 		it('should change status to busy', (done) => {
-			request.get(api('users.setStatus'))
+			request.post(api('users.setStatus'))
 				.set(credentials)
 				.query({
 					status: 'busy',
@@ -223,7 +223,7 @@ describe('[Users]', function() {
 		});
 
 		it('should change status to offline', (done) => {
-			request.get(api('users.setStatus'))
+			request.post(api('users.setStatus'))
 				.set(credentials)
 				.query({
 					status: 'offline',
@@ -237,7 +237,7 @@ describe('[Users]', function() {
 		});
 
 		it('should change status to online', (done) => {
-			request.get(api('users.setStatus'))
+			request.post(api('users.setStatus'))
 				.set(credentials)
 				.query({
 					status: 'online',
@@ -251,7 +251,7 @@ describe('[Users]', function() {
 		});
 
 		it('should NOT change status to custom', (done) => {
-			request.get(api('users.setStatus'))
+			request.post(api('users.setStatus'))
 				.set(credentials)
 				.query({
 					status: 'custom',
