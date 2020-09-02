@@ -197,7 +197,7 @@ describe('[Users]', function() {
 		it('should change status to away', (done) => {
 			request.post(api('users.setStatus'))
 				.set(credentials)
-				.query({
+				.send({
 					status: 'away',
 				})
 				.expect('Content-Type', 'application/json')
@@ -211,7 +211,7 @@ describe('[Users]', function() {
 		it('should change status to busy', (done) => {
 			request.post(api('users.setStatus'))
 				.set(credentials)
-				.query({
+				.send({
 					status: 'busy',
 				})
 				.expect('Content-Type', 'application/json')
@@ -225,7 +225,7 @@ describe('[Users]', function() {
 		it('should change status to offline', (done) => {
 			request.post(api('users.setStatus'))
 				.set(credentials)
-				.query({
+				.send({
 					status: 'offline',
 				})
 				.expect('Content-Type', 'application/json')
@@ -239,7 +239,7 @@ describe('[Users]', function() {
 		it('should change status to online', (done) => {
 			request.post(api('users.setStatus'))
 				.set(credentials)
-				.query({
+				.send({
 					status: 'online',
 				})
 				.expect('Content-Type', 'application/json')
@@ -253,7 +253,7 @@ describe('[Users]', function() {
 		it('should NOT change status to custom', (done) => {
 			request.post(api('users.setStatus'))
 				.set(credentials)
-				.query({
+				.send({
 					status: 'custom',
 				})
 				.expect('Content-Type', 'application/json')

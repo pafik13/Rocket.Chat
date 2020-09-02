@@ -274,7 +274,12 @@ API.v1.addRoute('users.setStatus', { authRequired: true }, {
 			});
 		}
 
-		Meteor.runAsUser(this.userId, () => Meteor.call('UserPresence:setDefaultStatus', status));
+		Meteor.users.update(this.userId, {
+			$set: {
+				status,
+				statusDefault: status,
+			},
+		});
 
 		return API.v1.success();
 	},
