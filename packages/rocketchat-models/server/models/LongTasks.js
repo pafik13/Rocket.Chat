@@ -11,13 +11,14 @@ import { Base } from './_Base';
     instanceId: string (id of Rocket instance)
     execs: number (executions count)
   }
-  */
+*/
 
 class LongTasks extends Base {
 	constructor() {
 		super('long_tasks');
 
-		this.tryEnsureIndex({ name: 1 });
+		this.tryEnsureIndex({ method: 1 });
+		this.tryEnsureIndex({ last: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 });
 	}
 
 	// find one
