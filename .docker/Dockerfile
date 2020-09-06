@@ -1,4 +1,4 @@
-FROM rocketchat/base:12.18
+FROM rocketchat/base:12.16
 
 RUN set -x \
  && apt-get update \
