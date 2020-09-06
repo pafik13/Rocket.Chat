@@ -1119,6 +1119,9 @@ export class Rooms extends Base {
 			$set: {
 				lastMessage,
 			},
+			$inc: {
+				messageEventsCount: 1,
+			},
 		};
 
 		return this.update(query, update);
@@ -1136,6 +1139,10 @@ export class Rooms extends Base {
 			$unset: {
 				lastMessage: 1,
 			},
+		};
+
+		update.$inc = {
+			messageEventsCount: 1,
 		};
 
 		return this.update(query, update);

@@ -17,4 +17,3 @@ export { elastic } from './elastic';
 export { redis } from './redis';
 
 import './notifyUsersOnMessage';
-import './incMessageEventsCount';
