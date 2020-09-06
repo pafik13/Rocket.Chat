@@ -295,7 +295,7 @@ jobs:
 
             if [[ $CIRCLE_BRANCH == 'develop' ]]; then
               echo "Build develop Docker image"
-              cp ~/repo/.docker/Dockerfile .
+              cp ~/repo/.docker/Dockerfile.develop .
               docker build -t anonym/rocket:develop .
 
               docker tag anonym/rocket:develop gitlab.apianon.ru:5555/backend/rocket:develop
