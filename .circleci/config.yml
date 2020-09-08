@@ -167,7 +167,7 @@ jobs:
           name: Prepare build
           command: |
             mkdir /tmp/build/
-	          cp .circleci/queries.sh /tmp/build/esq.sh
+            cp .circleci/queries.sh /tmp/build/esq.sh
             cd /tmp/build-test
             tar czf /tmp/build/Rocket.Chat.tar.gz bundle
             cd /tmp/build-test/bundle/programs/server
