@@ -904,14 +904,24 @@ export class Subscriptions extends Base {
 			inc = 1;
 		}
 		const query = {
-			rid: roomId,
-			'u._id': {
-				$ne: userId,
+			$and: [{
+				rid: roomId,
+				'u._id': {
+					$ne: userId,
+				},
+			}, {
+				$or: [{
+					lmServerId: {
+						$exists: false,
+					},
+				}, {
+					t: 'd',
+				},
+				],
 			},
-			lmServerId: {
-				$exists: false,
-			},
+			],
 		};
+
 
 		const update = {
 			$set: {
