@@ -57,7 +57,6 @@ export {
 	EmojiCustom,
 	OAuthApps,
 	OEmbedCache,
-	SmarshHistory,
 	WebdavAccounts,
 	ReadReceipts,
 	BannedUsers,
