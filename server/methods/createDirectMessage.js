@@ -8,8 +8,8 @@ import { RateLimiter, getRecordAboutBlock } from 'meteor/rocketchat:lib';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
 Meteor.methods({
-	createDirectMessage(username) {
-		check(username, String);
+	createDirectMessage(usernameOrUserId) {
+		check(usernameOrUserId, String);
 		const now = new Date();
 
 		const callerId = Meteor.userId();
@@ -28,21 +28,24 @@ Meteor.methods({
 			});
 		}
 
-		if (settings.get('Message_AllowDirectMessagesToYourself') === false && me.username === username) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'createDirectMessage',
-			});
-		}
-
 		if (!hasPermission(callerId, 'create-d')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
 				method: 'createDirectMessage',
 			});
 		}
 
-		const to = Users.findOneByUsername(username);
+		let to = Users.findOneByUsername(usernameOrUserId);
 
 		if (!to) {
+			to = Users.findOneById(usernameOrUserId);
+			if (!to) {
+				throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+					method: 'createDirectMessage',
+				});
+			}
+		}
+
+		if (settings.get('Message_AllowDirectMessagesToYourself') === false && me.username === to.username) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'createDirectMessage',
 			});
