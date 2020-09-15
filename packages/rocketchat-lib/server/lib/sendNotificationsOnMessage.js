@@ -257,9 +257,9 @@ async function sendAllNotifications(message, room) {
 		project,
 	]);
 
-	// 	let count = 0;
+	// let count = 0;
 	while (await cursor.hasNext()) {
-		// load   one document from the resultset into memory
+		// load one document from the resultset into memory
 		const subscription = await cursor.next();
 		await sendNotification({
 			subscription,
