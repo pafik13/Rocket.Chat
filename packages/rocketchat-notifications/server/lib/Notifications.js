@@ -2,6 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { DDPCommon } from 'meteor/ddp-common';
 import { Subscriptions, Rooms } from 'meteor/rocketchat:models';
 
+const userNotificationEvents = ['audioNotification', 'notification'];
+
 const changedPayload = function(collection, id, fields) {
 	return DDPCommon.stringifyDDP({
 		msg: 'changed',
@@ -17,6 +19,22 @@ const send = function(self, msg) {
 	self.socket.send(msg);
 };
 class RoomStreamer extends Meteor.Streamer {
+	addSubscription(subscription, eventName) {
+		super.addSubscription(subscription, eventName);
+		const [userId, event] = eventName.split('/');
+		if (userNotificationEvents.includes(event)) {
+			Meteor.users.update(userId, { $set: { isSubscribedOnNotification: true } });
+		}
+	}
+
+	removeSubscription(subscription, eventName) {
+		super.removeSubscription(subscription, eventName);
+		const [userId, event] = eventName.split('/');
+		if (userNotificationEvents.includes(event)) {
+			Meteor.users.update(userId, { $set: { isSubscribedOnNotification: false } });
+		}
+	}
+
 	_publish(publication, eventName, options) {
 		super._publish(publication, eventName, options);
 		const uid = Meteor.userId();

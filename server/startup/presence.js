@@ -37,6 +37,8 @@ const handler = (user, status, statusConnection) => {
 				logger.error('Auth Ingest Error:', err);
 			}
 		}
+
+		Meteor.users.update(user._id, { $set: { isSubscribedOnNotification: false } });
 	}
 };
 
