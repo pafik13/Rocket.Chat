@@ -69,7 +69,7 @@ export function shouldNotifyMobile({
 	hasMentionToAll,
 	isHighlighted,
 	hasMentionToUser,
-	isSubscribedOnNotification,
+	isSubscribedOnNotifications,
 	roomType,
 }) {
 // 	console.log(
@@ -79,7 +79,7 @@ export function shouldNotifyMobile({
 // 		hasMentionToAll,
 // 		isHighlighted,
 // 		hasMentionToUser,
-// 		isSubscribedOnNotification,
+// 		isSubscribedOnNotifications,
 // 		roomType,
 // 	);
 	if (disableAllMessageNotifications && mobilePushNotifications == null && !isHighlighted && !hasMentionToUser) {
@@ -90,7 +90,7 @@ export function shouldNotifyMobile({
 		return false;
 	}
 
-	if (!alwaysNotifyMobileBoolean && isSubscribedOnNotification) {
+	if (!alwaysNotifyMobileBoolean && isSubscribedOnNotifications) {
 		return false;
 	}
 

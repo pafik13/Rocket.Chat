@@ -5,7 +5,7 @@ import { Notifications } from 'meteor/rocketchat:notifications';
 export function shouldNotifyAudio({
 	disableAllMessageNotifications,
 	status,
-	isSubscribedOnNotification,
+	isSubscribedOnNotifications,
 	audioNotifications,
 	hasMentionToAll,
 	hasMentionToHere,
@@ -17,7 +17,7 @@ export function shouldNotifyAudio({
 // 		'shouldNotifyAudio',
 // 		disableAllMessageNotifications,
 // 		status,
-// 		isSubscribedOnNotification,
+// 		isSubscribedOnNotifications,
 // 		audioNotifications,
 // 		hasMentionToAll,
 // 		hasMentionToHere,
@@ -29,7 +29,7 @@ export function shouldNotifyAudio({
 		return false;
 	}
 
-	if (!isSubscribedOnNotification || status === 'busy' || audioNotifications === 'nothing') {
+	if (!isSubscribedOnNotifications || status === 'busy' || audioNotifications === 'nothing') {
 		return false;
 	}
 

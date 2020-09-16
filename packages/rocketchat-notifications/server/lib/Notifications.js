@@ -23,7 +23,7 @@ class RoomStreamer extends Meteor.Streamer {
 		super.addSubscription(subscription, eventName);
 		const [userId, event] = eventName.split('/');
 		if (userNotificationEvents.includes(event)) {
-			Meteor.users.update(userId, { $set: { isSubscribedOnNotification: true } });
+			Meteor.users.update(userId, { $set: { isSubscribedOnNotifications: true } });
 		}
 	}
 
@@ -31,7 +31,7 @@ class RoomStreamer extends Meteor.Streamer {
 		super.removeSubscription(subscription, eventName);
 		const [userId, event] = eventName.split('/');
 		if (userNotificationEvents.includes(event)) {
-			Meteor.users.update(userId, { $set: { isSubscribedOnNotification: false } });
+			Meteor.users.update(userId, { $set: { isSubscribedOnNotifications: false } });
 		}
 	}
 

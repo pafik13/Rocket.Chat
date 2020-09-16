@@ -44,7 +44,7 @@ export function notifyDesktopUser({
 export function shouldNotifyDesktop({
 	disableAllMessageNotifications,
 	status,
-	isSubscribedOnNotification,
+	isSubscribedOnNotifications,
 	desktopNotifications,
 	hasMentionToAll,
 	hasMentionToHere,
@@ -56,7 +56,7 @@ export function shouldNotifyDesktop({
 // 		'shouldNotifyDesktop',
 // 		disableAllMessageNotifications,
 // 		status,
-// 		isSubscribedOnNotification,
+// 		isSubscribedOnNotifications,
 // 		desktopNotifications,
 // 		hasMentionToAll,
 // 		hasMentionToHere,
@@ -68,7 +68,7 @@ export function shouldNotifyDesktop({
 		return false;
 	}
 
-	if (!isSubscribedOnNotification || status === 'busy' || desktopNotifications === 'nothing') {
+	if (!isSubscribedOnNotifications || status === 'busy' || desktopNotifications === 'nothing') {
 		return false;
 	}
 

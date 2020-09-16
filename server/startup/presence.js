@@ -38,7 +38,7 @@ const handler = (user, status, statusConnection) => {
 			}
 		}
 
-		Meteor.users.update(user._id, { $set: { isSubscribedOnNotification: false } });
+		Meteor.users.update(user._id, { $set: { isSubscribedOnNotifications: false } });
 	}
 };
 
