@@ -57,7 +57,7 @@ const sendNotification = async({
 	if (shouldNotifyAudio({
 		disableAllMessageNotifications,
 		status: receiver.status,
-		statusConnection: receiver.statusConnection,
+		isSubscribedOnNotification: receiver.isSubscribedOnNotification,
 		audioNotifications,
 		hasMentionToAll,
 		hasMentionToHere,
@@ -72,7 +72,7 @@ const sendNotification = async({
 	if (shouldNotifyDesktop({
 		disableAllMessageNotifications,
 		status: receiver.status,
-		statusConnection: receiver.statusConnection,
+		isSubscribedOnNotification: receiver.isSubscribedOnNotification,
 		desktopNotifications,
 		hasMentionToAll,
 		hasMentionToHere,
@@ -96,7 +96,7 @@ const sendNotification = async({
 		hasMentionToAll,
 		isHighlighted,
 		hasMentionToUser,
-		statusConnection: receiver.statusConnection,
+		isSubscribedOnNotification: receiver.isSubscribedOnNotification,
 		roomType,
 	})) {
 
@@ -127,7 +127,7 @@ const project = {
 		'receiver.emails': 1,
 		'receiver.language': 1,
 		'receiver.status': 1,
-		'receiver.statusConnection': 1,
+		'receiver.isSubscribedOnNotification': 1,
 		'receiver.username': 1,
 	},
 };

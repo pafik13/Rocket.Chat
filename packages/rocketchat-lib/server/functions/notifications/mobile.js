@@ -69,9 +69,19 @@ export function shouldNotifyMobile({
 	hasMentionToAll,
 	isHighlighted,
 	hasMentionToUser,
-	statusConnection,
+	isSubscribedOnNotification,
 	roomType,
 }) {
+// 	console.log(
+// 		'shouldNotifyMobile',
+// 		disableAllMessageNotifications,
+// 		mobilePushNotifications,
+// 		hasMentionToAll,
+// 		isHighlighted,
+// 		hasMentionToUser,
+// 		isSubscribedOnNotification,
+// 		roomType,
+// 	);
 	if (disableAllMessageNotifications && mobilePushNotifications == null && !isHighlighted && !hasMentionToUser) {
 		return false;
 	}
@@ -80,7 +90,7 @@ export function shouldNotifyMobile({
 		return false;
 	}
 
-	if (!alwaysNotifyMobileBoolean && statusConnection === 'online') {
+	if (!alwaysNotifyMobileBoolean && isSubscribedOnNotification) {
 		return false;
 	}
 

@@ -44,7 +44,7 @@ export function notifyDesktopUser({
 export function shouldNotifyDesktop({
 	disableAllMessageNotifications,
 	status,
-	statusConnection,
+	isSubscribedOnNotification,
 	desktopNotifications,
 	hasMentionToAll,
 	hasMentionToHere,
@@ -52,11 +52,23 @@ export function shouldNotifyDesktop({
 	hasMentionToUser,
 	roomType,
 }) {
+// 	console.log(
+// 		'shouldNotifyDesktop',
+// 		disableAllMessageNotifications,
+// 		status,
+// 		isSubscribedOnNotification,
+// 		desktopNotifications,
+// 		hasMentionToAll,
+// 		hasMentionToHere,
+// 		isHighlighted,
+// 		hasMentionToUser,
+// 		roomType,
+// 	);
 	if (disableAllMessageNotifications && desktopNotifications == null && !isHighlighted && !hasMentionToUser) {
 		return false;
 	}
 
-	if (statusConnection === 'offline' || status === 'busy' || desktopNotifications === 'nothing') {
+	if (!isSubscribedOnNotification || status === 'busy' || desktopNotifications === 'nothing') {
 		return false;
 	}
 
