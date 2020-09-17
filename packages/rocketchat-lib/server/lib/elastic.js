@@ -177,6 +177,7 @@ const updateRooms = async(rooms) => {
 		const { _id: roomId } = room;
 
 		delete room._id;
+		room.fnameAndName = `${ room.fname } ${ room.name }`;
 
 		actions.push({ update : { _index : 'room', _id : roomId } });
 		actions.push({ doc: room, doc_as_upsert: true });
