@@ -5,7 +5,7 @@
 	for the *server* pieces of code which does include the shared
 	library files.
 */
-export { sendNotification } from './sendNotificationsOnMessage';
+export { sendNotification, sendSinglePush } from './sendNotificationsOnMessage';
 export { notifyUser } from './sendNotificationOnInviteOrKick';
 export { hostname } from '../../lib/startup/settingsOnLoadSiteUrl';
 export { passwordPolicy } from './passwordPolicy';

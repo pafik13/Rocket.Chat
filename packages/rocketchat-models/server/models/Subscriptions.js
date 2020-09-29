@@ -155,7 +155,10 @@ export class Subscriptions extends Base {
 			updateUserSubs.$set = { 'subscriptions.$.audioNotifications': audioNotifications };
 		}
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
+
 		return this.update(query, update);
 	}
 
@@ -176,7 +179,9 @@ export class Subscriptions extends Base {
 			},
 		};
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -209,7 +214,9 @@ export class Subscriptions extends Base {
 			};
 		}
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -233,7 +240,9 @@ export class Subscriptions extends Base {
 			},
 		};
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -266,7 +275,9 @@ export class Subscriptions extends Base {
 			};
 		}
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -299,7 +310,9 @@ export class Subscriptions extends Base {
 			};
 		}
 
-		Users.update({ _id: Meteor.userId(), subscriptions: query }, updateUserSubs);
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}

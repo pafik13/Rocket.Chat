@@ -23,7 +23,6 @@ Package.onUse(function(api) {
 		'kadira:flow-router',
 		'kadira:blaze-layout',
 		'rocketchat:ui-master',
-		'rocketchat:push',
 		'rocketchat:utils',
 		'rocketchat:emoji',
 		'rocketchat:notifications',

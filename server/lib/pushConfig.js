@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { appTokensCollection, Push } from 'meteor/rocketchat:push';
+import { sendSinglePush } from 'meteor/rocketchat:lib';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 
@@ -27,31 +27,13 @@ Meteor.methods({
 			});
 		}
 
-		const query = {
-			$and: [{
-				userId: user._id,
-			}, {
-				$or: [{
-					'token.apn': {
-						$exists: true,
-					},
-				}, {
-					'token.gcm': {
-						$exists: true,
-					},
-				}],
-			}],
-		};
-
-		const tokens = appTokensCollection.find(query).count();
-
-		if (tokens === 0) {
+		if (user.tokens && user.tokens.length === 0) {
 			throw new Meteor.Error('error-no-tokens-for-this-user', 'There are no tokens for this user', {
 				method: 'push_test',
 			});
 		}
 
-		Push.send({
+		sendSinglePush({
 			from: 'push',
 			title: `@${ user.username }`,
 			text: TAPi18n.__('This_is_a_push_test_messsage'),
@@ -64,63 +46,7 @@ Meteor.methods({
 
 		return {
 			message: 'Your_push_was_sent_to_s_devices',
-			params: [tokens],
+			params: [user.tokens.length],
 		};
 	},
 });
-
-
-function configurePush() {
-	if (settings.get('Push_debug')) {
-		Push.debug = true;
-		console.log('Push: configuring...');
-	}
-
-	if (settings.get('Push_enable') === true) {
-		let apn;
-		let gcm;
-
-		if (settings.get('Push_enable_gateway') === false) {
-			gcm = {
-				apiKey: settings.get('Push_gcm_api_key'),
-				projectNumber: settings.get('Push_gcm_project_number'),
-			};
-
-			apn = {
-				passphrase: settings.get('Push_apn_passphrase'),
-				keyData: settings.get('Push_apn_key'),
-				certData: settings.get('Push_apn_cert'),
-			};
-
-			if (settings.get('Push_production') !== true) {
-				apn = {
-					passphrase: settings.get('Push_apn_dev_passphrase'),
-					keyData: settings.get('Push_apn_dev_key'),
-					certData: settings.get('Push_apn_dev_cert'),
-					gateway: 'gateway.sandbox.push.apple.com',
-				};
-			}
-
-			if (!apn.keyData || apn.keyData.trim() === '' || !apn.certData || apn.certData.trim() === '') {
-				apn = undefined;
-			}
-
-			if (!gcm.apiKey || gcm.apiKey.trim() === '' || !gcm.projectNumber || gcm.projectNumber.trim() === '') {
-				gcm = undefined;
-			}
-		}
-
-		Push.configure({
-			apn,
-			gcm,
-			production: settings.get('Push_production'),
-			sendInterval: 1000,
-			sendBatchSize: 500,
-			// debug: true,
-		});
-
-		Push.enabled = true;
-	}
-}
-
-Meteor.startup(configurePush);
