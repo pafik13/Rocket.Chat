@@ -1,24 +1,52 @@
 import { TAPi18n } from 'meteor/tap:i18n';
-import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('sendNotificationOnInviteOrKick');
 
-import { sendNotification, project, lookup, filter } from './sendNotificationsOnMessage';
+import { sendNotification } from './sendNotificationsOnMessage';
+
+const project = {
+	$project: {
+		audioNotifications: 1,
+		desktopNotificationDuration: 1,
+		desktopNotifications: 1,
+		emailNotifications: 1,
+		mobilePushNotifications: 1,
+		muteGroupMentions: 1,
+		name: 1,
+		userHighlights: 1,
+		'u._id': 1,
+		'receiver.active': 1,
+		'receiver.emails': 1,
+		'receiver.language': 1,
+		'receiver.status': 1,
+		'receiver.isSubscribedOnNotifications': 1,
+		'receiver.username': 1,
+	},
+};
+
+const filter = {
+	$match: {
+		'receiver.active': true,
+	},
+};
+
+const lookup = {
+	$lookup: {
+		from: 'users',
+		localField: 'u._id',
+		foreignField: '_id',
+		as: 'receiver',
+	},
+};
 
 async function notifyUser(subscriptionId, sender, message, room) {
 	const mentionIds = [];
 	const hasMentionToAll = false;
 	const hasMentionToHere = false;
 
-	// Don't fetch all users if room exceeds max members
-	const maxMembersForNotification = settings.get('Notifications_Max_Room_Members');
-	let roomMembersCount = room.usersCount;
-	if (!roomMembersCount) {
-		roomMembersCount = Subscriptions.findByRoomId(room._id).count();
-	}
-	const disableAllMessageNotifications = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
+	const disableAllMessageNotifications = false;
 
 	const query = {
 		_id: subscriptionId,

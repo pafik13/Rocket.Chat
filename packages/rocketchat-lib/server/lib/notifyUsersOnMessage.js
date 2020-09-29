@@ -1,27 +1,9 @@
 import _ from 'underscore';
-import s from 'underscore.string';
 import moment from 'moment';
 import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
-/**
- * Chechs if a messages contains a user highlight
- *
- * @param {string} message
- * @param {array|undefined} highlights
- *
- * @returns {boolean}
- */
-
-export function messageContainsHighlight(message, highlights) {
-	if (! highlights || highlights.length === 0) { return false; }
-
-	return highlights.some(function(highlight) {
-		const regexp = new RegExp(s.escapeRegExp(highlight), 'i');
-		return regexp.test(message.msg);
-	});
-}
 
 function notifyUsersOnMessage(message, room) {
 	// skips this callback if the message was edited and increments it if the edit was way in the past (aka imported)
@@ -48,7 +30,6 @@ function notifyUsersOnMessage(message, room) {
 		let toHere = false;
 		const mentionIds = [];
 		const highlightsIds = [];
-		const highlights = Subscriptions.findByRoomWithUserHighlights(room._id, { fields: { userHighlights: 1, 'u._id': 1 } }).fetch();
 		if (message.mentions != null) {
 			message.mentions.forEach(function(mention) {
 				if (!toAll && mention._id === 'all') {
@@ -62,14 +43,6 @@ function notifyUsersOnMessage(message, room) {
 				}
 			});
 		}
-
-		highlights.forEach(function(subscription) {
-			if (subscription.userHighlights && messageContainsHighlight(message, subscription.userHighlights)) {
-				if (subscription.u._id !== message.u._id) {
-					highlightsIds.push(subscription.u._id);
-				}
-			}
-		});
 
 		if (room.t === 'd') {
 			const unreadCountDM = settings.get('Unread_Count_DM');

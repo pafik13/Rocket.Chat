@@ -1,0 +1,23 @@
+db.users.find().limit(10).pretty()
+
+
+db.users.find({"_id" : "AJKGZXSJp6434SBMN"}).pretty()
+
+db.users.update({"_id" : "AJKGZXSJp6434SBMN"}, { $set: {status: "online"} })
+
+db.users.find({"_id" : "X2hZbcma2EqYswA9v"}).pretty()
+
+db.users.update({"_id" : "fz8WfHjpQXDg8mNcQ"}, { $set: {status: "away"} })
+
+db.rocketchat_subscription.find({"i._id": 'xBowA3G4rzAt2L9pJ'})
+
+db.users.update({"_id" : "xBowA3G4rzAt2L9pJ"}, { $set: {status: "away"} })
+
+db.rocketchat_subscription.find({rid: 'GENERAL', ts: {$gt: ISODate("2019-04-18T00:00:02Z")}}).count()
+db.rocketchat_subscription.updateMany({ rid: 'GENERAL' }, {$set: { alert: true, open: true }, $inc: {unread:1}})
+db.rocketchat_subscription.updateMany({rid: 'GENERAL', ts: {$gt: ISODate("2019-04-18T00:00:02Z")}}, {$set: { alert: true, open: true }, $inc: {unread:1}})
+
+
+
+0: "{"msg":"method","method":"saveSettings","params":[[{"_id":"Unread_Count","value":"all_messages"}]],"id":"18"}"
+

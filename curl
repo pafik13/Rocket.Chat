@@ -1,0 +1,109 @@
+
+curl -H "Content-type:application/json" \
+      http://localhost:3000/api/v1/login \
+      -d '{ "user": "00maksim00", "password": "p644837" }'
+--------------------------------------------------------------------------------
+{
+  "status": "success",
+  "data": {
+    "userId": "rwzj94XmEDrNDX37a",
+    "authToken": "kMZFGSEk7Qa1c5HrJOEHqfbnNqYCwFDGc74ASap3__E",
+    "me": {
+      "_id": "rwzj94XmEDrNDX37a",
+      "name": "Максим",
+      "emails": [
+        {
+          "address": "u644837@apianon.com",
+          "verified": false
+        }
+      ],
+      "status": "offline",
+      "username": "00maksim00",
+      "active": true,
+      "roles": [
+        "user"
+      ],
+      "settings": {
+        "preferences": {
+          "enableAutoAway": true,
+          "idleTimeLimit": 300,
+          "desktopNotificationDuration": 0,
+          "audioNotifications": "mentions",
+          "desktopNotifications": "mentions",
+          "mobileNotifications": "mentions",
+          "unreadAlert": true,
+          "useEmojis": true,
+          "convertAsciiEmoji": true,
+          "autoImageLoad": true,
+          "saveMobileBandwidth": true,
+          "collapseMediaByDefault": false,
+          "hideUsernames": false,
+          "hideRoles": false,
+          "hideFlexTab": false,
+          "hideAvatars": false,
+          "sidebarGroupByType": true,
+          "sidebarViewMode": "medium",
+          "sidebarHideAvatar": false,
+          "sidebarShowUnread": false,
+          "sidebarShowFavorites": true,
+          "sendOnEnter": "normal",
+          "messageViewMode": 0,
+          "emailNotificationMode": "mentions",
+          "roomCounterSidebar": false,
+          "newRoomNotification": "door",
+          "newMessageNotification": "chime",
+          "muteFocusedConversations": true,
+          "notificationsSoundVolume": 100
+        }
+      }
+    }
+  }
+}
+--------------------------------------------------------------------------------
+
+
+curl -H "X-Auth-Token: kMZFGSEk7Qa1c5HrJOEHqfbnNqYCwFDGc74ASap3__E" \
+     -H "X-User-Id: rwzj94XmEDrNDX37a" \
+     -H "Content-type:application/json" \
+     http://localhost:3000/api/v1/channels.create \
+     -d '{ "name" : "my-test-channel-2", "topic": "my topic", "description":"my description", "customFields" : { "photoUrl" : "http://468dsdas.ru"} }'
+--------------------------------------------------------------------------------
+{
+  "channel": {
+    "_id": "MdzuoPAoeAqCNtdpb",
+    "name": "my-test-channels",
+    "fname": "my-test-channels",
+    "t": "c",
+    "msgs": 0,
+    "usersCount": 0,
+    "u": {
+      "_id": "rwzj94XmEDrNDX37a",
+      "username": "00maksim00"
+    },
+    "customFields": {
+      "anonym_id": -1,
+      "photoUrl": "http://468dsdas.ru",
+      "registeredAt": "2019-06-03T20:58:07.398Z"
+    },
+    "ts": "2019-06-03T20:58:07.401Z",
+    "ro": false,
+    "sysMes": true,
+    "_updatedAt": "2019-06-03T20:58:07.407Z"
+  },
+  "success": true
+}
+
+curl -H "X-Auth-Token: kMZFGSEk7Qa1c5HrJOEHqfbnNqYCwFDGc74ASap3__E" \
+     -H "X-User-Id: rwzj94XmEDrNDX37a" \
+     -H "Content-type:application/json" \
+     http://localhost:3000/api/v1/rooms.delete \
+     -d '{ "roomName" : "my-test-channel-2" }'
+
+
+
+curl -H "X-Auth-Token: kMZFGSEk7Qa1c5HrJOEHqfbnNqYCwFDGc74ASap3__E" \
+     -H "X-User-Id: rwzj94XmEDrNDX37a" \
+     -H "Content-type:application/json" \
+     http://localhost:3000/api/v1/groups.create \
+     -d '{ "name" : "my-test-group-1", "topic": "my topic", "description":"my description", "customFields" : { "photoUrl" : "http://468dsdas.ru"} }'
+--------------------------------------------------------------------------------
