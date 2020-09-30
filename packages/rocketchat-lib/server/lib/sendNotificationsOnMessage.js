@@ -47,6 +47,8 @@ const sendNotification = async({
 		desktopNotifications,
 	} = subscription;
 
+	console.log(sendNotification, subscription, receiver);
+
 	// busy users don't receive audio notification
 	if (shouldNotifyAudio({
 		disableAllMessageNotifications,
@@ -123,7 +125,7 @@ async function sendAllNotifications(message, room) {
 	}
 	const disableAllMessageNotifications = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
 
-	if (!disableAllMessageNotifications) { return; }
+	if (disableAllMessageNotifications) { return; }
 
 	sendSinglePush({
 		message,
@@ -139,7 +141,7 @@ async function sendAllNotifications(message, room) {
 	};
 
 	const options = {
-		project: {
+		projection: {
 			'subscriptions.$': 1,
 			active: 1,
 			language: 1,
@@ -148,6 +150,8 @@ async function sendAllNotifications(message, room) {
 			username: 1,
 		},
 	};
+
+	console.log(query, options);
 
 	// 	const timeToken = `notification::${ Random.id() }`;
 	// 	console.time(timeToken);

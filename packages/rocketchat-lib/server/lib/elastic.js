@@ -253,6 +253,7 @@ callbacks.add('afterAddedToRoom', async(obj, room) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterLeaveRoom', async(obj) => {
@@ -268,6 +269,7 @@ callbacks.add('afterLeaveRoom', async(obj) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterRemoveFromRoom', async(obj) => {
@@ -283,6 +285,7 @@ callbacks.add('afterRemoveFromRoom', async(obj) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterSaveUser', async(user) => {
@@ -297,6 +300,7 @@ callbacks.add('afterSaveUser', async(user) => {
 			logger.error(err);
 		}
 	}
+	return user;
 });
 
 export const elastic = {

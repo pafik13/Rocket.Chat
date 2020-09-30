@@ -40,23 +40,24 @@ Meteor.methods({
 		// lookup app by id if one was included
 		if (options.id) {
 			const user = Users.findOne({ _id: this.userId, tokens: { _id: options.id } }, { projection: { 'tokens.$': 1 } });
-			doc = user.tokens[0];
+			if (user) { doc = user.tokens[0]; }
 		}
 
 		// No doc was found - we check the database to see if
 		// we can find a match for the app via token and appName
 		let value; let type;
-		if (options.apn) {
-			value = options.apn;
+		const { token } = options;
+		if (token.apn) {
+			value = token.apn;
 			type = 'APN';
 		} else {
-			value = options.gcm;
+			value = token.gcm;
 			type = 'GCM';
 		}
 
 		if (!doc) {
-			const user = Users.findOne({ _id: this.userId, tokens: { value, appName: options.appName } }, { projection: { 'tokens.$': 1 } });
-			doc = user.tokens[0];
+			const user = Users.findOne({ _id: this.userId, tokens: { value, appName: options.appName } }, { fields: { 'tokens.$': 1 } });
+			if (user) { doc = user.tokens[0]; }
 		}
 
 		// if we could not find the id or token then create it
@@ -100,7 +101,7 @@ Meteor.methods({
 		check(id, String);
 
 		logger.debug(`Settings userId "${ this.userId }" for app:`, id);
-		const user = Users.findOne({ tokens: { _id: id } }, { projection: { 'tokens.$': 1 } });
+		const user = Users.findOne({ tokens: { _id: id } }, { fields: { 'tokens.$': 1 } });
 		const [doc] = user.tokens;
 
 		if (doc) {

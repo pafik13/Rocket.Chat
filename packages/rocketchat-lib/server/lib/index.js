@@ -15,6 +15,7 @@ export { processDirectEmail } from './processDirectEmail';
 export { msgStream } from './msgStream';
 export { elastic } from './elastic';
 export { redis } from './redis';
+export { subscriptionNotificationPreferencesProjection } from './syncSubsInUsers';
 
 import './notifyUsersOnMessage';
-import './syncSubsInUsers';
+

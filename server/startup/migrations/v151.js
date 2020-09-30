@@ -15,25 +15,26 @@ Migrations.add({
 
 			const tokens = [];
 			for (let doc, i = 0; i < docs.length; i++) {
-				if (doc.apn || doc.gcm) {
-					let value; let type;
+				doc = docs[i];
+				if (doc.token) {
+					const { token } = doc;
+					if (token.apn || token.gcm) {
+						let value; let type;
 
-					if (doc.apn) {
-						value = doc.apn;
-						type = 'APN';
-					} else {
-						value = doc.gcm;
-						type = 'GCM';
+						if (token.apn) {
+							value = token.apn;
+							type = 'APN';
+						} else {
+							value = token.gcm;
+							type = 'GCM';
+						}
+
+						const { _id, appName, enabled, updatedAt, createdAt } = doc;
+
+						tokens.push({
+							_id, value, type, appName, enabled, updatedAt, createdAt,
+						});
 					}
-
-					tokens.push({
-						value,
-						type,
-						appName: doc.appName,
-						enabled: true,
-						createdAt: new Date(),
-						updatedAt: new Date(),
-					});
 				}
 			}
 

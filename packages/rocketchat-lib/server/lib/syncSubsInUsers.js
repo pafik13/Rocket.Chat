@@ -3,33 +3,36 @@ import { Subscriptions, Users } from 'meteor/rocketchat:models';
 import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('syncSubsInUsers', {});
 
+export const subscriptionNotificationPreferencesProjection = {
+	rid: 1,
+	audioNotifications: 1,
+	audioNotificationValue: 1,
+	audioPrefOrigion: 1,
+	desktopNotifications: 1,
+	desktopNotificationDuration: 1,
+	desktopPrefOrigin: 1,
+	mobilePushNotifications: 1,
+	mobilePrefOrigin: 1,
+	emailNotifications: 1,
+	emailPrefOrigin: 1,
+	disableNotifications: 1,
+};
+
 /**
   @param {string} subId
   @param {string} userId
 */
 const addSubscription = async(subId, userId) => {
 	logger.debug('addSubscription', subId, userId);
-	const subscription = await Subscriptions.model.rawCollection().findOne({ _id: subId }, {
-		projection: {
-			audioNotifications: 1,
-			audioNotificationValue: 1,
-			audioPrefOrigion: 1,
-			desktopNotifications: 1,
-			desktopNotificationDuration: 1,
-			desktopPrefOrigin: 1,
-			mobilePushNotifications: 1,
-			mobilePrefOrigin: 1,
-			emailNotifications: 1,
-			emailPrefOrigin: 1,
-			disableNotifications: 1,
-		},
-	});
+	const subscription = await Subscriptions.model.rawCollection().findOne({ _id: subId }, { projection:subscriptionNotificationPreferencesProjection	});
 	logger.debug('addSubscription', subscription);
-	const result = await Users.model.rawCollection().update({ _id: userId }, {
+	const cmdRes = await Users.model.rawCollection().update({ _id: userId }, {
 		$push: {
 			subscriptions: subscription,
 		},
 	});
+	const { result } = cmdRes;
+
 	logger.debug('addSubscription', result);
 	return result;
 };
@@ -40,11 +43,13 @@ const addSubscription = async(subId, userId) => {
 */
 const delSubscription = async(subId, userId) => {
 	logger.debug('delSubscription', subId, userId);
-	const result = await Users.model.rawCollection().update({ _id: userId }, {
+	const cmdRes = await Users.model.rawCollection().update({ _id: userId }, {
 		$pull: {
 			subscriptions: { _id: subId },
 		},
 	});
+	const { result } = cmdRes;
+
 	logger.debug('delSubscription', result);
 	return result;
 };
@@ -148,5 +153,3 @@ callbacks.add('afterRemoveFromRoom', async(obj) => {
 	}
 	return obj;
 });
-
-
