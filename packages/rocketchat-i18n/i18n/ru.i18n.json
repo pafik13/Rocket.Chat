@@ -2219,6 +2219,7 @@
   "Push": "Push уведомления",
   "Push_Setting_Requires_Restart_Alert": "После изменения этого параметра потребуется перезапустить Rocket.Chat.",
   "Push_apn_cert": "APN сертификат",
+	"Push_fcm_service_account": "Сервисный аккаунт FCM",
   "Push_apn_dev_cert": "APN Dev сертификат",
   "Push_apn_dev_key": "Ключ APN Dev",
   "Push_apn_dev_passphrase": "APN Dev Passphrase",

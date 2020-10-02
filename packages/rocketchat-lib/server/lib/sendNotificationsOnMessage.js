@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-// import { Random } from 'meteor/random';
 import moment from 'moment';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
@@ -131,6 +130,7 @@ async function sendAllNotifications(message, room) {
 		message,
 		room,
 		notificationMessage,
+		sender,
 	});
 
 	const query = {
