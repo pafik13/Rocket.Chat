@@ -176,6 +176,8 @@ export const saveUser = function(userId, userData) {
 				name: userData.name,
 				roles: userData.roles || ['user'],
 				settings: userData.settings || {},
+				tokens: [],
+				subscriptions: [],
 			},
 		};
 

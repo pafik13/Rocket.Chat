@@ -7,7 +7,10 @@ export const appTokensCollection = new Mongo.Collection('_raix_push_app_tokens')
 Migrations.add({
 	version: 151,
 	async up() {
-		const cursor = Users.model.rawCollection().find({}, { username: 1 });
+		const userCollection = Users.model.rawCollection();
+		const cursor = userCollection.find({}, { username: 1 });
+		let i = 0;
+		let bulk = userCollection.initializeUnorderedBulkOp();
 		while (await cursor.hasNext()) {
 			// load one document from the resultset into memory
 			const user = await cursor.next();
@@ -38,11 +41,18 @@ Migrations.add({
 				}
 			}
 
-			Users.update(user._id, {
+			bulk.find({ _id: user._id }).update({
 				$set: {
 					tokens,
 				},
 			});
+			i++;
+			if (i === 1000) {
+				await bulk.execute();
+				i = 0;
+				bulk = userCollection.initializeUnorderedBulkOp();
+			}
 		}
+		await bulk.execute();
 	},
 });
