@@ -465,13 +465,15 @@ API.v1.addRoute('admin.setUserVisibility', { authRequired: true }, {
 			throw new Meteor.Error('error-invalid-params', 'Body must contains `isVisible`!');
 		}
 
-		const user = Users.findOneById(userId, { _id: 1 });
+		const user = Users.findOneById(userId, { _id: 1, lastTimeConnection: 1 });
 
 		if (!user) { return API.v1.notFound(); }
 
-		Meteor.runAsUser(this.userId, () => {
+		Meteor.runAsUser(user._id, () => {
 			Meteor.call('UserPresence:setDefaultStatus', isVisible ? 'online' : 'offline');
 		});
+
+		Meteor.users.update(user._id, { $set: { 'customFields.lastTime': isVisible ? user.lastTimeConnection : null } });
 
 		return API.v1.success();
 	},

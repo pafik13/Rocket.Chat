@@ -37,8 +37,10 @@ const handler = (user, status, statusConnection) => {
 				logger.error('Auth Ingest Error:', err);
 			}
 		}
-
-		Meteor.users.update(user._id, { $set: { isSubscribedOnNotifications: false } });
+		const now = new Date();
+		if (statusConnection === 'offline') {
+			Meteor.users.update(user._id, { $set: { isSubscribedOnNotifications: false, 'customFields.lastTime': user.statusDefault === 'offline' ? null : now, lastTimeConnection: now } });
+		}
 	}
 };
 
