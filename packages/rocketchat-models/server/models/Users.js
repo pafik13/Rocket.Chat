@@ -20,7 +20,7 @@ export class Users extends Base {
 		this.tryEnsureIndex({ type: 1 });
 		this.tryEnsureIndex({ 'visitorEmails.address': 1 });
 		this.tryEnsureIndex({ deactivatedUntil: 1 });
-		this.tryEnsureIndex({ 'subscriptions._id': 1 }, { unique: true });
+		// 		this.tryEnsureIndex({ 'subscriptions._id': 1 }, { unique: true });
 		this.tryEnsureIndex({ 'subscriptions.rid': 1 });
 		this.tryEnsureIndex({ 'subscriptions.rid': 1, isSubscribedOnNotifications: 1 });
 		this.tryEnsureIndex({ 'tockens._id': 1 }, { unique: true });
