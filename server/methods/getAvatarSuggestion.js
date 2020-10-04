@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { getAvatarSuggestionForUser } from 'meteor/rocketchat:lib';
 
 Meteor.methods({
 	getAvatarSuggestion() {
@@ -11,8 +10,6 @@ Meteor.methods({
 
 		this.unblock();
 
-		const user = Meteor.user();
-
-		return getAvatarSuggestionForUser(user);
+		return [];
 	},
 });
