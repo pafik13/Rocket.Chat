@@ -586,7 +586,7 @@ API.v1.addRoute('rooms.leave', { authRequired: true }, {
 
 API.v1.addRoute('rooms.delete', { authRequired: true }, {
 	post() {
-		deleteOrLeaveRoom(this.bodyParams);
+		deleteOrLeaveRoom(this.bodyParams, this.userId);
 
 		return API.v1.success();
 	},
@@ -606,7 +606,7 @@ API.v1.addRoute('rooms.deleteMany', { authRequired: true }, {
 
 		for (let r = 0; r < rooms.length; r++) {
 			const params = rooms[r];
-			deleteOrLeaveRoom(params);
+			deleteOrLeaveRoom(params, this.userId);
 		}
 
 		return API.v1.success();
