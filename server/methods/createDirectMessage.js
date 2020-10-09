@@ -4,7 +4,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { getDefaultSubscriptionPref } from 'meteor/rocketchat:utils';
-import { RateLimiter, getRecordAboutBlock } from 'meteor/rocketchat:lib';
+import { RateLimiter, getRecordAboutBlock, addSubscriptionToUser } from 'meteor/rocketchat:lib';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
 Meteor.methods({
@@ -74,6 +74,7 @@ Meteor.methods({
 
 		const room = Rooms.findOneById(rid);
 
+		let subscription;
 		if (room) {
 			Rooms.update({
 				_id: rid,
@@ -125,6 +126,9 @@ Meteor.methods({
 					...myDefaultSubscriptionPref,
 				});
 			}
+
+			subscription = Subscriptions.findOneByRoomIdAndUserId(rid, me._id, { fields: { _id: 1 }	});
+			Promise.await(addSubscriptionToUser(subscription._id, me._id));
 
 			return { rid };
 		}
@@ -186,6 +190,9 @@ Meteor.methods({
 			...myDefaultSubscriptionPref,
 		});
 
+		subscription = Subscriptions.findOneByRoomIdAndUserId(rid, me._id, { fields: { _id: 1 }	});
+		Promise.await(addSubscriptionToUser(subscription._id, me._id));
+
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to, 'd');
 		if (!isNeedAcceptUploads) {
 			toDefaultSubscriptionPref.uploadsState = 'acceptedAll';
@@ -214,6 +221,9 @@ Meteor.methods({
 			ts: now,
 			...toDefaultSubscriptionPref,
 		});
+
+		subscription = Subscriptions.findOneByRoomIdAndUserId(rid, to._id, { fields: { _id: 1 }	});
+		Promise.await(addSubscriptionToUser(subscription._id, to._id));
 
 		if (hasBlock) {
 			Meteor.call('blockUser', { rid, blocked: block.blocked, reason: block.reason });

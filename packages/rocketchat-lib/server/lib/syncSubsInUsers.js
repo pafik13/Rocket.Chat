@@ -22,7 +22,7 @@ export const subscriptionNotificationPreferencesProjection = {
   @param {string} subId
   @param {string} userId
 */
-const addSubscription = async(subId, userId) => {
+export const addSubscription = async(subId, userId) => {
 	logger.debug('addSubscription', subId, userId);
 	const subscription = await Subscriptions.model.rawCollection().findOne({ _id: subId }, { projection:subscriptionNotificationPreferencesProjection	});
 	logger.debug('addSubscription', subscription);
@@ -41,7 +41,7 @@ const addSubscription = async(subId, userId) => {
   @param {string} subId
   @param {string} userId
 */
-const delSubscription = async(subId, userId) => {
+export const delSubscription = async(subId, userId) => {
 	logger.debug('delSubscription', subId, userId);
 	const cmdRes = await Users.model.rawCollection().update({ _id: userId }, {
 		$pull: {
