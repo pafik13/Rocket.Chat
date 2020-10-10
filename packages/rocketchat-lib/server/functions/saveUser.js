@@ -106,7 +106,7 @@ function validateUserData(userId, userData) {
 }
 
 function validateUserEditing(userId, userData) {
-	const editingMyself = userData._id && userId === userData._id;
+	const editingMyself = false;
 
 	const canEditOtherUserInfo = hasPermission(userId, 'edit-other-user-info');
 	const canEditOtherUserPassword = hasPermission(userId, 'edit-other-user-password');
