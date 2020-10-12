@@ -39,7 +39,7 @@ Meteor.methods({
 
 		// lookup app by id if one was included
 		if (options.id) {
-			const user = Users.findOne({ _id: this.userId, tokens: { _id: options.id } }, { projection: { 'tokens.$': 1 } });
+			const user = Users.findOne({ _id: this.userId, 'tokens._id': options.id }, { projection: { 'tokens.$': 1 } });
 			if (user) { doc = user.tokens[0]; }
 		}
 
@@ -56,7 +56,7 @@ Meteor.methods({
 		}
 
 		if (!doc) {
-			const user = Users.findOne({ _id: this.userId, tokens: { value, appName: options.appName } }, { fields: { 'tokens.$': 1 } });
+			const user = Users.findOne({ _id: this.userId, 'tokens.value': value, 'tokens.appName': options.appName }, { fields: { 'tokens.$': 1 } });
 			if (user) { doc = user.tokens[0]; }
 		}
 
