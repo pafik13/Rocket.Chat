@@ -586,7 +586,11 @@ API.v1.addRoute('rooms.leave', { authRequired: true }, {
 
 API.v1.addRoute('rooms.delete', { authRequired: true }, {
 	post() {
-		deleteOrLeaveRoom(this.bodyParams, this.userId);
+		const room = findRoomByIdOrName({ params: this.bodyParams });
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('eraseRoom', room._id);
+		});
 
 		return API.v1.success();
 	},
