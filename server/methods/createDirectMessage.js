@@ -4,12 +4,12 @@ import { settings } from 'meteor/rocketchat:settings';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Users, Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import { getDefaultSubscriptionPref } from 'meteor/rocketchat:utils';
-import { RateLimiter, getRecordAboutBlock } from 'meteor/rocketchat:lib';
+import { RateLimiter, getRecordAboutBlock, addSubscriptionToUser } from 'meteor/rocketchat:lib';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 
 Meteor.methods({
-	createDirectMessage(username) {
-		check(username, String);
+	createDirectMessage(usernameOrUserId) {
+		check(usernameOrUserId, String);
 		const now = new Date();
 
 		const callerId = Meteor.userId();
@@ -28,21 +28,24 @@ Meteor.methods({
 			});
 		}
 
-		if (settings.get('Message_AllowDirectMessagesToYourself') === false && me.username === username) {
-			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
-				method: 'createDirectMessage',
-			});
-		}
-
 		if (!hasPermission(callerId, 'create-d')) {
 			throw new Meteor.Error('error-not-allowed', 'Not allowed', {
 				method: 'createDirectMessage',
 			});
 		}
 
-		const to = Users.findOneByUsername(username);
+		let to = Users.findOneByUsername(usernameOrUserId);
 
 		if (!to) {
+			to = Users.findOneById(usernameOrUserId);
+			if (!to) {
+				throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+					method: 'createDirectMessage',
+				});
+			}
+		}
+
+		if (settings.get('Message_AllowDirectMessagesToYourself') === false && me.username === to.username) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'createDirectMessage',
 			});
@@ -71,6 +74,7 @@ Meteor.methods({
 
 		const room = Rooms.findOneById(rid);
 
+		let subscription;
 		if (room) {
 			Rooms.update({
 				_id: rid,
@@ -122,6 +126,9 @@ Meteor.methods({
 					...myDefaultSubscriptionPref,
 				});
 			}
+
+			subscription = Subscriptions.findOneByRoomIdAndUserId(rid, me._id, { fields: { _id: 1 }	});
+			Promise.await(addSubscriptionToUser(subscription._id, me._id));
 
 			return { rid };
 		}
@@ -183,6 +190,9 @@ Meteor.methods({
 			...myDefaultSubscriptionPref,
 		});
 
+		subscription = Subscriptions.findOneByRoomIdAndUserId(rid, me._id, { fields: { _id: 1 }	});
+		Promise.await(addSubscriptionToUser(subscription._id, me._id));
+
 		const toDefaultSubscriptionPref = getDefaultSubscriptionPref(to, 'd');
 		if (!isNeedAcceptUploads) {
 			toDefaultSubscriptionPref.uploadsState = 'acceptedAll';
@@ -211,6 +221,9 @@ Meteor.methods({
 			ts: now,
 			...toDefaultSubscriptionPref,
 		});
+
+		subscription = Subscriptions.findOneByRoomIdAndUserId(rid, to._id, { fields: { _id: 1 }	});
+		Promise.await(addSubscriptionToUser(subscription._id, to._id));
 
 		if (hasBlock) {
 			Meteor.call('blockUser', { rid, blocked: block.blocked, reason: block.reason });

@@ -177,6 +177,11 @@ const updateRooms = async(rooms) => {
 		const { _id: roomId } = room;
 
 		delete room._id;
+		if (room.fname) {
+			room.fnameAndName = `${ room.fname } ${ room.name }`;
+		} else {
+			room.fnameAndName = room.name;
+		}
 
 		actions.push({ update : { _index : 'room', _id : roomId } });
 		actions.push({ doc: room, doc_as_upsert: true });
@@ -248,6 +253,7 @@ callbacks.add('afterAddedToRoom', async(obj, room) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterLeaveRoom', async(obj) => {
@@ -263,6 +269,7 @@ callbacks.add('afterLeaveRoom', async(obj) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterRemoveFromRoom', async(obj) => {
@@ -278,6 +285,7 @@ callbacks.add('afterRemoveFromRoom', async(obj) => {
 			logger.error(err);
 		}
 	}
+	return obj;
 });
 
 callbacks.add('afterSaveUser', async(user) => {
@@ -292,6 +300,7 @@ callbacks.add('afterSaveUser', async(user) => {
 			logger.error(err);
 		}
 	}
+	return user;
 });
 
 export const elastic = {

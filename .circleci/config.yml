@@ -167,6 +167,7 @@ jobs:
           name: Prepare build
           command: |
             mkdir /tmp/build/
+            cp .circleci/queries.sh /tmp/build/esq.sh
             cd /tmp/build-test
             tar czf /tmp/build/Rocket.Chat.tar.gz bundle
             cd /tmp/build-test/bundle/programs/server
@@ -295,7 +296,7 @@ jobs:
 
             if [[ $CIRCLE_BRANCH == 'develop' ]]; then
               echo "Build develop Docker image"
-              cp ~/repo/.docker/Dockerfile .
+              cp ~/repo/.docker/Dockerfile.develop ./Dockerfile
               docker build -t anonym/rocket:develop .
 
               docker tag anonym/rocket:develop gitlab.apianon.ru:5555/backend/rocket:develop

@@ -849,7 +849,7 @@ describe('[Chat]', function() {
 	});
 
 	describe('[/chat.unPinMessage]', () => {
-		it('should return an error when pinMessage is not allowed in this server', (done) => {
+		it('should return an error when unPinMessage is not allowed in this server', (done) => {
 			updateSetting('Message_AllowPinning', false).then(() => {
 				request.post(api('chat.unPinMessage'))
 					.set(credentials)
@@ -866,7 +866,7 @@ describe('[Chat]', function() {
 			});
 		});
 
-		it('should return an error when pinMessage is allowed in server but users dont have permission', (done) => {
+		it('should return an error when unPinMessage is allowed in server but users dont have permission', (done) => {
 			updateSetting('Message_AllowPinning', true).then(() => {
 				updatePermission('pin-message', []).then(() => {
 					request.post(api('chat.unPinMessage'))

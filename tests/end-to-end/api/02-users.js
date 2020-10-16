@@ -193,6 +193,78 @@ describe('[Users]', function() {
 		});
 	});
 
+	describe('[/users.setStatus]', () => {
+		it('should change status to away', (done) => {
+			request.post(api('users.setStatus'))
+				.set(credentials)
+				.send({
+					status: 'away',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should change status to busy', (done) => {
+			request.post(api('users.setStatus'))
+				.set(credentials)
+				.send({
+					status: 'busy',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should change status to offline', (done) => {
+			request.post(api('users.setStatus'))
+				.set(credentials)
+				.send({
+					status: 'offline',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should change status to online', (done) => {
+			request.post(api('users.setStatus'))
+				.set(credentials)
+				.send({
+					status: 'online',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('should NOT change status to custom', (done) => {
+			request.post(api('users.setStatus'))
+				.set(credentials)
+				.send({
+					status: 'custom',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+	});
+
 	describe('[/users.info]', () => {
 		it('should query information about a user by userId', (done) => {
 			request.get(api('users.info'))

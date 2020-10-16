@@ -1,100 +1,30 @@
 import { Meteor } from 'meteor/meteor';
 import { settings } from 'meteor/rocketchat:settings';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { nats } from 'meteor/rocketchat:models';
 import { roomTypes } from 'meteor/rocketchat:utils';
-import { PushNotification } from 'meteor/rocketchat:push-notifications';
+import { RocketChatAssets } from 'meteor/rocketchat:assets';
+import { getURL } from 'meteor/rocketchat:utils';
+import s from 'underscore.string';
 
-const CATEGORY_MESSAGE = 'MESSAGE';
-const CATEGORY_MESSAGE_NOREPLY = 'MESSAGE_NOREPLY';
+const natsQueue = process.env.NATS_QUEUE || 'notifications';
 
-let alwaysNotifyMobileBoolean;
-settings.get('Notifications_Always_Notify_Mobile', (key, value) => {
-	alwaysNotifyMobileBoolean = value;
-});
+export function sendSinglePush({ notificationMessage, room, message, sender }) {
 
-let SubscriptionRaw;
-Meteor.startup(() => {
-	SubscriptionRaw = Subscriptions.model.rawCollection();
-});
+	const url = getURL('', { cdn: true, full: true });
+	const regexString = `\\[ \\]\\(${ s.escapeRegExp(url) }(d|c|g|p|channel|direct|group|private|public\\/)(.)+\\) `;
+	const answerRE = new RegExp(regexString, 'gm');
 
-async function getBadgeCount(userId) {
-	const [result] = await SubscriptionRaw.aggregate([
-		{ $match: { 'u._id': userId } },
-		{
-			$group: {
-				_id: 'total',
-				total: { $sum: '$unread' },
-			},
-		},
-	]).toArray();
+	const { _id, username, name, customFields } = sender;
 
-	const { total } = result;
-	return total;
-}
-
-function canSendMessageToRoom(room, username) {
-	return !((room.muted || []).includes(username));
-}
-
-export async function sendSinglePush({ room, message, userId, receiverUsername, senderUsername, senderName, notificationMessage }) {
-	let username = '';
-	if (settings.get('Push_show_username_room')) {
-		username = settings.get('UI_Use_Real_Name') === true ? senderName : senderUsername;
-	}
-
-	PushNotification.send({
-		roomId: message.rid,
-		payload: {
-			host: Meteor.absoluteUrl(),
-			rid: message.rid,
-			sender: message.u,
-			type: room.t,
-			name: room.name,
-			messageType: message.t,
-			messageId: message._id,
-		},
+	nats.publish(natsQueue, {
+		roomId: room._id,
+		roomType: room.t,
 		roomName: settings.get('Push_show_username_room') && room.t !== 'd' ? `#${ roomTypes.getRoomName(room.t, room) }` : '',
-		username,
-		message: settings.get('Push_show_message') ? notificationMessage : ' ',
-		badge: await getBadgeCount(userId),
-		userId,
-		category: canSendMessageToRoom(room, receiverUsername) ? CATEGORY_MESSAGE : CATEGORY_MESSAGE_NOREPLY,
-		pushType: message.t && message.t === 'p2p-call' ? 'voip' : 'alert',
+		sender: { _id, username, name, customFields },
+		image: RocketChatAssets.getURL('Assets_favicon_192'),
+		messageId: message._id,
+		messageType: message.t,
+		host: Meteor.absoluteUrl(),
+		notificationMessage: settings.get('Push_show_message') ? notificationMessage.replace(answerRE, '') : ' ',
 	});
-}
-
-export function shouldNotifyMobile({
-	disableAllMessageNotifications,
-	mobilePushNotifications,
-	hasMentionToAll,
-	isHighlighted,
-	hasMentionToUser,
-	statusConnection,
-	roomType,
-}) {
-	if (disableAllMessageNotifications && mobilePushNotifications == null && !isHighlighted && !hasMentionToUser) {
-		return false;
-	}
-
-	if (mobilePushNotifications === 'nothing') {
-		return false;
-	}
-
-	if (!alwaysNotifyMobileBoolean && statusConnection === 'online') {
-		return false;
-	}
-
-	if (!mobilePushNotifications) {
-		const roomTypeName = roomTypes.getRoomTypeName(roomType);
-		const settingKey = `Accounts_Default_User_Preferences_mobileNotifications${ roomTypeName }`;
-		const settingVal = settings.get(settingKey);
-		if (settingVal === 'all') {
-			return true;
-		}
-		if (settingVal === 'nothing') {
-			return false;
-		}
-	}
-
-	return roomType === 'd' || (!disableAllMessageNotifications && hasMentionToAll) || isHighlighted || mobilePushNotifications === 'all' || hasMentionToUser;
 }

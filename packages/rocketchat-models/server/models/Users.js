@@ -20,6 +20,10 @@ export class Users extends Base {
 		this.tryEnsureIndex({ type: 1 });
 		this.tryEnsureIndex({ 'visitorEmails.address': 1 });
 		this.tryEnsureIndex({ deactivatedUntil: 1 });
+		this.tryEnsureIndex({ 'subscriptions._id': 1 }, { unique: 1, partialFilterExpression: { 'subscriptions._id': { $exists: true } } });
+		this.tryEnsureIndex({ 'subscriptions.rid': 1 });
+		this.tryEnsureIndex({ 'subscriptions.rid': 1, isSubscribedOnNotifications: 1 });
+		this.tryEnsureIndex({ 'tokens._id': 1 }, { unique: true, partialFilterExpression: { 'tokens._id': { $exists: true } } });
 		this.loadSettings();
 	}
 

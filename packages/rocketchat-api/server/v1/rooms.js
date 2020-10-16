@@ -35,6 +35,32 @@ function findRoomByIdOrName({ params, checkedArchived = true }) {
 	return room;
 }
 
+function deleteOrLeaveRoom(params, userId) {
+	const room = findRoomByIdOrName({ params });
+	if (room.t === 'd') {
+		Meteor.runAsUser(userId, () => {
+			Meteor.call('leaveRoom', room._id);
+		});
+	} else {
+		const options = {
+			fields: {
+				t: 1, roles: 1,
+			},
+		};
+		const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, userId, options);
+		if (subscription.roles && subscription.roles.includes('owner')) {
+			Meteor.runAsUser(userId, () => {
+				Meteor.call('eraseRoom', room._id);
+			});
+		} else {
+			Meteor.runAsUser(userId, () => {
+				Meteor.call('leaveRoom', room._id);
+			});
+		}
+	}
+}
+
+
 API.v1.addRoute('rooms.complain', { authRequired: true }, {
 	post() {
 		const room = findRoomByIdOrName({ params: this.bodyParams });
@@ -583,29 +609,8 @@ API.v1.addRoute('rooms.deleteMany', { authRequired: true }, {
 		}
 
 		for (let r = 0; r < rooms.length; r++) {
-			const item = rooms[r];
-			const room = findRoomByIdOrName({ params: item });
-			if (room.t === 'd') {
-				Meteor.runAsUser(this.userId, () => {
-					Meteor.call('leaveRoom', room._id);
-				});
-			} else {
-				const options = {
-					fields: {
-						t: 1, roles: 1,
-					},
-				};
-				const subscription = Subscriptions.findOneByRoomIdAndUserId(room._id, this.userId, options);
-				if (subscription.roles && subscription.roles.includes('owner')) {
-					Meteor.runAsUser(this.userId, () => {
-						Meteor.call('eraseRoom', room._id);
-					});
-				} else {
-					Meteor.runAsUser(this.userId, () => {
-						Meteor.call('leaveRoom', room._id);
-					});
-				}
-			}
+			const params = rooms[r];
+			deleteOrLeaveRoom(params, this.userId);
 		}
 
 		return API.v1.success();

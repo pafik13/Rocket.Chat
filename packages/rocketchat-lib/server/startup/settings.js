@@ -955,6 +955,10 @@ settings.addGroup('General', function() {
 		public: true,
 		i18nDescription: 'Store_Last_Message_Sent_per_Room',
 	});
+	this.add('Main_backend_host', 'https://stage.apianon.ru/', {
+		type: 'string',
+		public: true,
+	});
 	this.add('Use_elastic', false, {
 		type: 'boolean',
 		public: true,
@@ -1321,50 +1325,6 @@ settings.addGroup('Push', function() {
 		public: true,
 		alert: 'Push_Setting_Requires_Restart_Alert',
 	});
-	this.add('Push_debug', false, {
-		type: 'boolean',
-		public: true,
-		alert: 'Push_Setting_Requires_Restart_Alert',
-		enableQuery: {
-			_id: 'Push_enable',
-			value: true,
-		},
-	});
-	this.add('Push_enable_gateway', true, {
-		type: 'boolean',
-		alert: 'Push_Setting_Requires_Restart_Alert',
-		enableQuery: {
-			_id: 'Push_enable',
-			value: true,
-		},
-	});
-	this.add('Push_gateway', 'https://gateway.rocket.chat', {
-		type: 'string',
-		alert: 'Push_Setting_Requires_Restart_Alert',
-		enableQuery: [
-			{
-				_id: 'Push_enable',
-				value: true,
-			}, {
-				_id: 'Push_enable_gateway',
-				value: true,
-			},
-		],
-	});
-	this.add('Push_production', true, {
-		type: 'boolean',
-		public: true,
-		alert: 'Push_Setting_Requires_Restart_Alert',
-		enableQuery: [
-			{
-				_id: 'Push_enable',
-				value: true,
-			}, {
-				_id: 'Push_enable_gateway',
-				value: false,
-			},
-		],
-	});
 	this.add('Push_test_push', 'push_test', {
 		type: 'action',
 		actionText: 'Send_a_test_push_to_my_user',
@@ -1374,34 +1334,9 @@ settings.addGroup('Push', function() {
 		},
 	});
 	this.section('Certificates_and_Keys', function() {
-		this.add('Push_apn_passphrase', '', {
-			type: 'string',
-		});
-		this.add('Push_apn_key', '', {
+		this.add('Push_fcm_service_account', '', {
 			type: 'string',
 			multiline: true,
-		});
-		this.add('Push_apn_cert', '', {
-			type: 'string',
-			multiline: true,
-		});
-		this.add('Push_apn_dev_passphrase', '', {
-			type: 'string',
-		});
-		this.add('Push_apn_dev_key', '', {
-			type: 'string',
-			multiline: true,
-		});
-		this.add('Push_apn_dev_cert', '', {
-			type: 'string',
-			multiline: true,
-		});
-		this.add('Push_gcm_api_key', '', {
-			type: 'string',
-		});
-		return this.add('Push_gcm_project_number', '', {
-			type: 'string',
-			public: true,
 		});
 	});
 	return this.section('Privacy', function() {

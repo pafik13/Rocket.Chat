@@ -1,13 +1,12 @@
 import { Meteor } from 'meteor/meteor';
-// import { Random } from 'meteor/random';
 import moment from 'moment';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
-import { Subscriptions } from 'meteor/rocketchat:models';
+import { Subscriptions, Users } from 'meteor/rocketchat:models';
 import { roomTypes } from 'meteor/rocketchat:utils';
-import { callJoinRoom, messageContainsHighlight, parseMessageTextPerUser, replaceMentionedUsernamesWithFullNames } from '../functions/notifications/';
-import { sendSinglePush, shouldNotifyMobile } from '../functions/notifications/mobile';
+import { callJoinRoom, parseMessageTextPerUser, replaceMentionedUsernamesWithFullNames } from '../functions/notifications/';
+import { sendSinglePush } from '../functions/notifications/mobile';
 import { notifyDesktopUser, shouldNotifyDesktop } from '../functions/notifications/desktop';
 import { notifyAudioUser, shouldNotifyAudio } from '../functions/notifications/audio';
 
@@ -30,12 +29,7 @@ const sendNotification = async({
 
 	const hasMentionToUser = mentionIds.includes(subscription.u._id);
 
-	// mute group notifications (@here and @all) if not directly mentioned as well
-	if (!hasMentionToUser && subscription.muteGroupMentions && (hasMentionToAll || hasMentionToHere)) {
-		return;
-	}
-
-	const [receiver] = subscription.receiver;
+	const receiver = subscription.u;
 
 	const roomType = room.t;
 	// If the user doesn't have permission to view direct messages, don't send notification of direct messages.
@@ -45,19 +39,20 @@ const sendNotification = async({
 
 	notificationMessage = parseMessageTextPerUser(notificationMessage, message, receiver);
 
-	const isHighlighted = messageContainsHighlight(message, subscription.userHighlights);
+	const isHighlighted = false;
 
 	const {
 		audioNotifications,
 		desktopNotifications,
-		mobilePushNotifications,
 	} = subscription;
+
+	console.log(sendNotification, subscription, receiver);
 
 	// busy users don't receive audio notification
 	if (shouldNotifyAudio({
 		disableAllMessageNotifications,
 		status: receiver.status,
-		statusConnection: receiver.statusConnection,
+		isSubscribedOnNotifications: receiver.isSubscribedOnNotifications,
 		audioNotifications,
 		hasMentionToAll,
 		hasMentionToHere,
@@ -72,7 +67,7 @@ const sendNotification = async({
 	if (shouldNotifyDesktop({
 		disableAllMessageNotifications,
 		status: receiver.status,
-		statusConnection: receiver.statusConnection,
+		isSubscribedOnNotifications: receiver.isSubscribedOnNotifications,
 		desktopNotifications,
 		hasMentionToAll,
 		hasMentionToHere,
@@ -89,62 +84,6 @@ const sendNotification = async({
 			duration: subscription.desktopNotificationDuration,
 		});
 	}
-
-	if (shouldNotifyMobile({
-		disableAllMessageNotifications,
-		mobilePushNotifications,
-		hasMentionToAll,
-		isHighlighted,
-		hasMentionToUser,
-		statusConnection: receiver.statusConnection,
-		roomType,
-	})) {
-
-		sendSinglePush({
-			notificationMessage,
-			room,
-			message,
-			userId: subscription.u._id,
-			senderUsername: sender.username,
-			senderName: sender.name,
-			receiverUsername: receiver.username,
-		});
-	}
-};
-
-const project = {
-	$project: {
-		audioNotifications: 1,
-		desktopNotificationDuration: 1,
-		desktopNotifications: 1,
-		emailNotifications: 1,
-		mobilePushNotifications: 1,
-		muteGroupMentions: 1,
-		name: 1,
-		userHighlights: 1,
-		'u._id': 1,
-		'receiver.active': 1,
-		'receiver.emails': 1,
-		'receiver.language': 1,
-		'receiver.status': 1,
-		'receiver.statusConnection': 1,
-		'receiver.username': 1,
-	},
-};
-
-const filter = {
-	$match: {
-		'receiver.active': true,
-	},
-};
-
-const lookup = {
-	$lookup: {
-		from: 'users',
-		localField: 'u._id',
-		foreignField: '_id',
-		as: 'receiver',
-	},
 };
 
 async function sendAllNotifications(message, room) {
@@ -169,8 +108,8 @@ async function sendAllNotifications(message, room) {
 
 	const mentionIds = (message.mentions || []).map(({ _id }) => _id);
 	const mentionIdsWithoutGroups = mentionIds.filter((_id) => _id !== 'all' && _id !== 'here');
-	const hasMentionToAll = mentionIds.includes('all');
-	const hasMentionToHere = mentionIds.includes('here');
+	const hasMentionToAll = false;
+	const hasMentionToHere = false;
 
 	let notificationMessage = callbacks.run('beforeSendMessageNotifications', message.msg);
 	if (mentionIds.length > 0 && settings.get('UI_Use_Real_Name')) {
@@ -185,82 +124,44 @@ async function sendAllNotifications(message, room) {
 	}
 	const disableAllMessageNotifications = roomMembersCount > maxMembersForNotification && maxMembersForNotification !== 0;
 
-	const query = {
-		rid: room._id,
-		ignored: { $ne: sender._id },
-		disableNotifications: { $ne: true },
-		$or: [{
-			'userHighlights.0': { $exists: 1 },
-		}],
-	};
+	if (disableAllMessageNotifications) { return; }
 
-
-	const roomTypeName = roomTypes.getRoomTypeName(room.t);
-	['audio', 'desktop', 'mobile', 'email'].forEach((kind) => {
-		const notificationField = `${ kind === 'mobile' ? 'mobilePush' : kind }Notifications`;
-
-		const filter = { [notificationField]: 'all' };
-
-		if (disableAllMessageNotifications) {
-			filter[`${ kind }PrefOrigin`] = { $ne: 'user' };
-		}
-
-		query.$or.push(filter);
-
-		if (mentionIdsWithoutGroups.length > 0) {
-			query.$or.push({
-				[notificationField]: 'mentions',
-				'u._id': { $in: mentionIdsWithoutGroups },
-			});
-		} else if (!disableAllMessageNotifications && (hasMentionToAll || hasMentionToHere)) {
-			query.$or.push({
-				[notificationField]: 'mentions',
-			});
-		}
-
-		let serverField;
-		switch (kind) {
-			case 'email': {
-				serverField = 'emailNotificationMode';
-				break;
-			}
-			case 'audio': {
-				serverField = `${ kind }Notifications`;
-				break;
-			}
-			default: {
-				serverField = `${ kind }Notifications${ roomTypeName }`;
-				break;
-			}
-		}
-		const serverPreference = settings.get(`Accounts_Default_User_Preferences_${ serverField }`);
-		if ((room.t === 'd' && serverPreference !== 'nothing') || (!disableAllMessageNotifications && (serverPreference === 'all' || hasMentionToAll || hasMentionToHere))) {
-			query.$or.push({
-				[notificationField]: { $exists: false },
-			});
-		} else if (serverPreference === 'mentions' && mentionIdsWithoutGroups.length) {
-			query.$or.push({
-				[notificationField]: { $exists: false },
-				'u._id': { $in: mentionIdsWithoutGroups },
-			});
-		}
+	sendSinglePush({
+		message,
+		room,
+		notificationMessage,
+		sender,
 	});
 
-	// the find bellow is crucial. all subscription records returned will receive at least one kind of notification.
-	// the query is defined by the server's default values and Notifications_Max_Room_Members setting.
+	const query = {
+		'subscriptions.rid': room._id,
+		'subscriptions.disableNotifications': { $ne: true },
+		active: true,
+		isSubscribedOnNotifications: true,
+	};
+
+	const options = {
+		projection: {
+			'subscriptions.$': 1,
+			active: 1,
+			language: 1,
+			status: 1,
+			isSubscribedOnNotifications: 1,
+			username: 1,
+		},
+	};
+
+	console.log(query, options);
+
 	// 	const timeToken = `notification::${ Random.id() }`;
 	// 	console.time(timeToken);
-	const cursor = Subscriptions.model.rawCollection().aggregate([
-		{ $match: query },
-		lookup,
-		filter,
-		project,
-	]);
-
-	// 	let count = 0;
+	const cursor = Users.model.rawCollection().find(query, options);
+	// let count = 0;
 	while (await cursor.hasNext()) {
-		// load   one document from the resultset into memory
-		const subscription = await cursor.next();
+		// load one document from the resultset into memory
+		const user = await cursor.next();
+		const [subscription] = user.subscriptions;
+		subscription.u = user;
 		await sendNotification({
 			subscription,
 			sender,
@@ -319,4 +220,4 @@ async function sendAllNotifications(message, room) {
 
 callbacks.add('afterSaveMessage', (message, room) => Promise.await(sendAllNotifications(message, room)), callbacks.priority.LOW, 'sendNotificationsOnMessage');
 
-export { sendNotification, sendAllNotifications, project, lookup, filter };
+export { sendNotification, sendAllNotifications, sendSinglePush };

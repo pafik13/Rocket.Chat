@@ -16,7 +16,6 @@ Package.onUse(function(api) {
 		'rocketchat:metrics',
 		'rocketchat:ui',
 		'rocketchat:assets',
-		'rocketchat:push',
 		'templating',
 	]);
 	api.addFiles('client/stylesheets/pushNotifications.css', 'client');

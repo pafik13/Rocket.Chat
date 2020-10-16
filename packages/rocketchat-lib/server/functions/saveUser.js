@@ -106,7 +106,7 @@ function validateUserData(userId, userData) {
 }
 
 function validateUserEditing(userId, userData) {
-	const editingMyself = userData._id && userId === userData._id;
+	const editingMyself = false;
 
 	const canEditOtherUserInfo = hasPermission(userId, 'edit-other-user-info');
 	const canEditOtherUserPassword = hasPermission(userId, 'edit-other-user-password');
@@ -176,6 +176,8 @@ export const saveUser = function(userId, userData) {
 				name: userData.name,
 				roles: userData.roles || ['user'],
 				settings: userData.settings || {},
+				tokens: [],
+				subscriptions: [],
 			},
 		};
 

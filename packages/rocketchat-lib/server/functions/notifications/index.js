@@ -44,23 +44,6 @@ export function replaceMentionedUsernamesWithFullNames(message, mentions) {
 	return message;
 }
 
-/**
- * Checks if a message contains a user highlight
- *
- * @param {string} message
- * @param {array|undefined} highlights
- *
- * @returns {boolean}
- */
-export function messageContainsHighlight(message, highlights) {
-	if (! highlights || highlights.length === 0) { return false; }
-
-	return highlights.some(function(highlight) {
-		const regexp = new RegExp(s.escapeRegExp(highlight), 'i');
-		return regexp.test(message.msg);
-	});
-}
-
 export function callJoinRoom(userId, rid) {
 	return new Promise((resolve, reject) => {
 		Meteor.runAsUser(userId, () => Meteor.call('joinRoom', rid, (error, result) => {

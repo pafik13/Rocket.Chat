@@ -30,7 +30,6 @@ export class Subscriptions extends Base {
 		this.tryEnsureIndex({ emailNotifications: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ autoTranslate: 1 }, { sparse: 1 });
 		this.tryEnsureIndex({ autoTranslateLanguage: 1 }, { sparse: 1 });
-		this.tryEnsureIndex({ 'userHighlights.0': 1 }, { sparse: 1 });
 	}
 
 	findByRoomIds(roomIds) {
@@ -146,12 +145,19 @@ export class Subscriptions extends Base {
 		};
 
 		const update = {};
-
+		const updateUserSubs = {};
 		if (audioNotifications === 'default') {
 			update.$unset = { audioNotifications: 1 };
+			updateUserSubs.$unset = { 'subscriptions.$.audioNotifications': 1 };
+
 		} else {
 			update.$set = { audioNotifications };
+			updateUserSubs.$set = { 'subscriptions.$.audioNotifications': audioNotifications };
 		}
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -167,6 +173,16 @@ export class Subscriptions extends Base {
 			},
 		};
 
+		const updateUserSubs = {
+			$set: {
+				'subscriptions.$.audioNotificationValue': audioNotificationValue,
+			},
+		};
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
+
 		return this.update(query, update);
 	}
 
@@ -176,18 +192,31 @@ export class Subscriptions extends Base {
 		};
 
 		const update = {};
+		const updateUserSubs = {};
 
 		if (desktopNotifications === null) {
 			update.$unset = {
 				desktopNotifications: 1,
 				desktopPrefOrigin: 1,
 			};
+			updateUserSubs.$unset = {
+				'subscriptions.$.desktopNotifications': 1,
+				'subscriptions.$.desktopPrefOrigin': 1,
+			};
 		} else {
 			update.$set = {
 				desktopNotifications: desktopNotifications.value,
 				desktopPrefOrigin: desktopNotifications.origin,
 			};
+			updateUserSubs.$set = {
+				'subscriptions.$.desktopNotifications': desktopNotifications.value,
+				'subscriptions.$.desktopPrefOrigin': desktopNotifications.origin,
+			};
 		}
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -197,11 +226,23 @@ export class Subscriptions extends Base {
 			_id,
 		};
 
+		const intValue = parseInt(value);
+
 		const update = {
 			$set: {
-				desktopNotificationDuration: parseInt(value),
+				desktopNotificationDuration: intValue,
 			},
 		};
+
+		const updateUserSubs = {
+			$set: {
+				'subscriptions.$.desktopNotificationDuration': intValue,
+			},
+		};
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -212,18 +253,31 @@ export class Subscriptions extends Base {
 		};
 
 		const update = {};
+		const updateUserSubs = {};
 
 		if (mobilePushNotifications === null) {
 			update.$unset = {
 				mobilePushNotifications: 1,
 				mobilePrefOrigin: 1,
 			};
+			updateUserSubs.$unset = {
+				'subscriptions.$.mobilePushNotifications': 1,
+				'subscriptions.$.mobilePrefOrigin': 1,
+			};
 		} else {
 			update.$set = {
 				mobilePushNotifications: mobilePushNotifications.value,
 				mobilePrefOrigin: mobilePushNotifications.origin,
 			};
+			updateUserSubs.$set = {
+				'subscriptions.$.mobilePushNotifications': mobilePushNotifications.value,
+				'subscriptions.$.mobilePrefOrigin': mobilePushNotifications.origin,
+			};
 		}
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -234,18 +288,31 @@ export class Subscriptions extends Base {
 		};
 
 		const update = {};
+		const updateUserSubs = {};
 
 		if (emailNotifications === null) {
 			update.$unset = {
 				emailNotifications: 1,
 				emailPrefOrigin: 1,
 			};
+			updateUserSubs.$unset = {
+				'subscriptions.$.emailNotifications': 1,
+				'subscriptions.$.emailPrefOrigin': 1,
+			};
 		} else {
 			update.$set = {
 				emailNotifications: emailNotifications.value,
 				emailPrefOrigin: emailNotifications.origin,
 			};
+			updateUserSubs.$set = {
+				'subscriptions.$.emailNotifications': emailNotifications.value,
+				'subscriptions.$.emailPrefOrigin': emailNotifications.origin,
+			};
 		}
+
+		const queryUser = { _id: Meteor.userId(), 'subscriptions._id': _id };
+		const result = Users.update(queryUser, updateUserSubs);
+		console.log(queryUser, updateUserSubs, result);
 
 		return this.update(query, update);
 	}
@@ -286,20 +353,6 @@ export class Subscriptions extends Base {
 		const update = {
 			$set: {
 				hideUnreadStatus,
-			},
-		};
-
-		return this.update(query, update);
-	}
-
-	updateMuteGroupMentions(_id, muteGroupMentions) {
-		const query = {
-			_id,
-		};
-
-		const update = {
-			$set: {
-				muteGroupMentions,
 			},
 		};
 
@@ -376,7 +429,6 @@ export class Subscriptions extends Base {
 				code: 1,
 
 				// fields to define if should send a notification
-				ignored: 1,
 				audioNotifications: 1,
 				audioNotificationValue: 1,
 				desktopNotificationDuration: 1,
@@ -384,8 +436,6 @@ export class Subscriptions extends Base {
 				mobilePushNotifications: 1,
 				emailNotifications: 1,
 				disableNotifications: 1,
-				muteGroupMentions: 1,
-				userHighlights: 1,
 			},
 		});
 	}
@@ -411,7 +461,6 @@ export class Subscriptions extends Base {
 				mobilePushNotifications: 1,
 				emailNotifications: 1,
 				disableNotifications: 1,
-				muteGroupMentions: 1,
 			},
 		});
 	}
@@ -904,14 +953,24 @@ export class Subscriptions extends Base {
 			inc = 1;
 		}
 		const query = {
-			rid: roomId,
-			'u._id': {
-				$ne: userId,
+			$and: [{
+				rid: roomId,
+				'u._id': {
+					$ne: userId,
+				},
+			}, {
+				$or: [{
+					lmServerId: {
+						$exists: false,
+					},
+				}, {
+					t: 'd',
+				},
+				],
 			},
-			lmServerId: {
-				$exists: false,
-			},
+			],
 		};
+
 
 		const update = {
 			$set: {

@@ -16,6 +16,8 @@ import { API } from '../api';
 import _ from 'underscore';
 import Busboy from 'busboy';
 
+const userValidStatuses = ['online', 'away', 'offline', 'busy'];
+
 API.v1.addRoute('users.create', { authRequired: true }, {
 	post() {
 		check(this.bodyParams, {
@@ -256,6 +258,28 @@ API.v1.addRoute('users.resetAvatar', { authRequired: true }, {
 		} else {
 			return API.v1.unauthorized();
 		}
+
+		return API.v1.success();
+	},
+});
+
+API.v1.addRoute('users.setStatus', { authRequired: true }, {
+	post() {
+		const { status } = this.bodyParams;
+		check(status, String);
+
+		if (!userValidStatuses.includes(this.bodyParams.status)) {
+			throw new Meteor.Error('error-invalid-status', 'Valid status types include online, away, offline, and busy.', {
+				method: 'users.setStatus',
+			});
+		}
+
+		Meteor.users.update(this.userId, {
+			$set: {
+				status,
+				statusDefault: status,
+			},
+		});
 
 		return API.v1.success();
 	},

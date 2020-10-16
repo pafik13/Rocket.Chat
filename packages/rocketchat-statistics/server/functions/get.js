@@ -3,7 +3,7 @@ import { MongoInternals } from 'meteor/mongo';
 import _ from 'underscore';
 import os from 'os';
 import { InstanceStatus } from 'meteor/konecty:multiple-instances-status';
-import { Sessions, Settings, Users, Rooms, Subscriptions, Uploads, Messages, LivechatVisitors } from 'meteor/rocketchat:models';
+import { Sessions, Settings, Users, Rooms, Subscriptions, Uploads, Messages } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { Info } from 'meteor/rocketchat:utils';
 import { Migrations } from 'meteor/rocketchat:migrations';
@@ -71,7 +71,7 @@ statistics.get = function _getStatistics() {
 	statistics.totalLivechat = Rooms.findByType('l').count();
 
 	// livechat visitors
-	statistics.totalLivechatVisitors = LivechatVisitors.find().count();
+	statistics.totalLivechatVisitors = 0;
 
 	// livechat agents
 	statistics.totalLivechatAgents = Users.findAgents().count();

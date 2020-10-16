@@ -39,6 +39,8 @@ export const deleteMessage = function(message, user) {
 		const room = Rooms.findOneById(message.rid, { fields: { lastMessage: 1 } });
 		if (!room.lastMessage || room.lastMessage._id === message._id) {
 			Rooms.resetLastMessageById(message.rid, message._id);
+		} else {
+			Rooms.incMessageEventsCountById(message.rid);
 		}
 	}
 

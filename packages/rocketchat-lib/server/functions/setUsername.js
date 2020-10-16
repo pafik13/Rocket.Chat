@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import s from 'underscore.string';
 import { FileUpload } from 'meteor/rocketchat:file-upload';
 import { settings } from 'meteor/rocketchat:settings';
-import { Users, Messages, Subscriptions, Rooms, LivechatDepartmentAgents } from 'meteor/rocketchat:models';
+import { Users, Messages, Subscriptions, Rooms } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { RateLimiter } from '../lib';
 
@@ -26,40 +26,9 @@ export const _setUsername = function(userId, u) {
 		return user;
 	}
 	const previousUsername = user.username;
-	// Check username availability or if the user already owns a different casing of the name
-	// if (!previousUsername || !(username.toLowerCase() === previousUsername.toLowerCase())) {
-	// 	if (!checkUsernameAvailability(username)) {
-	// 		return false;
-	// 	}
-	// }
-	// If first time setting username, send Enrollment Email
-	// try {
-	// 	if (!previousUsername && user.emails && user.emails.length > 0 && settings.get('Accounts_Enrollment_Email')) {
-	// 		Accounts.sendEnrollmentEmail(user._id);
-	// 	}
-	// } catch (e) {
-	// 	console.error(e);
-	// }
-	// Set new username*
+	// Set new username
 	Users.setUsername(user._id, username);
 	user.username = username;
-	// if (!previousUsername && settings.get('Accounts_SetDefaultAvatar') === true) {
-	// 	const avatarSuggestions = getAvatarSuggestionForUser(user);
-	// 	let gravatar;
-	// 	Object.keys(avatarSuggestions).some((service) => {
-	// 		const avatarData = avatarSuggestions[service];
-	// 		if (service !== 'gravatar') {
-	// 			setUserAvatar(user, avatarData.blob, avatarData.contentType, service);
-	// 			gravatar = null;
-	// 			return true;
-	// 		}
-	// 		gravatar = avatarData;
-	// 		return false;
-	// 	});
-	// 	if (gravatar != null) {
-	// 		setUserAvatar(user, gravatar.blob, gravatar.contentType, 'gravatar');
-	// 	}
-	// }
 	// Username is available; if coming from old username, update all references
 	if (previousUsername) {
 		Messages.updateAllUsernamesByUserId(user._id, username);
@@ -73,7 +42,6 @@ export const _setUsername = function(userId, u) {
 		Rooms.replaceUsernameOfUserByUserId(user._id, username);
 		Subscriptions.setUserUsernameByUserId(user._id, username);
 		Subscriptions.setNameForDirectRoomsWithOldName(previousUsername, username);
-		LivechatDepartmentAgents.replaceUsernameOfAgentByUserId(user._id, username);
 
 		const fileStore = FileUpload.getStore('Avatars');
 		const file = fileStore.model.findOneByName(previousUsername);
