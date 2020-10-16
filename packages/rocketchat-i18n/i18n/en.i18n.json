@@ -1321,6 +1321,7 @@
   "FileUpload_S3_AWSAccessKeyId": "Access Key",
   "FileUpload_S3_AWSSecretAccessKey": "Secret Key",
   "FileUpload_S3_Bucket": "Bucket name",
+  "FileUpload_S3_BucketExtra": "Bucket name extra",
   "FileUpload_S3_BucketURL": "Bucket URL",
   "FileUpload_S3_CDN": "CDN Domain for Downloads",
   "FileUpload_S3_CDN_AccessKeyId": "CDN Access Key",
