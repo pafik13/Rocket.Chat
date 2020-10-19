@@ -6,9 +6,6 @@ import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
 import Busboy from 'busboy';
-import { Random } from 'meteor/random';
-import S3 from 'aws-sdk/clients/s3';
-import Path from 'path';
 import { settings } from 'meteor/rocketchat:settings';
 import { elastic } from 'meteor/rocketchat:lib';
 
@@ -360,31 +357,8 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 
 		const file = files[0];
 
-		const options = {
-			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
-			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
-			region: settings.get('FileUpload_S3_Region') || 'eu-central-1',
-			endpoint: settings.get('FileUpload_S3_BucketURL') || undefined,
-			signatureVersion: settings.get('FileUpload_S3_SignatureVersion') || 'v4',
-			s3ForcePathStyle: settings.get('FileUpload_S3_ForcePathStyle') || false,
-			sslEnabled: true,
-		};
-
-		const s3 = new S3(options);
-		const { filename, mimetype } = file;
-		const filenameInBase64 = new Buffer(filename).toString('base64');
-		const mimetypeInBase64 = new Buffer(mimetype).toString('base64');
-		const prefix = 'images/rocket_room_avatars';
-		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
-		const params = {
-			Body: file.fileBuffer,
-			Bucket: `${ settings.get('FileUpload_S3_BucketExtra') || settings.get('FileUpload_S3_Bucket') }`,
-			Key: key,
-			Tagging: `rid=${ rid }&userId=${ userId }&filenameInBase64=${ filenameInBase64 }&mimetypeInBase64=${ mimetypeInBase64 }`,
-			ACL: 'public-read',
-		};
-
-		customFields.photoUrl = (options.endpoint) ? `${ options.endpoint }/${ params.Bucket }/${ params.Key }` : `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`;
+		const { s3, params, photoUrl } = this.s3RoomAvatarPhotoUploadClient(rid, userId, file);
+		customFields.photoUrl = photoUrl;
 
 		let s3_result;
 		Meteor.runAsUser(userId, () => {
@@ -734,7 +708,7 @@ API.v1.addRoute('groups.members', { authRequired: true }, {
 				total = result.total.value;
 				const userIds = result.hits.map((it) => it._source.userId);
 				users = Users.find({ _id: { $in: userIds } }, {
-					fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields : 1 },
+					fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields: 1 },
 					sort: { username: sort.username != null ? sort.username : 1 },
 				}).fetch();
 			} else {
@@ -760,8 +734,8 @@ API.v1.addRoute('groups.members', { authRequired: true }, {
 			const members = subscriptions.fetch().map((s) => s.u && s.u._id);
 
 			users = Users.find({ _id: { $in: members } }, {
-				fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields : 1 },
-				sort: { username:  sort.username != null ? sort.username : 1 },
+				fields: { _id: 1, username: 1, name: 1, status: 1, utcOffset: 1, customFields: 1 },
+				sort: { username: sort.username != null ? sort.username : 1 },
 			}).fetch();
 		}
 

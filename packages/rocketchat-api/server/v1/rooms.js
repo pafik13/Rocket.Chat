@@ -1,14 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
-import { Random } from 'meteor/random';
 import { FileUpload } from 'meteor/rocketchat:file-upload';
 import { Rooms, Subscriptions } from 'meteor/rocketchat:models';
 import Busboy from 'busboy';
 import { API } from '../api';
-import S3 from 'aws-sdk/clients/s3';
-import Path from 'path';
 import _ from 'underscore';
-import { settings } from 'meteor/rocketchat:settings';
 import { stringToBoolean } from 'meteor/rocketchat:utils';
 
 
@@ -260,30 +256,12 @@ API.v1.addRoute('rooms.uploadAvatar/:rid', { authRequired: true }, {
 		}
 
 		const file = files[0];
-
-		const options = {
-			secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
-			accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
-			region: 'eu-central-1',
-			sslEnabled: true,
-		};
-
-		const s3 = new S3(options);
-
 		const { userId } = this;
-		const { filename, mimetype } = file;
-		const prefix = 'images/rocket_room_avatars';
-		const key = `${ prefix }/${ rid }/${ Random.id() }${ Path.extname(filename) }`;
-		const params = {
-			Body: file.fileBuffer,
-			Bucket: 'fotoanon',
-			Key: key,
-			Tagging: `rid=${ rid }&userId=${ userId }&filename=${ filename }&mimetype=${ mimetype }`,
-			ACL: 'public-read',
-		};
+
+		const { s3, params, photoUrl } = this.s3RoomAvatarPhotoUploadClient(rid, userId, file);
 
 		const customFields = {
-			photoUrl: `https://s3.${ options.region }.amazonaws.com/${ params.Bucket }/${ params.Key }`,
+			photoUrl,
 		};
 
 		Meteor.runAsUser(this.userId, () => {
