@@ -5,9 +5,9 @@ import { settings } from 'meteor/rocketchat:settings';
 import Path from 'path';
 import { Random } from 'meteor/random';
 
-API.helperMethods.set('s3RoomAvatarPhotoUploadClient', function _s3RoomAvatarPhotoUploadClient(rocketEntityId, userId, file, options) {
-	if (!rocketEntityId || !userId || !file) {
-		throw new Meteor.Error('s3AvatarPhotoUploadClient', 'The fields "userId" or "rocketEntityId" or "file" is can\'t be empty');
+API.helperMethods.set('s3RoomAvatarPhotoUploadClient', function _s3RoomAvatarPhotoUploadClient(roomId, userId, file, options) {
+	if (!roomId || !userId || !file) {
+		throw new Meteor.Error('s3AvatarPhotoUploadClient', 'The fields "userId" or "roomId" or "file" is can\'t be empty');
 	}
 
 	const s3options = Object.assign({
@@ -25,12 +25,12 @@ API.helperMethods.set('s3RoomAvatarPhotoUploadClient', function _s3RoomAvatarPho
 	const filenameInBase64 = new Buffer(filename).toString('base64');
 	const mimetypeInBase64 = new Buffer(mimetype).toString('base64');
 	const prefix = 'images/rocket_room_avatars';
-	const key = `${ prefix }/${ rocketEntityId }/${ Random.id() }${ Path.extname(filename) }`;
+	const key = `${ prefix }/${ roomId }/${ Random.id() }${ Path.extname(filename) }`;
 	const params = {
 		Body: file.fileBuffer,
-		Bucket: `${ settings.get('FileUpload_S3_BucketExtra') || settings.get('FileUpload_S3_Bucket') }`,
+		Bucket: settings.get('FileUpload_S3_BucketExtra') || settings.get('FileUpload_S3_Bucket'),
 		Key: key,
-		Tagging: `rid=${ rocketEntityId }&userId=${ userId }&filenameInBase64=${ filenameInBase64 }&mimetypeInBase64=${ mimetypeInBase64 }`,
+		Tagging: `rid=${ roomId }&userId=${ userId }&filenameInBase64=${ filenameInBase64 }&mimetypeInBase64=${ mimetypeInBase64 }`,
 		ACL: 'public-read',
 	};
 
