@@ -40,6 +40,9 @@ const handler = (user, status, statusConnection) => {
 		const now = new Date();
 		if (statusConnection === 'offline') {
 			Meteor.users.update(user._id, { $set: { isSubscribedOnNotifications: false, 'customFields.lastTime': user.statusDefault === 'offline' ? null : now, lastTimeConnection: now } });
+		} else {
+			// For Android and status `away`
+			Meteor.users.update(user._id, { $set: { isSubscribedOnNotifications: status === 'online' } });
 		}
 	}
 };
