@@ -45,6 +45,24 @@ describe('[Admin]', function() {
 
 	before((done) => getCredentials(done));
 
+	describe('ping', () => {
+		it('should not return OK', (done) => request.get(api('admin.ping'))
+			.expect(400)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', false);
+				expect(res.body).to.have.property('error', 'You must be a admin!');
+			})
+			.end(done));
+
+		it('should return OK', (done) => request.get(api('admin.ping'))
+			.set(credentials)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done));
+	});
+
 	describe('createDirectMessage/isDirectMessageExists', () => {
 		const username1 = `first_${ apiUsername }`;
 		const email1 = `first_${ apiEmail }`;

@@ -10,6 +10,17 @@ import { elastic } from 'meteor/rocketchat:utils';
 import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
 
+
+API.v1.addRoute('ping', { authRequired: false }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		return API.v1.success();
+	},
+});
+
 API.v1.addRoute('admin.truncateSubscriptions', { authRequired: true }, {
 	post() {
 		if (!hasRole(this.userId, 'admin')) {
