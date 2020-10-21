@@ -610,7 +610,7 @@ describe('[Admin]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', false);
 					expect(res.body).to.have.property('error', 'You must be a admin! [error-access-denied]');
-					expect(res.body).to.have.property('errorType', 'error-access-denied"');
+					expect(res.body).to.have.property('errorType', 'error-access-denied');
 				})
 				.end(done));
 
