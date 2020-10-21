@@ -11,7 +11,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
 
 
-API.v1.addRoute('admin.ping', { authRequired: false }, {
+API.v1.addRoute('admin.ping', { authRequired: true }, {
 	get() {
 		if (!hasRole(this.userId, 'admin')) {
 			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
