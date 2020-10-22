@@ -469,6 +469,43 @@ describe('[Users]', function() {
 				.then(() => updateSetting('Accounts_AllowPasswordChange', true))
 				.then(done);
 		});
+
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+
 		after((done) => {
 			updateSetting('Accounts_AllowUserProfileChange', true)
 				.then(() => updateSetting('Accounts_AllowUsernameChange', true))
@@ -720,6 +757,26 @@ describe('[Users]', function() {
 			});
 		});
 
+		it('should return error when user update own profile', (done) => {
+			updateSetting('Accounts_AllowPasswordChange', false)
+				.then(() => {
+					request.post(api('users.update'))
+						.set(userCredentials)
+						.send({
+							userId: user._id,
+							data: {
+								password: 'itsnotworking',
+							},
+						})
+						.expect('Content-Type', 'application/json')
+						.expect(400)
+						.expect((res) => {
+							expect(res.body).to.have.property('success', false);
+						})
+						.end(done);
+				});
+		});
+
 		it('should return an error when trying update profile and it is not allowed', (done) => {
 			updatePermission('edit-other-user-info', ['user']).then(() => {
 				updateSetting('Accounts_AllowUserProfileChange', false)
@@ -806,23 +863,6 @@ describe('[Users]', function() {
 		const editedUsername = `basicInfo.name${ +new Date() }`;
 		const editedName = `basic-info-test-name${ +new Date() }`;
 		const editedEmail = `test${ +new Date() }@mail.com`;
-
-		it('users.update: should return error when user update own profile', (done) => {
-			request.post(api('users.update'))
-				.set(userCredentials)
-				.send({
-					userId: user._id,
-					data: {
-						email: editedEmail,
-					},
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(400)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', false);
-				})
-				.end(done);
-		});
 
 		it('enabling E2E in server and generating keys to user...', (done) => {
 			updateSetting('E2E_Enable', true).then(() => {
