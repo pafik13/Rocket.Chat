@@ -29,7 +29,7 @@ const sendNotification = async({
 
 	const hasMentionToUser = mentionIds.includes(subscription.u._id);
 
-	const receiver = subscription.u;
+	const receiver = subscription.receiver ? subscription.receiver[0] : subscription.u;
 
 	const roomType = room.t;
 	// If the user doesn't have permission to view direct messages, don't send notification of direct messages.
