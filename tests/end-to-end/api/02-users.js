@@ -807,6 +807,23 @@ describe('[Users]', function() {
 		const editedName = `basic-info-test-name${ +new Date() }`;
 		const editedEmail = `test${ +new Date() }@mail.com`;
 
+		it('users.update: should return error when user update own profile', (done) => {
+			request.post(api('users.update'))
+				.set(userCredentials)
+				.send({
+					userId: user._id,
+					data: {
+						email: editedEmail,
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+
 		it('enabling E2E in server and generating keys to user...', (done) => {
 			updateSetting('E2E_Enable', true).then(() => {
 				request.post(api('e2e.setUserPublicAndPivateKeys'))
