@@ -110,6 +110,13 @@ settings.addGroup('FileUpload', function() {
 				value: 'AmazonS3',
 			},
 		});
+		this.add('FileUpload_S3_RegionExtra', '', {
+			type: 'string',
+			enableQuery: {
+				_id: 'FileUpload_Storage_Type',
+				value: 'AmazonS3',
+			},
+		});
 		this.add('FileUpload_S3_BucketURL', '', {
 			type: 'string',
 			enableQuery: {

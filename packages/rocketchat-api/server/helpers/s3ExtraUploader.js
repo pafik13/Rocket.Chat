@@ -13,17 +13,19 @@ API.helperMethods.set('s3RoomAvatarPhotoUploadClient', function _s3RoomAvatarPho
 	const s3options = Object.assign({
 		secretAccessKey: settings.get('FileUpload_S3_AWSSecretAccessKey'),
 		accessKeyId: settings.get('FileUpload_S3_AWSAccessKeyId'),
-		region: settings.get('FileUpload_S3_Region') || 'eu-central-1',
-		endpoint: settings.get('FileUpload_S3_BucketURL') || undefined,
+		region: settings.get('FileUpload_S3_RegionExtra') || settings.get('FileUpload_S3_Region'),
+		endpoint: settings.get('FileUpload_S3_BucketURL'),
 		signatureVersion: settings.get('FileUpload_S3_SignatureVersion') || 'v4',
 		s3ForcePathStyle: settings.get('FileUpload_S3_ForcePathStyle') || false,
 		sslEnabled: true,
 	}, options);
 
+	if (!s3options.endpoint) { delete s3options.endpoint; }
+
 	const s3 = new S3(s3options);
 	const { filename, mimetype } = file;
-	const filenameInBase64 = new Buffer(filename).toString('base64');
-	const mimetypeInBase64 = new Buffer(mimetype).toString('base64');
+	const filenameInBase64 = Buffer.from(filename).toString('base64');
+	const mimetypeInBase64 = Buffer.from(mimetype).toString('base64');
 	const prefix = 'images/rocket_room_avatars';
 	const key = `${ prefix }/${ roomId }/${ Random.id() }${ Path.extname(filename) }`;
 	const params = {
