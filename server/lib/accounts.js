@@ -13,6 +13,10 @@ import { addUserRoles } from 'meteor/rocketchat:authorization';
 const accountsConfig = {
 	forbidClientAccountCreation: true,
 	loginExpirationInDays: settings.get('Accounts_LoginExpiration'),
+	defaultFieldSelector: {
+		tokens: 0,
+		subscriptions: 0,
+	},
 };
 
 Accounts.config(accountsConfig);
