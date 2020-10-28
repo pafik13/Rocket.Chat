@@ -101,14 +101,14 @@ Meteor.methods({
 		check(id, String);
 
 		logger.debug(`Settings userId "${ this.userId }" for app:`, id);
-		const user = Users.findOne({ tokens: { _id: id } }, { fields: { 'tokens.$': 1 } });
-		const [doc] = user.tokens;
+		const user = Users.findOne({ 'tokens._id': id }, { fields: { 'tokens.$': 1 } });
 
-		if (doc) {
-			Users.update({ _id: user._id }, { $pull: { tokens: { _id: id } } });
-			Users.update({ _id: this.userId }, { $push: { tokens: doc } });
+		if (user) {
+			const [token] = user.tokens;
+			Users.update({ _id: user._id }, { $pull: { 'tokens._id': token._id } });
+			Users.update({ _id: this.userId }, { $push: { tokens: token } });
 		}
 
-		return !!doc;
+		return !!user;
 	},
 });
