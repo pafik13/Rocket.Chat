@@ -16,6 +16,8 @@ function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) 
 		throw new Meteor.Error('error-room-param-not-provided', 'The parameter "roomId" or "roomName" is required');
 	}
 
+	console.log('findPrivateGroupByIdOrName', params, userId);
+
 	let roomSub;
 	if (params.roomId) {
 		roomSub = Subscriptions.findOneByRoomIdAndUserId(params.roomId, userId);
@@ -23,6 +25,7 @@ function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) 
 		roomSub = Subscriptions.findOneByRoomNameAndUserId(params.roomName, userId);
 	}
 
+	console.log('findPrivateGroupByIdOrName', roomSub);
 	if (!roomSub || roomSub.t !== 'p') {
 		throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any group');
 	}
