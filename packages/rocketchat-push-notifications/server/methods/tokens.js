@@ -15,7 +15,7 @@ const _matchToken = Match.OneOf({ apn: String }, { gcm: String });
  *   appName
  *   enabled
  *   createdAt
- *   updatedA
+ *   updatedAt
  */
 
 Meteor.methods({
@@ -60,6 +60,14 @@ Meteor.methods({
 			if (user) { doc = user.tokens[0]; }
 		}
 
+		// Disable for another user
+		Users.update({ _id: { $ne: this.userId }, 'tokens.value': value }, {
+			$set: {
+				'tokens.$.enabled':  false,
+				'tokens.$.updatedAt':  new Date(),
+			},
+		}, { multi: true });
+
 		// if we could not find the id or token then create it
 		if (!doc) {
 			// Rig default doc
@@ -84,6 +92,7 @@ Meteor.methods({
 			// We found the app so update the updatedAt and set the token
 			Users.update({ _id: this.userId, 'tokens._id': doc._id }, {
 				$set: {
+					'tokens.$.enabled':  true,
 					'tokens.$.updatedAt':  new Date(),
 					'tokens.$.value': value,
 					'tokens.$.type': type,
