@@ -101,8 +101,9 @@ class Notifications {
 					console.warn(`  session: "${ publication._session }"`);
 					console.warn(`  userId: "${ publication._session && publication._session.userId }"`);
 				}
+			} else {
+				originalPublish(publication, eventName, options);
 			}
-			originalPublish(publication, eventName, options);
 		};
 
 		// 		const rooms = Rooms.find({}, { name: 1 }).fetch();
