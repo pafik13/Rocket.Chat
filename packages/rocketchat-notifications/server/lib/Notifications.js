@@ -82,18 +82,24 @@ class Notifications {
 		const originalPublish = this.streamRoom._publish.bind(this.streamRoom);
 		this.streamRoom._publish = (publication, eventName, options) => {
 			const e = eventName.split('/')[1];
-			if (e === 'typing' && publication._session && publication._session.userId) {
-				const session = publication._session;
-				if (!this.streamRoom.$sessionsMap.has(session)) {
-					// 					console.log('!this.streamRoom.$sessionsMap.has(session)');
-					const subs = Subscriptions.findOpenedByUserId(session.userId, { fields: { rid: 1 } }).fetch();
-					for (let s = 0; s < subs.length; s++) {
-						const sub = subs[s];
-						// 						console.log(sub);
-						originalPublish(publication, `${ sub.rid }/${ e }`, options);
+			if (e === 'typing') {
+				if (publication._session && publication._session.userId) {
+					const session = publication._session;
+					if (!this.streamRoom.$sessionsMap.has(session)) {
+						// 					console.log('!this.streamRoom.$sessionsMap.has(session)');
+						const subs = Subscriptions.findOpenedByUserId(session.userId, { fields: { rid: 1 } }).fetch();
+						for (let s = 0; s < subs.length; s++) {
+							const sub = subs[s];
+							// 						console.log(sub);
+							originalPublish(publication, `${ sub.rid }/${ e }`, options);
+						}
+						this.streamRoom.$sessionsMap.set(session, true);
+						return;
 					}
-					this.streamRoom.$sessionsMap.set(session, true);
-					return;
+				} else {
+					console.warn('Invalid typing subscription:');
+					console.warn(`  session: "${ publication._session }"`);
+					console.warn(`  userId: "${ publication._session && publication._session.userId }"`);
 				}
 			}
 			originalPublish(publication, eventName, options);
