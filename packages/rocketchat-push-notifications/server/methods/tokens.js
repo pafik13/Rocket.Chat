@@ -114,7 +114,7 @@ Meteor.methods({
 
 		if (user) {
 			const [token] = user.tokens;
-			Users.update({ _id: user._id }, { $pull: { 'tokens._id': token._id } });
+			Users.update({ _id: user._id }, { $pull: { tokens: { _id : token._id } } });
 			Users.update({ _id: this.userId }, { $push: { tokens: token } });
 		}
 
