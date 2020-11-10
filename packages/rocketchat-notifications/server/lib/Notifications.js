@@ -92,28 +92,32 @@ class Notifications {
 							const sub = subs[s];
 							// 						console.log(sub);
 							originalPublish(publication, `${ sub.rid }/${ e }`, options);
-							publication.onStop(() => {
-								console.log('publication.onStop is called');
-								console.log('Subscriptions stats:');
-								console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-								const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
-								console.log(`  subs by name keys cnt: "${ keys.length }"`);
-								console.log('  subs by name:');
-								for (const key of keys.sort()) {
-									console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
-								}
-								this.streamRoom.$sessionsMap.set(session, false);
-							});
 						}
+						publication.onStop(() => {
+							console.log('publication.onStop is called');
+							console.log('Subscriptions stats:');
+							console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+							const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
+							console.log(`  subs by name keys cnt: "${ keys.length }"`);
+							let count = 0;
+							for (const key of keys.sort()) {
+								count += this.streamRoom.subscriptionsByEventName[key].length;
+								// 							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
+							}
+							console.log(`  subs by name all cnt: "${ count }"`);
+							this.streamRoom.$sessionsMap.delete(session);
+						});
 						this.streamRoom.$sessionsMap.set(session, true);
 						console.log('Subscriptions stats:');
 						console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
 						const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
 						console.log(`  subs by name keys cnt: "${ keys.length }"`);
-						console.log('  subs by name:');
+						let count = 0;
 						for (const key of keys.sort()) {
-							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
+							count += this.streamRoom.subscriptionsByEventName[key].length;
+							// 							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
 						}
+						console.log(`  subs by name all cnt: "${ count }"`);
 						return;
 					}
 				} else {
