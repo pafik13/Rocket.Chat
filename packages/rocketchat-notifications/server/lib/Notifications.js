@@ -92,8 +92,17 @@ class Notifications {
 							const sub = subs[s];
 							// 						console.log(sub);
 							originalPublish(publication, `${ sub.rid }/${ e }`, options);
+							publication.onStop(() => {
+								console.warn('publication.onStop is called');
+								console.warn('Subscriptions stats:');
+								console.warn(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+								console.warn(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
+							});
 						}
 						this.streamRoom.$sessionsMap.set(session, true);
+						console.warn('Subscriptions stats:');
+						console.warn(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+						console.warn(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
 						return;
 					}
 				} else {
