@@ -92,22 +92,33 @@ class Notifications {
 							const sub = subs[s];
 							// 						console.log(sub);
 							originalPublish(publication, `${ sub.rid }/${ e }`, options);
+							publication.onStop(() => {
+								console.log('publication.onStop is called');
+								console.log('Subscriptions stats:');
+								console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+								const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
+								console.log(`  subs by name keys cnt: "${ keys.length }"`);
+								console.log('  subs by name:');
+								for (const key of keys.sort()) {
+									console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
+								}
+								this.streamRoom.$sessionsMap.set(session, false);
+							});
 						}
-						publication.onStop(() => {
-							console.log('publication.onStop is called');
-							console.log('Subscriptions stats:');
-							console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-							console.log(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
-						});
 						this.streamRoom.$sessionsMap.set(session, true);
 						console.log('Subscriptions stats:');
 						console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-						console.log(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
+						const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
+						console.log(`  subs by name keys cnt: "${ keys.length }"`);
+						console.log('  subs by name:');
+						for (const key of keys.sort()) {
+							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
+						}
 						return;
 					}
 				} else {
 					console.log('Invalid typing subscription:');
-					console.log(`  session: "${ publication._session }"`);
+					console.log(`  session: "${ publication._session.id }"`);
 					console.log(`  userId: "${ publication._session && publication._session.userId }"`);
 				}
 			} else {
