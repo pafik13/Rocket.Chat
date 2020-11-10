@@ -92,23 +92,23 @@ class Notifications {
 							const sub = subs[s];
 							// 						console.log(sub);
 							originalPublish(publication, `${ sub.rid }/${ e }`, options);
-							publication.onStop(() => {
-								console.warn('publication.onStop is called');
-								console.warn('Subscriptions stats:');
-								console.warn(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-								console.warn(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
-							});
 						}
+						publication.onStop(() => {
+							console.log('publication.onStop is called');
+							console.log('Subscriptions stats:');
+							console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+							console.log(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
+						});
 						this.streamRoom.$sessionsMap.set(session, true);
-						console.warn('Subscriptions stats:');
-						console.warn(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-						console.warn(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
+						console.log('Subscriptions stats:');
+						console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
+						console.log(`  subs by name keys cnt: "${ Object.keys(this.streamRoom.subscriptionsByEventName).length }"`);
 						return;
 					}
 				} else {
-					console.warn('Invalid typing subscription:');
-					console.warn(`  session: "${ publication._session }"`);
-					console.warn(`  userId: "${ publication._session && publication._session.userId }"`);
+					console.log('Invalid typing subscription:');
+					console.log(`  session: "${ publication._session }"`);
+					console.log(`  userId: "${ publication._session && publication._session.userId }"`);
 				}
 			} else {
 				originalPublish(publication, eventName, options);
