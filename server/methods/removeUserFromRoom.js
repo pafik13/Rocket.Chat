@@ -45,10 +45,24 @@ Meteor.methods({
 		}
 
 		if (hasRole(removedUser._id, 'owner', room._id)) {
+			if (!hasPermission(fromId, 'remove-owner', data.rid)) {
+				throw new Meteor.Error('error-not-allowed', 'Not allowed (remove-owner)', {
+					method: 'removeUserFromRoom',
+				});
+			}
+
 			const numOwners = getUsersInRole('owner', room._id).fetch().length;
 
 			if (numOwners === 1) {
 				throw new Meteor.Error('error-you-are-last-owner', 'You are the last owner. Please set new owner before leaving the room.', {
+					method: 'removeUserFromRoom',
+				});
+			}
+		}
+
+		if (hasRole(removedUser._id, 'moderator', room._id)) {
+			if (!hasPermission(fromId, 'remove-moderator', data.rid)) {
+				throw new Meteor.Error('error-not-allowed', 'Not allowed (remove-moderator)', {
 					method: 'removeUserFromRoom',
 				});
 			}

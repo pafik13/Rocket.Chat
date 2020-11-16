@@ -55,6 +55,8 @@ Meteor.startup(function() {
 		{ _id: 'mention-here',                  roles : ['admin', 'owner', 'moderator', 'user'] },
 		{ _id: 'mute-user',                     roles : ['admin', 'owner', 'moderator'] },
 		{ _id: 'remove-user',                   roles : ['admin', 'owner', 'moderator'] },
+		{ _id: 'remove-moderator',              roles : ['admin', 'owner', 'moderator'] },
+		{ _id: 'remove-owner',                  roles : ['admin', 'owner'] },
 		{ _id: 'reset-other-user-e2e-key',      roles : ['admin'] },
 		{ _id: 'run-import',                    roles : ['admin'] },
 		{ _id: 'run-migration',                 roles : ['admin'] },

@@ -797,6 +797,314 @@ describe('[Channels]', function() {
 		});
 	});
 
+	describe('[/channel.kick with roles]', () => {
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
+		let userCredentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
+		before((done) => {
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: user._id,
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+		});
+		let moder1;
+		before((done) => {
+			const username = `moder1.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					moder1 = res.body.user;
+					done();
+				});
+		});
+
+		let moder1Credentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: moder1.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					moder1Credentials = {};
+					moder1Credentials['X-Auth-Token'] = res.body.data.authToken;
+					moder1Credentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
+		before((done) => {
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: moder1._id,
+				})
+				.end(done);
+		});
+		before((done) => {
+			request.post(api('channels.addModerator'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: moder1._id,
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: moder1._id,
+			}).end(done);
+			moder1 = undefined;
+		});
+		let moder2;
+		before((done) => {
+			const username = `moder2.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					moder2 = res.body.user;
+					done();
+				});
+		});
+
+		before((done) => {
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: moder2._id,
+				})
+				.end(done);
+		});
+		before((done) => {
+			request.post(api('channels.addModerator'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: moder2._id,
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: moder2._id,
+			}).end(done);
+			moder2 = undefined;
+		});
+		let owner1;
+		before((done) => {
+			const username = `owner1.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					owner1 = res.body.user;
+					done();
+				});
+		});
+
+		let owner1Credentials;
+		before((done) => {
+			request.post(api('login'))
+				.send({
+					user: owner1.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					owner1Credentials = {};
+					owner1Credentials['X-Auth-Token'] = res.body.data.authToken;
+					owner1Credentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
+		before((done) => {
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: owner1._id,
+				})
+				.end(done);
+		});
+		before((done) => {
+			request.post(api('channels.addOwner'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: owner1._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: owner1._id,
+			}).end(done);
+			owner1 = undefined;
+		});
+		let owner2;
+		before((done) => {
+			const username = `owner2.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					owner2 = res.body.user;
+					done();
+				});
+		});
+
+		before((done) => {
+			request.post(api('channels.invite'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: owner2._id,
+				})
+				.end(done);
+		});
+		before((done) => {
+			request.post(api('channels.addOwner'))
+				.set(credentials)
+				.send({
+					roomName: apiPublicChannelName,
+					userId: owner2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: owner2._id,
+			}).end(done);
+			owner2 = undefined;
+		});
+
+		it('should return error when user try to kick moder', (done) => request.post(api('channels.kick'))
+			.set(userCredentials)
+			.send({
+				roomName: apiPublicChannelName,
+				userId: moder1,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(400)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', false);
+				expect(res.body).to.have.property('errorType', 'error-not-allowed');
+			})
+			.end(done));
+
+		it('should return error when user try to kick owner', (done) => request.post(api('channels.kick'))
+			.set(userCredentials)
+			.send({
+				roomName: apiPublicChannelName,
+				userId: owner1,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(400)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', false);
+				expect(res.body).to.have.property('errorType', 'error-not-allowed');
+			})
+			.end(done));
+
+		it('should return error when moder try to kick owner', (done) => request.post(api('channels.kick'))
+			.set(moder1Credentials)
+			.send({
+				roomName: apiPublicChannelName,
+				userId: owner1,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(400)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', false);
+				expect(res.body).to.have.property('errorType', 'error-not-allowed');
+			})
+			.end(done));
+
+		it('moder should to kick moder', (done) => request.post(api('channels.kick'))
+			.set(moder1Credentials)
+			.send({
+				roomName: apiPublicChannelName,
+				userId: moder2,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done));
+
+		it('owner should to kick owner', (done) => request.post(api('channels.kick'))
+			.set(owner1Credentials)
+			.send({
+				roomName: apiPublicChannelName,
+				userId: owner2,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+			})
+			.end(done));
+	});
+
 	describe('/channels.setCustomFields:', () => {
 		let cfchannel;
 		it('create channel with customFields', (done) => {
