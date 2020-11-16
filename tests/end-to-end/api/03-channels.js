@@ -1040,7 +1040,7 @@ describe('[Channels]', function() {
 			.set(userCredentials)
 			.send({
 				roomName: apiPublicChannelName,
-				userId: moder1,
+				userId: moder1._id,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(400)
@@ -1054,7 +1054,7 @@ describe('[Channels]', function() {
 			.set(userCredentials)
 			.send({
 				roomName: apiPublicChannelName,
-				userId: owner1,
+				userId: owner1._id,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(400)
@@ -1068,7 +1068,7 @@ describe('[Channels]', function() {
 			.set(moder1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
-				userId: owner1,
+				userId: owner1._id,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(400)
@@ -1082,7 +1082,7 @@ describe('[Channels]', function() {
 			.set(moder1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
-				userId: moder2,
+				userId: moder2._id,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
@@ -1095,7 +1095,7 @@ describe('[Channels]', function() {
 			.set(owner1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
-				userId: owner2,
+				userId: owner2._id,
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
