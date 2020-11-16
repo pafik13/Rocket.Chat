@@ -46,7 +46,7 @@ const sendNotification = async({
 		desktopNotifications,
 	} = subscription;
 
-	console.log(sendNotification, subscription, receiver);
+	console.log('sendNotification', subscription, receiver);
 
 	// busy users don't receive audio notification
 	if (shouldNotifyAudio({
