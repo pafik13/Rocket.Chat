@@ -3,6 +3,7 @@ import { settings } from 'meteor/rocketchat:settings';
 import { Rooms, Subscriptions, Messages } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { callbacks } from 'meteor/rocketchat:callbacks';
+import { redis } from '../lib';
 
 export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 	const now = new Date();
@@ -45,6 +46,13 @@ export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 		groupMentions: 0,
 	};
 	if (inviter && user._id !== inviter._id) { sub.unaccepted = true; }
+	const msgsInRedis = Promise.await(redis.get(room._id));
+	if (msgsInRedis) {
+		sub.lmServerId = msgsInRedis;
+	} else if (room.lastMessage && room.lastMessage.serverId) {
+		sub.lmServerId = room.lastMessage.serverId;
+	}
+
 	subscription = Subscriptions.createWithRoomAndUser(room, user, sub);
 
 	if (!silenced) {
