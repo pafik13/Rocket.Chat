@@ -1036,7 +1036,7 @@ describe('[Channels]', function() {
 			owner2 = undefined;
 		});
 
-		it('should return error when user try to kick moder', (done) => request.post(api('channels.kick'))
+		it('should return error when user try to kick moder', () => request.post(api('channels.kick'))
 			.set(userCredentials)
 			.send({
 				roomName: apiPublicChannelName,
@@ -1048,9 +1048,9 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.property('success', false);
 				expect(res.body).to.have.property('errorType', 'error-not-allowed');
 			})
-			.end(done));
+			.end());
 
-		it('should return error when user try to kick owner', (done) => request.post(api('channels.kick'))
+		it('should return error when user try to kick owner', () => request.post(api('channels.kick'))
 			.set(userCredentials)
 			.send({
 				roomName: apiPublicChannelName,
@@ -1062,9 +1062,9 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.property('success', false);
 				expect(res.body).to.have.property('errorType', 'error-not-allowed');
 			})
-			.end(done));
+			.end());
 
-		it('should return error when moder try to kick owner', (done) => request.post(api('channels.kick'))
+		it('should return error when moder try to kick owner', () => request.post(api('channels.kick'))
 			.set(moder1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
@@ -1076,9 +1076,9 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.property('success', false);
 				expect(res.body).to.have.property('errorType', 'error-not-allowed');
 			})
-			.end(done));
+			.end());
 
-		it('moder should to kick moder', (done) => request.post(api('channels.kick'))
+		it('moder should to kick moder', () => request.post(api('channels.kick'))
 			.set(moder1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
@@ -1089,9 +1089,9 @@ describe('[Channels]', function() {
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
 			})
-			.end(done));
+			.end());
 
-		it('owner should to kick owner', (done) => request.post(api('channels.kick'))
+		it('owner should to kick owner', () => request.post(api('channels.kick'))
 			.set(owner1Credentials)
 			.send({
 				roomName: apiPublicChannelName,
@@ -1102,7 +1102,7 @@ describe('[Channels]', function() {
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
 			})
-			.end(done));
+			.end());
 	});
 
 	describe('/channels.setCustomFields:', () => {
