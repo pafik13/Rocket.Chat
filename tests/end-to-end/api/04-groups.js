@@ -424,73 +424,83 @@ describe('[Groups]', function() {
 			owner2 = undefined;
 		});
 
-		it('should return error when user try to kick moder', (done) => request.post(api('groups.kick'))
-			.set(userCredentials)
-			.send({
-				roomName: testGroup.name,
-				userId: moder1._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(400)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', false);
-				expect(res.body).to.have.property('errorType', 'error-not-allowed');
-			})
-			.end(done));
+		it('should return error when user try to kick moder', (done) => {
+			request.post(api('groups.kick'))
+				.set(userCredentials)
+				.send({
+					roomName: testGroup.name,
+					userId: moder1._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-not-allowed');
+				})
+				.end(done);
+		});
 
-		it('should return error when user try to kick owner', (done) => request.post(api('groups.kick'))
-			.set(userCredentials)
-			.send({
-				roomName: testGroup.name,
-				userId: owner1._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(400)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', false);
-				expect(res.body).to.have.property('errorType', 'error-not-allowed');
-			})
-			.end(done));
+		it('should return error when user try to kick owner', (done) => {
+			request.post(api('groups.kick'))
+				.set(userCredentials)
+				.send({
+					roomName: testGroup.name,
+					userId: owner1._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-not-allowed');
+				})
+				.end(done);
+		});
 
-		it('should return error when moder try to kick owner', (done) => request.post(api('groups.kick'))
-			.set(moder1Credentials)
-			.send({
-				roomName: testGroup.name,
-				userId: owner1._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(400)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', false);
-				expect(res.body).to.have.property('errorType', 'error-not-allowed');
-			})
-			.end(done));
+		it('should return error when moder try to kick owner', (done) => {
+			request.post(api('groups.kick'))
+				.set(moder1Credentials)
+				.send({
+					roomName: testGroup.name,
+					userId: owner1._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('errorType', 'error-not-allowed');
+				})
+				.end(done);
+		});
 
-		it('moder should to kick moder', (done) => request.post(api('groups.kick'))
-			.set(moder1Credentials)
-			.send({
-				roomName: testGroup.name,
-				userId: moder2._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', true);
-			})
-			.end(done));
+		it('moder should to kick moder', (done) => {
+			request.post(api('groups.kick'))
+				.set(moder1Credentials)
+				.send({
+					roomName: testGroup.name,
+					userId: moder2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
 
-		it('owner should to kick owner', (done) => request.post(api('groups.kick'))
-			.set(owner1Credentials)
-			.send({
-				roomName: testGroup.name,
-				userId: owner2._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', true);
-			})
-			.end(done));
+		it('owner should to kick owner', (done) => {
+			request.post(api('groups.kick'))
+				.set(owner1Credentials)
+				.send({
+					roomName: testGroup.name,
+					userId: owner2._id,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
 	});
 
 
