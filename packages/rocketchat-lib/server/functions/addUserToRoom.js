@@ -49,6 +49,8 @@ export const addUserToRoom = function(roomOrId, user, inviter, silenced) {
 	const msgsInRedis = Promise.await(redis.get(room._id));
 	if (msgsInRedis) {
 		sub.lmServerId = msgsInRedis;
+	} else if (room.msgs) {
+		sub.lmServerId = room.msgs;
 	} else if (room.lastMessage && room.lastMessage.serverId) {
 		sub.lmServerId = room.lastMessage.serverId;
 	}
