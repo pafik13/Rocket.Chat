@@ -2301,6 +2301,8 @@
   "Remove": "Удалить",
   "remove-closed-livechat-rooms": "Удалить закрытый Livechat Rooms",
   "remove-user": "Удалить пользователя",
+  "remove-moderator": "Удалить модератора",
+  "remove-owner": "Удалить владельца",
   "remove-user_description": "Разрешение на удаление пользователя из чата",
   "Remove_Admin": "Удалить администратора",
   "Remove_as_leader": "Удалить из лидеров",

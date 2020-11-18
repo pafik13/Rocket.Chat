@@ -2368,6 +2368,8 @@
   "Remove": "Remove",
   "remove-closed-livechat-rooms": "Remove Closed Livechat Rooms",
   "remove-user": "Remove User",
+  "remove-moderator": "Remove Moderator",
+  "remove-owner": "Remove Owner",
   "remove-user_description": "Permission to remove a user from a room",
   "Remove_Admin": "Remove Admin",
   "Remove_as_leader": "Remove as leader",
