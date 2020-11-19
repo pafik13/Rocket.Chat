@@ -380,12 +380,13 @@ API.v1.addRoute('users.update', { authRequired: true }, {
 			}),
 		});
 		const { userId } = this.bodyParams;
+		const user = Users.findOneById(userId, { fields: { customFields: 1 } });
+		if (!user) { return API.v1.failure('User not found'); }
 		const userData = _.extend({ _id: userId }, this.bodyParams.data);
 
 		Meteor.runAsUser(this.userId, () => saveUser(this.userId, userData));
 
 		if (this.bodyParams.data.customFields) {
-			const user = Users.findOneById(userId, { fields: { customFields: 1 } });
 			const newCustomFields = {
 				...user.customFields,
 				...this.bodyParams.data.customFields,
