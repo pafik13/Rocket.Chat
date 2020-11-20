@@ -70,6 +70,20 @@ class RoomStreamer extends Meteor.Streamer {
 	}
 }
 
+const printStreamRoomSubsStat = (streamRoom) => {
+	console.log('publication.onStop is called');
+	console.log('Subscriptions stats:');
+	console.log(`  subs len: "${ streamRoom.subscriptions.length }"`);
+	const keys = Object.keys(streamRoom.subscriptionsByEventName);
+	console.log(`  subs by name keys cnt: "${ keys.length }"`);
+	let count = 0;
+	for (const key of keys.sort()) {
+		count += streamRoom.subscriptionsByEventName[key].length;
+		// 							console.log(`  ${ key }: ${ streamRoom.subscriptionsByEventName[key].length }`);
+	}
+	console.log(`  subs by name all cnt: "${ count }"`);
+};
+
 class Notifications {
 	constructor() {
 		const self = this;
@@ -87,37 +101,22 @@ class Notifications {
 					const session = publication._session;
 					if (!this.streamRoom.$sessionsMap.has(session)) {
 						// 					console.log('!this.streamRoom.$sessionsMap.has(session)');
-						const subs = Subscriptions.findOpenedByUserId(session.userId, { fields: { rid: 1 } }).fetch();
-						for (let s = 0; s < subs.length; s++) {
-							const sub = subs[s];
-							// 						console.log(sub);
-							originalPublish(publication, `${ sub.rid }/${ e }`, options);
-						}
+						const cursorHandle = Subscriptions.findOpenedByUserId(session.userId, { fields: { rid: 1 } }).observe({
+							added(sub) {
+								console.log('cursorHandle.added is called');
+								originalPublish(publication, `${ sub.rid }/${ e }`, options);
+							},
+							removed(oldSub) {
+								console.log(`cursorHandle.removed is called: rid=${ oldSub.rid } _id=${ oldSub._id }`);
+							},
+						});
 						publication.onStop(() => {
-							console.log('publication.onStop is called');
-							console.log('Subscriptions stats:');
-							console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-							const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
-							console.log(`  subs by name keys cnt: "${ keys.length }"`);
-							let count = 0;
-							for (const key of keys.sort()) {
-								count += this.streamRoom.subscriptionsByEventName[key].length;
-								// 							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
-							}
-							console.log(`  subs by name all cnt: "${ count }"`);
 							this.streamRoom.$sessionsMap.delete(session);
+							cursorHandle.stop();
+							printStreamRoomSubsStat(this.streamRoom);
 						});
 						this.streamRoom.$sessionsMap.set(session, true);
-						console.log('Subscriptions stats:');
-						console.log(`  subs len: "${ this.streamRoom.subscriptions.length }"`);
-						const keys = Object.keys(this.streamRoom.subscriptionsByEventName);
-						console.log(`  subs by name keys cnt: "${ keys.length }"`);
-						let count = 0;
-						for (const key of keys.sort()) {
-							count += this.streamRoom.subscriptionsByEventName[key].length;
-							// 							console.log(`  ${ key }: ${ this.streamRoom.subscriptionsByEventName[key].length }`);
-						}
-						console.log(`  subs by name all cnt: "${ count }"`);
+						printStreamRoomSubsStat(this.streamRoom);
 						return;
 					}
 				} else {
