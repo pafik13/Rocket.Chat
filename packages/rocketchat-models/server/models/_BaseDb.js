@@ -386,6 +386,7 @@ export class BaseDb extends EventEmitter {
 			ids.push(record._id);
 
 			record._deletedAt = new Date();
+			record._deletedBy = Meteor.userId();
 			record.__collection__ = this.name;
 
 			trash.upsert({ _id: record._id }, _.omit(record, '_id'));
@@ -467,6 +468,7 @@ export class BaseDb extends EventEmitter {
 
 	trashUpsert(record) {
 		record._deletedAt = new Date();
+		record._deletedBy = Meteor.userId();
 		record.__collection__ = this.name;
 
 		trash.upsert({ _id: record._id }, _.omit(record, '_id'));
