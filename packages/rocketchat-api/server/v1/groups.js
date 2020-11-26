@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Subscriptions, Rooms, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
+import { composeMessageObjectWithUser, stringToBoolean, HEADER_COUTNRY_CODE, HEADER_NGINX_GEO_CODE } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -240,6 +240,10 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		const readOnly = typeof this.bodyParams.readOnly !== 'undefined' ? this.bodyParams.readOnly : false;
 		const membersHidden = typeof this.bodyParams.membersHidden !== 'undefined' ? this.bodyParams.membersHidden : false;
 
+		const { headers } = this.request;
+		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+		const { country = countryFromHeader || 'EN' } = this.bodyParams;
+
 		let result;
 		let rid;
 		Meteor.runAsUser(this.userId, () => {
@@ -260,6 +264,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
+			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({
@@ -331,9 +336,13 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			return API.v1.failure('Just 1 file is allowed');
 		}
 
+		const { headers } = this.request;
+		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+
 		let customFields = {};
 		let location;
 		let filesHidden = false;
+		let country;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
@@ -341,6 +350,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			fields.readOnly = stringToBoolean(fields.readOnly);
 			fields.membersHidden = stringToBoolean(fields.membersHidden);
 			filesHidden = stringToBoolean(fields.filesHidden);
+			country = fields.country || countryFromHeader || 'EN';
 
 			validateGroup(fields);
 			if (fields.customFields) {
@@ -378,6 +388,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
+			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({

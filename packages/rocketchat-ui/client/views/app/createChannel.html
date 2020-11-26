@@ -110,6 +110,21 @@
 					</div>
 					<div class="rc-input">
 						<label class="rc-input__label">
+							<div class="rc-input__title">{{_ "Country"}}</div>
+							<div class="rc-input__wrapper">
+								<div class="rc-select">
+									<select id="country" class="input-monitor rc-select__element" name="country">
+										{{#each countries}}
+											<option value="{{key}}" dir="auto">{{name}}</option>
+										{{/each}}
+									</select>
+									{{> icon block="rc-select__arrow" icon="arrow-down" }}
+								</div>
+							</div>
+						</label>
+					</div>
+					<div class="rc-input">
+						<label class="rc-input__label">
 							<div class="rc-input__title">{{_ "Invite_Users"}}</div>
 							<div class="rc-input__wrapper">
 								<div class="rc-input__icon">

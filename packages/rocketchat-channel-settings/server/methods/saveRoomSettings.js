@@ -5,6 +5,7 @@ import { Rooms } from 'meteor/rocketchat:models';
 import { validateGeoJSON } from 'meteor/rocketchat:utils';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { _ } from 'meteor/underscore';
+import { isValid as isValidCountryCode } from 'i18n-iso-countries';
 
 
 import { saveRoomName } from '../functions/saveRoomName';
@@ -19,7 +20,32 @@ import { saveRoomSystemMessages } from '../functions/saveRoomSystemMessages';
 import { saveRoomTokenpass } from '../functions/saveRoomTokens';
 import { saveStreamingOptions } from '../functions/saveStreamingOptions';
 
-const fields = ['roomName', 'roomTopic', 'roomAnnouncement', 'roomCustomFields', 'roomDescription', 'roomType', 'readOnly', 'reactWhenReadOnly', 'systemMessages', 'default', 'joinCode', 'tokenpass', 'streamingOptions', 'retentionEnabled', 'retentionMaxAge', 'retentionExcludePinned', 'retentionFilesOnly', 'retentionOverrideGlobal', 'encrypted', 'membersHidden', 'location', 'filesHidden', 'blocked'];
+const fields = [
+	'roomName',
+	'roomTopic',
+	'roomAnnouncement',
+	'roomCustomFields',
+	'roomDescription',
+	'roomType',
+	'readOnly',
+	'reactWhenReadOnly',
+	'systemMessages',
+	'default',
+	'joinCode',
+	'tokenpass',
+	'streamingOptions',
+	'retentionEnabled',
+	'retentionMaxAge',
+	'retentionExcludePinned',
+	'retentionFilesOnly',
+	'retentionOverrideGlobal',
+	'encrypted',
+	'membersHidden',
+	'location',
+	'filesHidden',
+	'blocked',
+	'country',
+];
 Meteor.methods({
 	saveRoomSettings(rid, settings, value) {
 		const userId = Meteor.userId();
@@ -168,6 +194,20 @@ Meteor.methods({
 					method: 'saveRoomSettings',
 					action: 'Editing_room',
 				});
+			}
+			if (setting === 'country') {
+				if (!hasPermission(userId, 'edit-room', rid)) {
+					throw new Meteor.Error('error-action-not-allowed', 'Editing room blocked state is not allowed', {
+						method: 'saveRoomSettings',
+						action: 'Editing_room',
+					});
+				}
+				if (!isValidCountryCode(value)) {
+					throw new Meteor.Error('error-invalid-country', 'Invalid country code', {
+						method: 'saveRoomSettings',
+						action: 'Editing_room',
+					});
+				}
 			}
 		});
 

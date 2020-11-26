@@ -11,6 +11,10 @@ import { t, roomTypes } from 'meteor/rocketchat:utils';
 import { hasAllPermission } from 'meteor/rocketchat:authorization';
 import toastr from 'toastr';
 import _ from 'underscore';
+import { isValid as isValidCountryCode, registerLocale, getNames as getCountryNames } from 'i18n-iso-countries';
+import * as en from 'i18n-iso-countries/langs/en.json';
+
+registerLocale(en);
 
 const acEvents = {
 	'click .rc-popup-list__item'(e, t) {
@@ -182,6 +186,11 @@ Template.createChannel.helpers({
 			(roomTypeOrder) => roomTypes.roomTypes[roomTypeOrder.identifier]
 		).filter((roomType) => roomType.creationTemplate);
 	},
+	countries() {
+		const names = getCountryNames('en', { select: 'all' });
+		console.log(names);
+		return Object.keys(names).map((key) => ({ key, name: names[key][0] }));
+	},
 });
 
 Template.createChannel.events({
@@ -292,6 +301,9 @@ Template.createChannel.events({
 		const encrypted = instance.encrypted.get();
 		const isPrivate = type === 'p';
 		const isInvalidLocation = instance.invalidLocation.get();
+		const selectedCountry = $('#country').val();
+		console.log('selectedCountry', selectedCountry);
+
 
 		if (instance.invalid.get() || instance.inUse.get()) {
 			return e.target.name.focus();
@@ -301,6 +313,9 @@ Template.createChannel.events({
 		}
 		if (isInvalidLocation) {
 			return e.target.locationLng.focus();
+		}
+		if (!isValidCountryCode(selectedCountry)) {
+			return e.target.country.focus();
 		}
 		if (!Object.keys(instance.extensions_validations).map((key) => instance.extensions_validations[key]).reduce((valid, fn) => fn(instance) && valid, true)) {
 			return instance.extensions_invalid.set(true);
@@ -318,6 +333,10 @@ Template.createChannel.events({
 					coordinates: [Number(lng), Number(lat)],
 				};
 			}
+		}
+
+		if (selectedCountry) {
+			extraData.country = selectedCountry;
 		}
 
 		console.log('extraData', extraData);

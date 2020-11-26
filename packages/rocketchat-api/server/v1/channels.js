@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Rooms, Subscriptions, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
+import { composeMessageObjectWithUser, stringToBoolean, HEADER_COUTNRY_CODE, HEADER_NGINX_GEO_CODE } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -266,7 +266,11 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 
 		const rid = API.channels.create.execute(userId, bodyParams);
 
-		const { customFields, description, topic, location, filesHidden = false } = bodyParams;
+		const { headers } = this.request;
+
+		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+
+		const { customFields, description, topic, location, filesHidden = false, country = countryFromHeader || 'EN' } = bodyParams;
 
 		Meteor.runAsUser(this.userId, () => {
 			if (customFields) {
@@ -282,6 +286,7 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
+			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({
@@ -328,16 +333,21 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			return API.v1.failure('Just 1 file is allowed');
 		}
 
+		const { headers } = this.request;
+		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+
 		let customFields = {};
 		let location;
 		let errorResponse;
 		let filesHidden = false;
+		let country;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
 			filesHidden = stringToBoolean(fields.filesHidden);
+			country = fields.country || countryFromHeader || 'EN';
 
 			API.channels.create.validate({
 				user: {
@@ -395,6 +405,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 				Meteor.call('saveRoomSettings', rid, 'location', location);
 			}
 			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
+			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({
