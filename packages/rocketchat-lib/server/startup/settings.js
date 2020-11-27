@@ -1058,6 +1058,11 @@ settings.addGroup('General', function() {
 			public: true,
 			i18nDescription: 'Rooms_Max_For_Mark_As_Inactive',
 		});
+		this.add('Rooms_Default_Country', 'RU', {
+			type: 'string',
+			public: true,
+			i18nDescription: 'Rooms_Default_Country',
+		});
 	});
 	this.section('Notifications', function() {
 		this.add('Notifications_Max_Room_Members', 100, {

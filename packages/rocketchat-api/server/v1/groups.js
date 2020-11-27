@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Subscriptions, Rooms, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
-import { composeMessageObjectWithUser, stringToBoolean, HEADER_COUTNRY_CODE, HEADER_NGINX_GEO_CODE } from 'meteor/rocketchat:utils';
+import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
 import { API } from '../api';
 import _ from 'underscore';
 import s from 'underscore.string';
@@ -240,8 +240,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		const readOnly = typeof this.bodyParams.readOnly !== 'undefined' ? this.bodyParams.readOnly : false;
 		const membersHidden = typeof this.bodyParams.membersHidden !== 'undefined' ? this.bodyParams.membersHidden : false;
 
-		const { headers } = this.request;
-		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+		const countryFromHeader = this.getCountry();
 		const { country = countryFromHeader || 'EN' } = this.bodyParams;
 
 		let result;
@@ -336,8 +335,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			return API.v1.failure('Just 1 file is allowed');
 		}
 
-		const { headers } = this.request;
-		const countryFromHeader = headers[HEADER_COUTNRY_CODE] || headers[HEADER_NGINX_GEO_CODE];
+		const countryFromHeader = this.getCountry();
 
 		let customFields = {};
 		let location;

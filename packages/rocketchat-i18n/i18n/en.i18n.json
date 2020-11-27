@@ -2475,6 +2475,7 @@
   "Rooms_Maximum_Count": "Maximum rooms at all",
   "Rooms_Max_Days_For_Inactive": "Max days for mark as inactive",
   "Rooms_Max_For_Mark_As_Inactive": "Max rooms for mark as inactive at once",
+  "Rooms_Default_Country": "Rooms default country",
   "Routing": "Routing",
   "Run_only_once_for_each_visitor": "Run only once for each visitor",
   "run-import": "Run Import",

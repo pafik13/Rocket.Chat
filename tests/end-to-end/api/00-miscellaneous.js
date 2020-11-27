@@ -169,7 +169,9 @@ describe('miscellaneous', function() {
 				.send({
 					name: `channel.test.${ Date.now() }`,
 				})
+				.expect(200)
 				.end((err, res) => {
+					expect(err, null);
 					testChannel = res.body.channel;
 					done();
 				});

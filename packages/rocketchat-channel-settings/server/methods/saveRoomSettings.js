@@ -310,6 +310,9 @@ Meteor.methods({
 				case 'blocked':
 					Rooms.setBlockedById(rid, value);
 					break;
+				case 'country':
+					Rooms.setCountryById(rid, value);
+					break;
 			}
 		});
 

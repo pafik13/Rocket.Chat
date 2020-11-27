@@ -1376,6 +1376,18 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	setCountryById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				country: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	saveRetentionEnabledById(_id, value) {
 		const query = { _id };
 
