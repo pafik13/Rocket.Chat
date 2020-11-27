@@ -62,6 +62,36 @@ describe('[Groups]', function() {
 			.end(done);
 	});
 
+	it('/groups.create with X-Country-Code', (done) => {
+		request.post(api('groups.createWithAvatar'))
+			.set(credentials)
+			.set('X-Country-Code', 'KZ')
+			.send({
+				name: `group-create-x-country-code-${ Date.now() }`,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.nested.property('group.country', 'KZ');
+			})
+			.end(done);
+	});
+
+	it('/groups.create with X-Nginx-Geo-Client-Country', (done) => {
+		request.post(api('groups.create'))
+			.set(credentials)
+			.set('X-Nginx-Geo-Client-Country', 'GB')
+			.send({
+				name: `group-create-x-nginx-geo-client-country-${ Date.now() }`,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.nested.property('group.country', 'GB');
+			})
+			.end(done);
+	});
+
 	describe('[/groups.{accept,decline}]', () => {
 		let testGroup = {};
 		before((done) => {

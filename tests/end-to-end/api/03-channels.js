@@ -32,12 +32,15 @@ describe('[Channels]', function() {
 	it('/channels.create', (done) => {
 		request.post(api('channels.create'))
 			.set(credentials)
+			.set('X-Country-Code', 'KZ')
+			.set('X-Nginx-Geo-Client-Country', 'GB')
 			.send({
 				name: apiPublicChannelName,
 				location: {
 					type: 'Point',
 					coordinates: [33, 55],
 				},
+				country: 'AU',
 			})
 			.expect('Content-Type', 'application/json')
 			.expect(200)
@@ -48,6 +51,7 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.t', 'c');
 				expect(res.body).to.have.nested.property('channel.msgs', 1);
 				expect(res.body).to.have.nested.property('channel.filesHidden', false);
+				expect(res.body).to.have.nested.property('channel.country', 'AU');
 				channel._id = res.body.channel._id;
 			})
 			.end(done);
@@ -56,6 +60,8 @@ describe('[Channels]', function() {
 	it('/channels.createWithAvatar', (done) => {
 		request.post(api('channels.createWithAvatar'))
 			.set(credentials)
+			.set('X-Country-Code', 'KZ')
+			.set('X-Nginx-Geo-Client-Country', 'GB')
 			.attach('file', imgURL)
 			.field({
 				name: `channel-createWithAvatar-${ Date.now() }`,
@@ -68,6 +74,37 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.property('success', true);
 				expect(res.body).to.have.property('channel');
 				expect(res.body).to.have.property('s3_result');
+				expect(res.body).to.have.nested.property('channel.country', 'KZ');
+			})
+			.end(done);
+	});
+
+	it('/channels.create with X-Country-Code', (done) => {
+		request.post(api('channels.create'))
+			.set(credentials)
+			.set('X-Country-Code', 'KZ')
+			.send({
+				name: `channel-create-x-country-code-${ Date.now() }`,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.nested.property('channel.country', 'KZ');
+			})
+			.end(done);
+	});
+
+	it('/channels.create with X-Nginx-Geo-Client-Country', (done) => {
+		request.post(api('channels.create'))
+			.set(credentials)
+			.set('X-Nginx-Geo-Client-Country', 'GB')
+			.send({
+				name: `channel-create-x-nginx-geo-client-country-${ Date.now() }`,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.nested.property('channel.country', 'GB');
 			})
 			.end(done);
 	});
