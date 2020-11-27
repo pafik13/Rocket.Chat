@@ -1,4 +1,4 @@
-import * as contentPriorityByCountries from './contentPriorityByCountries.json';
+import { default as contentPriorityByCountries } from './contentPriorityByCountries.json';
 
 const countriesByLang = {};
 const langByCountries = {};
