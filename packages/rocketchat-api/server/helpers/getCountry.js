@@ -7,7 +7,5 @@ const defaultCountry = settings.get('Rooms_Default_Country');
 API.helperMethods.set('getCountry', function _getCountry() {
 	const { headers } = this.request;
 
-	console.log(headers);
-
 	return headers[HEADER_COUTNRY_CODE.toLowerCase()] || headers[HEADER_NGINX_GEO_CODE.toLowerCase()] || defaultCountry;
 });

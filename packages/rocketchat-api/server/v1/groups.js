@@ -241,7 +241,7 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		const membersHidden = typeof this.bodyParams.membersHidden !== 'undefined' ? this.bodyParams.membersHidden : false;
 
 		const countryFromHeader = this.getCountry();
-		const { country = countryFromHeader || 'EN' } = this.bodyParams;
+		const { country = countryFromHeader } = this.bodyParams;
 
 		let result;
 		let rid;
@@ -348,7 +348,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			fields.readOnly = stringToBoolean(fields.readOnly);
 			fields.membersHidden = stringToBoolean(fields.membersHidden);
 			filesHidden = stringToBoolean(fields.filesHidden);
-			country = fields.country || countryFromHeader || 'EN';
+			country = fields.country || countryFromHeader;
 
 			validateGroup(fields);
 			if (fields.customFields) {

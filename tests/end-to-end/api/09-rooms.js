@@ -408,8 +408,8 @@ describe('[Rooms]', function() {
 		let testGroup;
 		let testDM;
 		const channelExpectedKeys = [
-			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'sysMes', 'filesHidden', 'default', 'messageEventsCount',
-			'lastMessage', '_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed', 'ro', 'lm',
+			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'sysMes', 'filesHidden', 'country', 'messageEventsCount',
+			'lastMessage', '_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed', 'default', 'ro', 'lm',
 		];
 		const groupExpectedKeys = Array.from(channelExpectedKeys);
 		groupExpectedKeys.push('membersHidden');

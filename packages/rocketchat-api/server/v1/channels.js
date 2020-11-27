@@ -270,8 +270,6 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 
 		const { customFields, description, topic, location, filesHidden = false, country = countryFromHeader } = bodyParams;
 
-		console.log('country', country);
-
 		Meteor.runAsUser(this.userId, () => {
 			if (customFields) {
 				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
@@ -346,7 +344,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
 			filesHidden = stringToBoolean(fields.filesHidden);
-			country = fields.country || countryFromHeader || 'EN';
+			country = fields.country || countryFromHeader;
 
 			API.channels.create.validate({
 				user: {
