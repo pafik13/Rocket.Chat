@@ -745,7 +745,8 @@ API.v1.addRoute('channels.list.popular', { authRequired: false }, {
 
 		// 		let result;
 		// 		Meteor.runAsUser(this.userId, () => {
-		const result = Meteor.call('getPopularChannels', offset, count);
+		const country = this.getCountry();
+		const result = Meteor.call('getPopularChannels', country, offset, count);
 		// 		});
 
 		const rooms = result.records;

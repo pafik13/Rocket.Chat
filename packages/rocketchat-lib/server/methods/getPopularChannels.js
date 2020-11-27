@@ -1,9 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Rooms } from 'meteor/rocketchat:models';
+import { getCountriesWithSameLanguage } from 'meteor/rocketchat:utils';
 
 Meteor.methods({
-	getPopularChannels(offset = 0, limit = 20) {
+	getPopularChannels(country, offset = 0, limit = 20) {
+		check(country, String);
 		check(offset, Number);
 		check(limit, Number);
 
@@ -12,8 +14,9 @@ Meteor.methods({
 		// 			throw new Meteor.Error('error-invalid-user', 'Invalid user', { method: 'getPopularChannels' });
 		// 		}
 
-		const query = {
+		let query = {
 			t: 'c',
+			country,
 		};
 
 		const options = {
@@ -38,9 +41,21 @@ Meteor.methods({
 			limit,
 		};
 
-		const rooms = Rooms.find(query, options);
+		let rooms = Rooms.find(query, options);
+		let total = rooms.count(); // count ignores the `skip` and `limit` options
+		if (!total) {
+			const countries = getCountriesWithSameLanguage(country);
+			if (countries.length) {
+				query = {
+					t: 'c',
+					country: { $in: countries },
+				};
+				rooms = Rooms.find(query, options);
+				total = rooms.count();
+			}
+		}
 		return {
-			total: rooms.count(), // count ignores the `skip` and `limit` options
+			total,
 			records: rooms.fetch(),
 		};
 	},
