@@ -24,6 +24,7 @@ export { stringToBoolean } from '../lib/stringToBoolean';
 export { hyphenate } from '../lib/hyphenate';
 export { complaintReasonsList } from '../lib/complaintReasons';
 export { randomInteger } from './functions/randomInteger';
+export { getCountriesWithSameLanguage } from './functions/getCountriesWithSameLanguage';
 
 export const HEADER_COUTNRY_CODE = 'X-Country-Code';
 export const HEADER_NGINX_GEO_CODE = 'X-Nginx-Geo-Client-Country';
