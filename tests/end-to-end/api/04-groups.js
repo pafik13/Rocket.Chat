@@ -63,7 +63,7 @@ describe('[Groups]', function() {
 	});
 
 	it('/groups.create with X-Country-Code', (done) => {
-		request.post(api('groups.createWithAvatar'))
+		request.post(api('groups.create'))
 			.set(credentials)
 			.set('X-Country-Code', 'KZ')
 			.send({
