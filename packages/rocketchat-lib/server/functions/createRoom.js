@@ -173,7 +173,7 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		const memberSubsCount = Promise.await(Subscriptions.countWODirectsByUserId(member._id));
 
 		if (isTheOwner || memberSubsCount < roomsMaxCount) {
-			const subId = Subscriptions.createWithRoomAndUser(room, member, extra);
+			const subId = Promise.await(Subscriptions.createWithRoomAndUser(room, member, extra));
 			subs.push({
 				user: member,
 				subscription: { _id: subId },
