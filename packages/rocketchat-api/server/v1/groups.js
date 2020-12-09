@@ -262,28 +262,24 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		const countryFromHeader = this.getCountry();
 		const { country = countryFromHeader } = this.bodyParams;
 
-		Meteor.runAsUser(this.userId, () => {
-			const { description, topic, location, filesHidden = false, membersHidden = false } = this.bodyParams;
-			const extraData = {
-				membersHidden, filesHidden, country,
-			};
-			if (topic) {
-				extraData.topic = topic;
-			}
-			if (description) {
-				extraData.description = description;
-			}
-			if (location) {
-				extraData.location = location;
-			}
+		const { description, topic, location, filesHidden = false, membersHidden = false } = this.bodyParams;
+		const extraData = {
+			membersHidden, filesHidden, country,
+		};
+		if (topic) {
+			extraData.topic = topic;
+		}
+		if (description) {
+			extraData.description = description;
+		}
+		if (location) {
+			extraData.location = location;
+		}
 
-			const { group: {
-				rid,
-			} } = createGroup(this.userId, this.bodyParams, extraData);
+		const { group: { rid } } = createGroup(this.userId, this.bodyParams, extraData);
 
-			return API.v1.success({
-				group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
-			});
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
 		});
 	},
 });
@@ -370,9 +366,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			extraData.location = location;
 		}
 
-		const { group: {
-			rid,
-		} } = createGroup(userId, fields, extraData);
+		const { group: { rid } } = createGroup(userId, fields, extraData);
 
 		const file = files[0];
 
