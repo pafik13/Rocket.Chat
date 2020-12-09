@@ -218,6 +218,28 @@ API.v1.addRoute('groups.counters', { authRequired: true }, {
 	},
 });
 
+function validateGroup(params) {
+	if (!params.name) {
+		throw new Error('Field "name" is required');
+	}
+
+	if (params.members && !_.isArray(params.members)) {
+		throw new Error('Field "members" must be an array if provided');
+	}
+}
+
+function createGroup(userId, params, extraData) {
+	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
+
+	const roomInfo = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields, extraData));
+
+	console.log('createGroup', roomInfo, userId);
+	return {
+		group: findPrivateGroupByIdOrName({ params: { roomId: roomInfo.rid }, userId }),
+	};
+}
+
+
 // Create Private Group
 API.v1.addRoute('groups.create', { authRequired: true }, {
 	post() {
@@ -237,63 +259,34 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 			return API.v1.failure('Body param "customFields" must be an object if provided');
 		}
 
-		const readOnly = typeof this.bodyParams.readOnly !== 'undefined' ? this.bodyParams.readOnly : false;
-		const membersHidden = typeof this.bodyParams.membersHidden !== 'undefined' ? this.bodyParams.membersHidden : false;
-
 		const countryFromHeader = this.getCountry();
 		const { country = countryFromHeader } = this.bodyParams;
 
-		let result;
-		let rid;
 		Meteor.runAsUser(this.userId, () => {
-			result = Meteor.call('createPrivateGroup', this.bodyParams.name, this.bodyParams.members ? this.bodyParams.members : [], readOnly, this.bodyParams.customFields, { membersHidden });
-			rid = result.rid;
-
-			const { customFields, description, topic, location, filesHidden = false } = this.bodyParams;
-			if (customFields) {
-				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
-			}
+			const { description, topic, location, filesHidden = false, membersHidden = false } = this.bodyParams;
+			const extraData = {
+				membersHidden, filesHidden, country,
+			};
 			if (topic) {
-				Meteor.call('saveRoomSettings', rid, 'roomTopic', topic);
+				extraData.topic = topic;
 			}
 			if (description) {
-				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
+				extraData.description = description;
 			}
 			if (location) {
-				Meteor.call('saveRoomSettings', rid, 'location', location);
+				extraData.location = location;
 			}
-			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
-			Meteor.call('saveRoomSettings', rid, 'country', country);
-		});
 
-		return API.v1.success({
-			group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+			const { group: {
+				rid,
+			} } = createGroup(this.userId, this.bodyParams, extraData);
+
+			return API.v1.success({
+				group: this.composeRoomWithLastMessage(Rooms.findOneById(rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+			});
 		});
 	},
 });
-
-function validateGroup(params) {
-	if (!params.name) {
-		throw new Error('Field "name" is required');
-	}
-
-	if (params.members && !_.isArray(params.members)) {
-		throw new Error('Field "members" must be an array if provided');
-	}
-}
-
-function createGroup(userId, params) {
-	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
-	const membersHidden = typeof params.membersHidden !== 'undefined' ? params.membersHidden : false;
-
-	const id = Meteor.runAsUser(userId, () => Meteor.call('createPrivateGroup', params.name, params.members ? params.members : [], readOnly, params.customFields, { membersHidden }));
-
-	console.log('createGroup', id, userId);
-	return {
-		group: findPrivateGroupByIdOrName({ params: { roomId: id.rid }, userId }),
-	};
-}
-
 
 API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 	post() {
@@ -340,13 +333,14 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		let customFields = {};
 		let location;
 		let filesHidden = false;
+		let membersHidden = false;
 		let country;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
-			fields.membersHidden = stringToBoolean(fields.membersHidden);
+			membersHidden = stringToBoolean(fields.membersHidden);
 			filesHidden = stringToBoolean(fields.filesHidden);
 			country = fields.country || countryFromHeader;
 
@@ -363,8 +357,22 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			return API.v1.failure(e.message);
 		}
 
-		const { group } = createGroup(userId, fields);
-		const { rid } = group;
+		const extraData = {
+			filesHidden, membersHidden, country,
+		};
+		if (fields.topic) {
+			extraData.topic = fields.topic;
+		}
+		if (fields.description) {
+			extraData.description = fields.description;
+		}
+		if (location) {
+			extraData.location = location;
+		}
+
+		const { group: {
+			rid,
+		} } = createGroup(userId, fields, extraData);
 
 		const file = files[0];
 
@@ -376,17 +384,6 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 			s3_result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
 
 			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
-			if (fields.topic) {
-				Meteor.call('saveRoomSettings', rid, 'roomTopic', fields.topic);
-			}
-			if (fields.description) {
-				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
-			}
-			if (location) {
-				Meteor.call('saveRoomSettings', rid, 'location', location);
-			}
-			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
-			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({

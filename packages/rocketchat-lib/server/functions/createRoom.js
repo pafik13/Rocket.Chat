@@ -6,6 +6,7 @@ import { hasPermission /* addUserRoles */} from 'meteor/rocketchat:authorization
 import { getValidRoomName, validateGeoJSON, spotlightRoomsIsValidText } from 'meteor/rocketchat:utils';
 import _ from 'underscore';
 import s from 'underscore.string';
+import { isValid as isValidCountryCode } from 'i18n-iso-countries';
 
 
 function createDirectRoom(source, target, extraData, options) {
@@ -102,6 +103,10 @@ export const createRoom = function(type, name, owner, members, readOnly, extraDa
 		if (locationErrors) {
 			throw new Meteor.Error('error-invalid-location', locationErrors, { function: 'RocketChat.createRoom' });
 		}
+	}
+
+	if (extraData.country && !isValidCountryCode(extraData.country)) {
+		throw new Meteor.Error('error-invalid-country', `Invalid country code: ${ extraData.country }`, { function: 'RocketChat.createRoom' });
 	}
 
 	const now = new Date();

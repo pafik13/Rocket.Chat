@@ -219,9 +219,9 @@ function createChannelValidator(params) {
 	}
 }
 
-function createChannel(userId, params) {
+function createChannel(userId, params, extraData) {
 	const readOnly = typeof params.readOnly !== 'undefined' ? params.readOnly : false;
-	const id = Meteor.runAsUser(userId, () => Meteor.call('createChannel', params.name, params.members ? params.members : [], readOnly, params.customFields));
+	const id = Meteor.runAsUser(userId, () => Meteor.call('createChannel', params.name, params.members ? params.members : [], readOnly, params.customFields, extraData));
 
 	return id.rid;
 }
@@ -236,7 +236,7 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 	post() {
 		const { userId, bodyParams } = this;
 
-		let error;
+		let errorResponse;
 
 		try {
 			API.channels.create.validate({
@@ -254,38 +254,34 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 			});
 		} catch (e) {
 			if (e.message === 'unauthorized') {
-				error = API.v1.unauthorized();
+				errorResponse = API.v1.unauthorized();
 			} else {
-				error = API.v1.failure(e.message);
+				errorResponse = API.v1.failure(e.message);
 			}
 		}
 
-		if (error) {
-			return error;
+		if (errorResponse) {
+			return errorResponse;
 		}
-
-		const rid = API.channels.create.execute(userId, bodyParams);
 
 		const countryFromHeader = this.getCountry();
 
-		const { customFields, description, topic, location, filesHidden = false, country = countryFromHeader } = bodyParams;
+		const { description, topic, location, filesHidden = false, country = countryFromHeader } = bodyParams;
 
-		Meteor.runAsUser(this.userId, () => {
-			if (customFields) {
-				Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
-			}
-			if (topic) {
-				Meteor.call('saveRoomSettings', rid, 'roomTopic', topic);
-			}
-			if (description) {
-				Meteor.call('saveRoomSettings', rid, 'roomDescription', description);
-			}
-			if (location) {
-				Meteor.call('saveRoomSettings', rid, 'location', location);
-			}
-			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
-			Meteor.call('saveRoomSettings', rid, 'country', country);
-		});
+		const extraData = {
+			filesHidden, country,
+		};
+		if (topic) {
+			extraData.topic = topic;
+		}
+		if (description) {
+			extraData.description = description;
+		}
+		if (location) {
+			extraData.location = location;
+		}
+
+		const rid = API.channels.create.execute(userId, bodyParams, extraData);
 
 		return API.v1.success({
 			channel: this.composeRoomWithLastMessage(findChannelByIdOrName({ params: { roomId: rid }, userId: this.userId }), this.userId),
@@ -380,7 +376,20 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			return errorResponse;
 		}
 
-		const rid = API.channels.create.execute(userId, fields);
+		const extraData = {
+			filesHidden, country,
+		};
+		if (fields.topic) {
+			extraData.topic = fields.topic;
+		}
+		if (fields.description) {
+			extraData.description = fields.description;
+		}
+		if (location) {
+			extraData.location = location;
+		}
+
+		const rid = API.channels.create.execute(userId, fields, extraData);
 
 		const file = files[0];
 
@@ -392,17 +401,6 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 			s3_result = Meteor.wrapAsync(s3.putObject.bind(s3))(params);
 
 			Meteor.call('saveRoomSettings', rid, 'roomCustomFields', customFields);
-			if (fields.topic) {
-				Meteor.call('saveRoomSettings', rid, 'roomTopic', fields.topic);
-			}
-			if (fields.description) {
-				Meteor.call('saveRoomSettings', rid, 'roomDescription', fields.description);
-			}
-			if (location) {
-				Meteor.call('saveRoomSettings', rid, 'location', location);
-			}
-			Meteor.call('saveRoomSettings', rid, 'filesHidden', filesHidden);
-			Meteor.call('saveRoomSettings', rid, 'country', country);
 		});
 
 		return API.v1.success({
