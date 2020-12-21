@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { sendSinglePush } from 'meteor/rocketchat:lib';
+import { sendPushNotifications } from 'meteor/rocketchat:lib';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 
@@ -33,7 +33,7 @@ Meteor.methods({
 			});
 		}
 
-		sendSinglePush({
+		sendPushNotifications({
 			from: 'push',
 			title: `@${ user.username }`,
 			text: TAPi18n.__('This_is_a_push_test_messsage'),
@@ -42,6 +42,7 @@ Meteor.methods({
 			},
 			sound: 'default',
 			userId: user._id,
+			event: 'message',
 		});
 
 		return {

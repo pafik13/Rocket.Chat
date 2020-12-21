@@ -6,7 +6,7 @@ import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Subscriptions, Users } from 'meteor/rocketchat:models';
 import { roomTypes } from 'meteor/rocketchat:utils';
 import { callJoinRoom, parseMessageTextPerUser, replaceMentionedUsernamesWithFullNames } from '../functions/notifications/';
-import { sendSinglePush } from '../functions/notifications/mobile';
+import { sendPushNotifications, Events } from '../functions/notifications/mobile';
 import { notifyDesktopUser, shouldNotifyDesktop } from '../functions/notifications/desktop';
 import { notifyAudioUser, shouldNotifyAudio } from '../functions/notifications/audio';
 
@@ -126,11 +126,12 @@ async function sendAllNotifications(message, room) {
 
 	if (disableAllMessageNotifications) { return; }
 
-	sendSinglePush({
+	sendPushNotifications({
 		message,
 		room,
 		notificationMessage,
 		sender,
+		event: Events.MESSAGE,
 	});
 
 	const query = {
@@ -220,4 +221,4 @@ async function sendAllNotifications(message, room) {
 
 callbacks.add('afterSaveMessage', (message, room) => Promise.await(sendAllNotifications(message, room)), callbacks.priority.LOW, 'sendNotificationsOnMessage');
 
-export { sendNotification, sendAllNotifications, sendSinglePush };
+export { sendNotification, sendAllNotifications, sendPushNotifications };

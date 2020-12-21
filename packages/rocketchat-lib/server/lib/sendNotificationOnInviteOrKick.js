@@ -5,6 +5,7 @@ import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('sendNotificationOnInviteOrKick');
 
 import { sendNotification } from './sendNotificationsOnMessage';
+import { sendPushNotifications, Events } from '../functions/notifications/mobile';
 
 const project = {
 	$project: {
@@ -63,28 +64,32 @@ async function notifyUser(subscriptionId, sender, message, room) {
 		project,
 	]);
 
-	// 	let count = 0;
 	while (await cursor.hasNext()) {
 		// load one document from the resultset into memory
 		const subscription = await cursor.next();
 		logger.debug('subscription', subscription);
-		const userLng = subscription.receiver.language;
+		const [receiver] = subscription.receiver;
+		const userLng = receiver.language;
 		const room_type_name = room.t === 'c' ? TAPi18n.__('channel', {}, userLng) : TAPi18n.__('group', {}, userLng);
-		await sendNotification({
-			subscription,
-			sender,
-			hasMentionToAll,
-			hasMentionToHere,
-			message,
-			notificationMessage: TAPi18n.__('You_are_invited_to_room', { room_type_name }, userLng),
-			room,
-			mentionIds,
-			disableAllMessageNotifications,
-		});
-		// 		count++;
+		const notificationMessage = TAPi18n.__('You_are_invited_to_room', { room_type_name }, userLng);
+		if (receiver.isSubscribedOnNotifications) {
+			await sendNotification({
+				subscription,
+				sender,
+				hasMentionToAll,
+				hasMentionToHere,
+				message,
+				notificationMessage,
+				room,
+				mentionIds,
+				disableAllMessageNotifications,
+			});
+		} else {
+			sendPushNotifications({
+				notificationMessage, sender, message, room, event: Events.INVITE,
+			});
+		}
 	}
-	// 	console.timeEnd(timeToken);
-	// 	console.log(`${ timeToken }::count=${ count }`);
 	return message;
 }
 

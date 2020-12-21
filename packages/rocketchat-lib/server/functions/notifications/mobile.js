@@ -8,7 +8,12 @@ import s from 'underscore.string';
 
 const natsQueue = process.env.NATS_QUEUE || 'notifications';
 
-export function sendSinglePush({ notificationMessage, room, message, sender }) {
+export const Events = {
+	MESSAGE: 'message',
+	INVITE: 'invite',
+};
+
+export function sendPushNotifications({ notificationMessage, room, message, sender, event }) {
 
 	const url = getURL('', { cdn: true, full: true });
 	const regexString = `\\[ \\]\\(${ s.escapeRegExp(url) }(d|c|g|p|channel|direct|group|private|public\\/)(.)+\\) `;
@@ -26,5 +31,6 @@ export function sendSinglePush({ notificationMessage, room, message, sender }) {
 		messageType: message.t,
 		host: Meteor.absoluteUrl(),
 		notificationMessage: settings.get('Push_show_message') ? notificationMessage.replace(answerRE, '') : ' ',
+		event,
 	});
 }
