@@ -302,14 +302,6 @@ jobs:
               docker tag anonym/rocket:develop gitlab.apianon.ru:5555/backend/rocket:develop
               docker push gitlab.apianon.ru:5555/backend/rocket:develop
 
-              echo "Build preview Docker image"
-              cp ~/repo/.docker-mongo/Dockerfile .
-              cp ~/repo/.docker-mongo/entrypoint.sh .
-              docker build -t anonym/rocket:preview .
-
-              docker tag anonym/rocket:preview gitlab.apianon.ru:5555/backend/rocket:preview
-              docker push gitlab.apianon.ru:5555/backend/rocket:preview
-
               exit 0
             fi;
 
