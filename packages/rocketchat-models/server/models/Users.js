@@ -5,6 +5,11 @@ import Subscriptions from './Subscriptions';
 import _ from 'underscore';
 import s from 'underscore.string';
 
+const excludedFieldsByDefault = {
+	tokens: 0,
+	subscriptions: 0,
+};
+
 export class Users extends Base {
 	constructor(...args) {
 		super(...args);
@@ -25,6 +30,24 @@ export class Users extends Base {
 		this.tryEnsureIndex({ 'subscriptions.rid': 1, isSubscribedOnNotifications: 1 });
 		this.tryEnsureIndex({ 'tokens._id': 1 }, { unique: true, partialFilterExpression: { 'tokens._id': { $exists: true } } });
 		this.loadSettings();
+	}
+
+	addExculdedFieldsToOptions(options) {
+		if (options) {
+			if (!options.fields) {
+				options.fields = excludedFieldsByDefault;
+			} else {
+				options.fields = {
+					...excludedFieldsByDefault,
+					...options.fields,
+				};
+			}
+		} else {
+			options = {
+				fields: excludedFieldsByDefault,
+			};
+		}
+		return options;
 	}
 
 	loadSettings() {
@@ -73,164 +96,12 @@ export class Users extends Base {
 		return this.findOne(query);
 	}
 
-	setOperator(_id, operator) {
-		const update = {
-			$set: {
-				operator,
-			},
-		};
-
-		return this.update(_id, update);
-	}
-
-	findOnlineAgents() {
-		const query = {
-			status: {
-				$exists: true,
-				$ne: 'offline',
-			},
-			statusLivechat: 'available',
-			roles: 'livechat-agent',
-		};
-
-		return this.find(query);
-	}
-
-	findOneOnlineAgentByUsername(username) {
-		const query = {
-			username,
-			status: {
-				$exists: true,
-				$ne: 'offline',
-			},
-			statusLivechat: 'available',
-			roles: 'livechat-agent',
-		};
-
-		return this.findOne(query);
-	}
-
-	findOneOnlineAgentById(_id) {
-		const query = {
-			_id,
-			status: {
-				$exists: true,
-				$ne: 'offline',
-			},
-			statusLivechat: 'available',
-			roles: 'livechat-agent',
-		};
-
-		return this.findOne(query);
-	}
-
 	findAgents() {
 		const query = {
 			roles: 'livechat-agent',
 		};
 
 		return this.find(query);
-	}
-
-	findOnlineUserFromList(userList) {
-		const query = {
-			status: {
-				$exists: true,
-				$ne: 'offline',
-			},
-			statusLivechat: 'available',
-			roles: 'livechat-agent',
-			username: {
-				$in: [].concat(userList),
-			},
-		};
-
-		return this.find(query);
-	}
-
-	getNextAgent() {
-		const query = {
-			status: {
-				$exists: true,
-				$ne: 'offline',
-			},
-			statusLivechat: 'available',
-			roles: 'livechat-agent',
-		};
-
-		const collectionObj = this.model.rawCollection();
-		const findAndModify = Meteor.wrapAsync(collectionObj.findAndModify, collectionObj);
-
-		const sort = {
-			livechatCount: 1,
-			username: 1,
-		};
-
-		const update = {
-			$inc: {
-				livechatCount: 1,
-			},
-		};
-
-		const user = findAndModify(query, sort, update);
-		if (user && user.value) {
-			return {
-				agentId: user.value._id,
-				username: user.value.username,
-			};
-		} else {
-			return null;
-		}
-	}
-
-	setLivechatStatus(userId, status) {
-		const query = {
-			_id: userId,
-		};
-
-		const update = {
-			$set: {
-				statusLivechat: status,
-			},
-		};
-
-		return this.update(query, update);
-	}
-
-	closeOffice() {
-		self = this;
-		self.findAgents().forEach(function(agent) {
-			self.setLivechatStatus(agent._id, 'not-available');
-		});
-	}
-
-	openOffice() {
-		self = this;
-		self.findAgents().forEach(function(agent) {
-			self.setLivechatStatus(agent._id, 'available');
-		});
-	}
-
-	getAgentInfo(agentId) {
-		const query = {
-			_id: agentId,
-		};
-
-		const options = {
-			fields: {
-				name: 1,
-				username: 1,
-				phone: 1,
-				customFields: 1,
-				status: 1,
-			},
-		};
-
-		if (this.settings.get('Livechat_show_agent_email')) {
-			options.fields.emails = 1;
-		}
-
-		return this.findOne(query, options);
 	}
 
 	setTokenpassTcaBalances(_id, tcaBalances) {
@@ -385,23 +256,18 @@ export class Users extends Base {
 
 	findOneByAnonymId(anonymId, options) {
 		const query = { 'customFields.anonym_id': parseInt(anonymId, 10) };
-		return this.findOne(query, options);
+
+		return this.findOne(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findOneByUsername(username, options) {
 		const query = { username };
 
-		return this.findOne(query, options);
+		return this.findOne(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findOneByEmailAddress(emailAddress, options) {
 		const query = { 'emails.address': emailAddress };
-
-		return this.findOne(query, options);
-	}
-
-	findOneAdmin(admin, options) {
-		const query = { admin };
 
 		return this.findOne(query, options);
 	}
@@ -418,7 +284,7 @@ export class Users extends Base {
 	findOneById(userId, options) {
 		const query = { _id: userId };
 
-		return this.findOne(query, options);
+		return this.findOne(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findOneByIdWithCustomFields(userId) {
@@ -428,6 +294,7 @@ export class Users extends Base {
 				username: 1,
 				name: 1,
 				customFields: 1,
+				...excludedFieldsByDefault,
 			},
 		};
 		return this.findOne(query, options);
@@ -442,7 +309,8 @@ export class Users extends Base {
 
 	findByIds(userIds, options) {
 		const query = { _id: { $in: userIds } };
-		return this.find(query, options);
+
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findUsersNotOffline(options) {
@@ -455,7 +323,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findByRoomId(rid, options) {
@@ -466,13 +334,13 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findByUsername(username, options) {
 		const query = { username };
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findActiveByUsernameOrNameRegexWithExceptions(searchTerm, exceptions, options) {
@@ -504,7 +372,7 @@ export class Users extends Base {
 			}],
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findByActiveUsersExcept(searchTerm, exceptions, options, forcedSearchFields) {
@@ -535,7 +403,7 @@ export class Users extends Base {
 		};
 
 		// do not use cache
-		return this._db.find(query, options);
+		return this._db.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findUsersByNameOrUsername(nameOrUsername, options) {
@@ -554,7 +422,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findByUsernameNameOrEmailAddress(usernameNameOrEmailAddress, options) {
@@ -569,7 +437,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findLDAPUsers(options) {
@@ -600,7 +468,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findUsersByIds(ids, options) {
@@ -609,7 +477,7 @@ export class Users extends Base {
 				$in: ids,
 			},
 		};
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findUsersWithUsernameByIds(ids, options) {
@@ -622,7 +490,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	findUsersWithUsernameByIdsNotOffline(ids, options) {
@@ -638,7 +506,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.find(query, options);
+		return this.find(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	getOldest(fields = { _id: 1 }) {
@@ -655,7 +523,7 @@ export class Users extends Base {
 			},
 		};
 
-		return this.findOne(query, options);
+		return this.findOne(query, this.addExculdedFieldsToOptions(options));
 	}
 
 	// UPDATE
