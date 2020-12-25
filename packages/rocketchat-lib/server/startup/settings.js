@@ -1124,6 +1124,32 @@ settings.addGroup('General', function() {
 });
 
 settings.addGroup('Message', function() {
+	this.section('Message_Spam', function() {
+		this.add('Message_SpamCheckerIsEnabled', true, {
+			type: 'boolean',
+			public: true,
+		});
+		this.add('Message_SpamSetLength', 5, {
+			type: 'int',
+			public: true,
+		});
+		this.add('Message_SpamMaxCount', 10, {
+			type: 'int',
+			public: true,
+		});
+		this.add('Message_SpamJWThresholdPct', 90, {
+			type: 'int',
+			public: true,
+		});
+		this.add('Message_SpamDeacivationPeriodInSecs', 7200, {
+			type: 'int',
+			public: true,
+		});
+		this.add('Message_SpamPeriodForAnalizeInHours', 6, {
+			type: 'int',
+			public: true,
+		});
+	});
 	this.section('Message_Attachments', function() {
 		this.add('Message_Attachments_GroupAttach', false, {
 			type: 'boolean',

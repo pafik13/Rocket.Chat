@@ -52,18 +52,18 @@ export function shouldNotifyDesktop({
 	hasMentionToUser,
 	roomType,
 }) {
-// 	console.log(
-// 		'shouldNotifyDesktop',
-// 		disableAllMessageNotifications,
-// 		status,
-// 		isSubscribedOnNotifications,
-// 		desktopNotifications,
-// 		hasMentionToAll,
-// 		hasMentionToHere,
-// 		isHighlighted,
-// 		hasMentionToUser,
-// 		roomType,
-// 	);
+	console.log(
+		'shouldNotifyDesktop',
+		disableAllMessageNotifications,
+		status,
+		isSubscribedOnNotifications,
+		desktopNotifications,
+		hasMentionToAll,
+		hasMentionToHere,
+		isHighlighted,
+		hasMentionToUser,
+		roomType,
+	);
 	if (disableAllMessageNotifications && desktopNotifications == null && !isHighlighted && !hasMentionToUser) {
 		return false;
 	}
