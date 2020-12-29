@@ -330,20 +330,26 @@ describe('[Chat]', function() {
 	});
 
 	describe('check spam', () => {
-		let user; let userCredentials;
-		const payload = {
+		let user; let userCredentials; let channel;
+		const getPayload = () => ({
 			message: {
 				text: 'Sample message with many chars',
-				channel: 'general',
+				rid: channel._id,
 			},
-		};
+		});
 		before(async() => {
-			const username = `user.test.${ Date.now() }`;
+			const username = `user.test-spam.${ Date.now() }`;
 			const email = `${ username }@rocket.chat`;
-			const resp = await request.post(api('users.create'))
+			let resp = await request.post(api('users.create'))
 				.set(credentials)
 				.send({ email, name: username, username, password });
 			user = resp.body.user;
+			resp = await request.post(api('channels.create'))
+				.set(credentials)
+				.send({
+					name: `channel.test-spam.${ Date.now() }`,
+				});
+			channel = resp.body.channel;
 
 			return request.post(api('login'))
 				.send({
@@ -369,7 +375,7 @@ describe('[Chat]', function() {
 		it('sending a message - 1', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -378,7 +384,7 @@ describe('[Chat]', function() {
 		it('sending a message - 2', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -387,7 +393,7 @@ describe('[Chat]', function() {
 		it('sending a message - 3', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -396,7 +402,7 @@ describe('[Chat]', function() {
 		it('sending a message - 4', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -405,7 +411,7 @@ describe('[Chat]', function() {
 		it('sending a message - 5', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -414,7 +420,7 @@ describe('[Chat]', function() {
 		it('sending a message - 6', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -423,7 +429,7 @@ describe('[Chat]', function() {
 		it('sending a message - 7', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -432,7 +438,7 @@ describe('[Chat]', function() {
 		it('sending a message - 8', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -441,7 +447,7 @@ describe('[Chat]', function() {
 		it('sending a message - 9', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -450,7 +456,7 @@ describe('[Chat]', function() {
 		it('sending a message - 10', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
@@ -459,7 +465,7 @@ describe('[Chat]', function() {
 		it('sending a message - 11', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)
-				.send(payload)
+				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(403)
 				.end(done);
