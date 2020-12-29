@@ -329,6 +329,146 @@ describe('[Chat]', function() {
 
 	});
 
+	describe('check spam', () => {
+		let user; let userCredentials;
+		const payload = {
+			message: {
+				text: 'Sample message with many chars',
+				channel: 'general',
+			},
+		};
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.expect(200)
+				.end((res) => {
+					user = res.body.user;
+					request.post(api('login'))
+						.send({
+							user: user.username,
+							password,
+						})
+						.expect('Content-Type', 'application/json')
+						.expect(200)
+						.expect((res) => {
+							userCredentials = {};
+							userCredentials['X-Auth-Token'] = res.body.data.authToken;
+							userCredentials['X-User-Id'] = res.body.data.userId;
+						})
+						.end(done);
+				});
+		});
+		after((done) => {
+			request.post(api('users.delete')).set(credentials).send({
+				userId: user._id,
+			}).end(done);
+			user = undefined;
+			userCredentials = undefined;
+		});
+
+		it('sending a message - 1', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 2', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 3', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 4', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 5', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 6', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 7', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 8', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 9', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 10', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('sending a message - 11', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send(payload)
+				.expect('Content-Type', 'application/json')
+				.expect(403)
+				.end(done);
+		});
+	});
+
 	describe('/chat.update', () => {
 		it('should update a message successfully', (done) => {
 			request.post(api('chat.update'))
