@@ -337,28 +337,25 @@ describe('[Chat]', function() {
 				channel: 'general',
 			},
 		};
-		before((done) => {
+		before(async() => {
 			const username = `user.test.${ Date.now() }`;
 			const email = `${ username }@rocket.chat`;
-			request.post(api('users.create'))
+			const resp = await request.post(api('users.create'))
 				.set(credentials)
-				.send({ email, name: username, username, password })
+				.send({ email, name: username, username, password });
+			user = resp.body.user;
+
+			return request.post(api('login'))
+				.send({
+					user: username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
-					user = res.body.user;
-					request.post(api('login'))
-						.send({
-							user: user.username,
-							password,
-						})
-						.expect('Content-Type', 'application/json')
-						.expect(200)
-						.expect((res) => {
-							userCredentials = {};
-							userCredentials['X-Auth-Token'] = res.body.data.authToken;
-							userCredentials['X-User-Id'] = res.body.data.userId;
-						})
-						.end(done);
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
 				});
 		});
 		after((done) => {
