@@ -1,10 +1,12 @@
 import { Meteor } from 'meteor/meteor';
+import { JaroWinklerDistance as calcJWDistance } from 'natural';
+import moment from 'moment';
+
 import { Users } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
-import { redis } from '../lib/redis';
-import { JaroWinklerDistance as calcJWDistance } from 'natural';
-import moment from 'moment';
+import { ExtASCIIFolder } from 'meteor/rocketchat:extasciifolder';
+import { redis } from './redis';
 import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('checkSpam');
 
@@ -26,20 +28,21 @@ callbacks.add('beforeSaveMessage', function(message) {
 		const lastMessagesFromRedis = Promise.await(redis.get(redisKey));
 		logger.log('lastMessagesFromRedis', lastMessagesFromRedis);
 
+		const normalizedMsg = ExtASCIIFolder.foldMaintaining(message.msg).toLowerCase();
 		let lastMessages;
 		if (!lastMessagesFromRedis) {
 			lastMessages = [
 				{
-					msg: message.msg, ts: message.ts, count: 1,
+					msg: normalizedMsg, ts: message.ts, count: 1,
 				},
 			];
 		} else {
 			let isMatched = false;
 			lastMessages = JSON.parse(lastMessagesFromRedis);
 			for (const lastMessage of lastMessages) {
-				const jwDistance = calcJWDistance(lastMessage.msg, message.msg);
+				const jwDistance = calcJWDistance(lastMessage.msg, normalizedMsg);
 				logger.log('lastMessage.msg', lastMessage.msg);
-				logger.log('message.msg', message.msg);
+				logger.log('normalizedMsg', normalizedMsg);
 				logger.log('jwDistance', jwDistance);
 				lastMessage.ts = new Date(lastMessage.ts);
 				const tsDiff = Math.abs(moment(lastMessage.ts).diff());
@@ -58,7 +61,7 @@ callbacks.add('beforeSaveMessage', function(message) {
 			if (!isMatched) {
 				lastMessages.push(
 					{
-						msg: message.msg, ts: message.ts, count: 1,
+						msg: normalizedMsg, ts: message.ts, count: 1,
 					},
 				);
 			}
