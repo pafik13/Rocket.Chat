@@ -344,7 +344,7 @@ describe('[Chat]', function() {
 				.set(credentials)
 				.send({ email, name: username, username, password })
 				.expect(200)
-				.end((res) => {
+				.expect((res) => {
 					user = res.body.user;
 					request.post(api('login'))
 						.send({
