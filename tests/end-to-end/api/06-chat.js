@@ -338,7 +338,7 @@ describe('[Chat]', function() {
 			},
 		});
 		before(async() => {
-			let resp = request.post(api('settings/Use_redis'))
+			let resp = await request.post(api('settings/Use_redis'))
 				.set(credentials)
 				.send({
 					value: true,
