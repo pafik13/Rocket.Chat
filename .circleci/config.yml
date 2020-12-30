@@ -217,6 +217,7 @@ jobs:
       - image: elasticsearch:7.5.1
         environment:
           - discovery.type: single-node
+      - image: redis:5
 
   test-with-oplog-mongo-4-0:
     <<: *test-with-oplog
@@ -227,6 +228,7 @@ jobs:
       - image: elasticsearch:7.5.1
         environment:
           - discovery.type: single-node
+      - image: redis:5
 
   deploy:
     <<: *defaults
