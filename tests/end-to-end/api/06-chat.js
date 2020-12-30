@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 
 import {
 	getCredentials,
@@ -333,7 +333,7 @@ describe('[Chat]', function() {
 		let user; let userCredentials; let channel;
 		const getPayload = () => ({
 			message: {
-				text: 'Sample message with many chars',
+				msg: 'Sample message with many chars',
 				rid: channel._id,
 			},
 		});
@@ -349,24 +349,21 @@ describe('[Chat]', function() {
 				.set(credentials)
 				.send({ email, name: username, username, password });
 			user = resp.body.user;
-			resp = await request.post(api('channels.create'))
-				.set(credentials)
-				.send({
-					name: `channel.test-spam.${ Date.now() }`,
-				});
-			channel = resp.body.channel;
 
-			return request.post(api('login'))
+			resp = await request.post(api('login'))
 				.send({
 					user: username,
 					password,
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					userCredentials = {};
-					userCredentials['X-Auth-Token'] = res.body.data.authToken;
-					userCredentials['X-User-Id'] = res.body.data.userId;
+				});
+			userCredentials = {};
+			userCredentials['X-Auth-Token'] = resp.body.data.authToken;
+			userCredentials['X-User-Id'] = resp.body.data.userId;
+			return request.post(api('channels.create'))
+				.set(userCredentials)
+				.send({
+					name: `channel.test-spam.${ Date.now() }`,
+				}).expect((res) => {
+					channel = res.body.channel;
 				});
 		});
 		after(async() => {
@@ -384,7 +381,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 1', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -393,7 +390,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 2', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -402,7 +399,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 3', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -411,7 +408,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 4', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -420,7 +417,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 5', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -429,7 +426,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 6', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -438,7 +435,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 7', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -447,7 +444,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 8', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -456,7 +453,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 9', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -465,7 +462,7 @@ describe('[Chat]', function() {
 
 		it('sending a message - 10', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -474,11 +471,17 @@ describe('[Chat]', function() {
 
 		it('sending a message - 11', (done) => {
 			request.post(api('chat.sendMessage'))
-				.set(credentials)
+				.set(userCredentials)
 				.send(getPayload())
 				.expect('Content-Type', 'application/json')
-				.expect(403)
-				.end(done);
+				.expect(400)
+				.end((err, res) => {
+					assert.ifError(err);
+					expect(res.body).to.have.property('success', false);
+					expect(res.body).to.have.property('error').match(/You can't send message because you are deactivated until/);
+					expect(res.body).to.have.property('errorType', 'error-user-deactivated');
+					done();
+				});
 		});
 	});
 

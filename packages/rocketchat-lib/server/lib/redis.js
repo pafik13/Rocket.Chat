@@ -1,7 +1,7 @@
 import IORedis from 'ioredis';
 import { settings } from 'meteor/rocketchat:settings';
-// import { Logger } from 'meteor/rocketchat:logger';
-const logger = console; // new Logger('redis', {});
+import { Logger } from 'meteor/rocketchat:logger';
+const logger = new Logger('redis', {});
 
 let isUseRedis = false ;// settings.get('Use_redis');
 let redisHost = settings.get('Redis_host') || 'localhost';
