@@ -152,7 +152,7 @@ async function sendAllNotifications(message, room) {
 		},
 	};
 
-	console.log(query, options);
+	// console.log(query, options);
 
 	// 	const timeToken = `notification::${ Random.id() }`;
 	// 	console.time(timeToken);

@@ -10,7 +10,8 @@ let redisPort = settings.get('Redis_port') || 6379;
 let client = isUseRedis ? new IORedis({ host: redisHost, port: redisPort }) : null;
 
 settings.get('Use_redis', (key, value) => {
-	logger.debug(key, value);
+	// logger.debug(key, value);
+	console.log(key, value);
 	isUseRedis = value;
 	if (isUseRedis) {
 		try {
@@ -19,7 +20,8 @@ settings.get('Use_redis', (key, value) => {
 		} catch (err) {
 			client = null;
 			isUseRedis = false;
-			logger.error(err);
+			// logger.error(err);
+			console.error(err);
 		}
 	} else {
 		if (client) { client.disconnect(); }
