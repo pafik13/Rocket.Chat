@@ -7,8 +7,8 @@ import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { ExtASCIIFolder } from 'meteor/rocketchat:extasciifolder';
 import { redis } from './redis';
-import { Logger } from 'meteor/rocketchat:logger';
-const logger = new Logger('checkSpam');
+// import { Logger } from 'meteor/rocketchat:logger';
+const logger = console; // new Logger('checkSpam');
 
 callbacks.add('beforeSaveMessage', function(message) {
 

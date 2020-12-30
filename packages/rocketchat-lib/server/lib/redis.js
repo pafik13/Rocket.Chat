@@ -1,7 +1,7 @@
 import IORedis from 'ioredis';
 import { settings } from 'meteor/rocketchat:settings';
-import { Logger } from 'meteor/rocketchat:logger';
-const logger = new Logger('redis', {});
+// import { Logger } from 'meteor/rocketchat:logger';
+const logger = console; // new Logger('redis', {});
 
 let isUseRedis = false ;// settings.get('Use_redis');
 let redisHost = settings.get('Redis_host') || 'localhost';
@@ -10,8 +10,7 @@ let redisPort = settings.get('Redis_port') || 6379;
 let client = isUseRedis ? new IORedis({ host: redisHost, port: redisPort }) : null;
 
 settings.get('Use_redis', (key, value) => {
-	// logger.debug(key, value);
-	console.log(key, value);
+	logger.debug(key, value);
 	isUseRedis = value;
 	if (isUseRedis) {
 		try {
@@ -20,8 +19,7 @@ settings.get('Use_redis', (key, value) => {
 		} catch (err) {
 			client = null;
 			isUseRedis = false;
-			// logger.error(err);
-			console.error(err);
+			logger.error(err);
 		}
 	} else {
 		if (client) { client.disconnect(); }
