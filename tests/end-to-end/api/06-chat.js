@@ -338,9 +338,14 @@ describe('[Chat]', function() {
 			},
 		});
 		before(async() => {
+			let resp = request.post(api('settings/Use_redis'))
+				.set(credentials)
+				.send({
+					value: true,
+				});
 			const username = `user.test-spam.${ Date.now() }`;
 			const email = `${ username }@rocket.chat`;
-			let resp = await request.post(api('users.create'))
+			resp = await request.post(api('users.create'))
 				.set(credentials)
 				.send({ email, name: username, username, password });
 			user = resp.body.user;
@@ -364,12 +369,17 @@ describe('[Chat]', function() {
 					userCredentials['X-User-Id'] = res.body.data.userId;
 				});
 		});
-		after((done) => {
-			request.post(api('users.delete')).set(credentials).send({
+		after(async() => {
+			await request.post(api('users.delete')).set(credentials).send({
 				userId: user._id,
-			}).end(done);
+			});
 			user = undefined;
 			userCredentials = undefined;
+			return request.post(api('settings/Use_redis'))
+				.set(credentials)
+				.send({
+					value: false,
+				});
 		});
 
 		it('sending a message - 1', (done) => {
