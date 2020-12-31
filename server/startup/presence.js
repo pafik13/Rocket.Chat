@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
+import { callbacks } from 'meteor/rocketchat:callbacks';
 import { InstanceStatus } from 'meteor/konecty:multiple-instances-status';
 import { UserPresence } from 'meteor/konecty:user-presence';
 import { UserPresenceMonitor } from 'meteor/konecty:user-presence';
@@ -23,7 +24,7 @@ settings.get('Main_backend_host', (key, value) => {
 	}
 });
 
-const handler = (user, status, statusConnection) => {
+const onSetUserStatusHandler = (user, status, statusConnection) => {
 	if (isLeader)	{
 		logger.log('UserPresenceMonitor:', user, status, statusConnection);
 		if (user.customFields && ingestURL) {
@@ -47,7 +48,27 @@ const handler = (user, status, statusConnection) => {
 	}
 };
 
+const afterCreateDirectRoomHandler = (room, { from, to }) => {
+	if (isLeader)	{
+		logger.log('afterCreateDirectRoomHandler:', room, from, to);
+		if (from.customFields && to.customFields && ingestURL) {
+			const { anonym_id: fromAnonymId } = from.customFields;
+			const { anonym_id: toAnonymId } = to.customFields;
+			const data = { method: 'dialogCreated', params: [fromAnonymId, toAnonymId] };
+			logger.debug(ingestURL, data);
+			try {
+				const result = HTTP.call('POST', ingestURL, { data, timeout: 1000 });
+				logger.log('Auth Ingest Result:', result);
+			} catch (err) {
+				logger.error('Auth Ingest Error:', err);
+			}
+		}
+	}
+};
+
 Meteor.startup(function() {
+	callbacks.add('afterCreateDirectRoom', afterCreateDirectRoomHandler, callbacks.priority.LOW, 'ingest-create-direct-room');
+
 	const instance = {
 		host: 'localhost',
 		port: String(process.env.PORT).trim(),
@@ -65,7 +86,7 @@ Meteor.startup(function() {
 		!['true', 'yes'].includes(String(process.env.DISABLE_PRESENCE_MONITOR).toLowerCase());
 	if (startMonitor) {
 		UserPresenceMonitor.start();
-		UserPresenceMonitor.onSetUserStatus(handler);
+		UserPresenceMonitor.onSetUserStatus(onSetUserStatusHandler);
 	}
 
 	InstanceStatus.getCollection().find({}).observeChanges({
