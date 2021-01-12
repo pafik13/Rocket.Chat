@@ -54,7 +54,7 @@ function prepareSubscription(sub) {
 	const room = Rooms.findOneById(sub.rid, roomOptions);
 	if (sub.i && sub.i._id) {
 		const interlocutor = Users.findOneByIdWithCustomFields(sub.i._id);
-		if (interlocutor.customFields) { sub.lastTime = interlocutor.customFields.lastTime; }
+		if (interlocutor && interlocutor.customFields) { sub.lastTime = interlocutor.customFields.lastTime; }
 	}
 	if (!room) {
 		SystemLogger.error(`subscriptions/get::rid=${ sub.rid }::id=${ sub._id }`);
