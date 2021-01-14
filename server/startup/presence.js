@@ -28,14 +28,19 @@ const onSetUserStatusHandler = (user, status, statusConnection) => {
 	if (isLeader)	{
 		logger.log('UserPresenceMonitor:', user, status, statusConnection);
 		if (user.customFields && ingestURL) {
-			const method = statusConnection === 'online' ? 'setOnline' : 'setOffline';
-			const data = { method, params: [user.customFields.anonym_id] };
-			logger.debug(ingestURL, data);
-			try {
-				const result = HTTP.call('POST', ingestURL, { data, timeout: 1000 });
-				logger.log('Auth Ingest Result:', result);
-			} catch (err) {
-				logger.error('Auth Ingest Error:', err);
+			const { anonym_id: anonymId } = user.customFields;
+			if (anonymId) {
+				const method = statusConnection === 'online' ? 'setOnline' : 'setOffline';
+				const data = { method, params: [user.customFields.anonym_id] };
+				logger.debug(ingestURL, data);
+				try {
+					const result = HTTP.call('POST', ingestURL, { data, timeout: 1000 });
+					logger.log('onSetUserStatusHandler http result:', result);
+				} catch (err) {
+					logger.error('onSetUserStatusHandler http Error:', err);
+				}
+			} else {
+				logger.error(`onSetUserStatusHandler error: user with empty anonym_id, id=${ user._id }`);
 			}
 		}
 		const now = new Date();
@@ -54,13 +59,18 @@ const afterCreateDirectRoomHandler = (room, { from, to }) => {
 		if (from.customFields && to.customFields && ingestURL) {
 			const { anonym_id: fromAnonymId } = from.customFields;
 			const { anonym_id: toAnonymId } = to.customFields;
-			const data = { method: 'dialogCreated', params: [fromAnonymId, toAnonymId] };
-			logger.debug(ingestURL, data);
-			try {
-				const result = HTTP.call('POST', ingestURL, { data, timeout: 1000 });
-				logger.log('Auth Ingest Result:', result);
-			} catch (err) {
-				logger.error('Auth Ingest Error:', err);
+			if (fromAnonymId && toAnonymId) {
+				const data = { method: 'dialogCreated', params: [fromAnonymId, toAnonymId] };
+				logger.debug(ingestURL, data);
+				try {
+					const result = HTTP.call('POST', ingestURL, { data, timeout: 1000 });
+					logger.log('afterCreateDirectRoomHandler http result:', result);
+				} catch (err) {
+					logger.error('afterCreateDirectRoomHandler error:', err);
+				}
+			} else {
+				if (!fromAnonymId) { logger.error(`afterCreateDirectRoomHandler error: from with empty anonym_id, id=${ from._id }`); }
+				if (!toAnonymId) { logger.error(`afterCreateDirectRoomHandler error: to with empty anonym_id, id=${ to._id }`); }
 			}
 		}
 	}
