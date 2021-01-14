@@ -266,6 +266,7 @@ Accounts.validateNewUser(function(user) {
 		throw new Meteor.Error('registration-disabled-authentication-services', 'User registration is disabled for authentication services');
 	}
 
+	console.log('validateNewUser', user);
 	return true;
 });
 
@@ -290,6 +291,7 @@ Accounts.validateNewUser(function(user) {
 		}
 	}
 
+	console.log('validateNewUser', user);
 	return true;
 });
 

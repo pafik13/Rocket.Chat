@@ -2,7 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import _ from 'underscore';
 import s from 'underscore.string';
-import * as Mailer from 'meteor/rocketchat:mailer';
 import { getRoles, hasPermission } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 import PasswordPolicy from '../lib/PasswordPolicyClass';
@@ -12,13 +11,6 @@ import { callbacks } from 'meteor/rocketchat:callbacks';
 import { Users } from 'meteor/rocketchat:models';
 
 const passwordPolicy = new PasswordPolicy();
-
-let html = '';
-Meteor.startup(() => {
-	Mailer.getTemplate('Accounts_UserAddedEmail_Email', (template) => {
-		html = template;
-	});
-});
 
 function validateUserData(userId, userData) {
 	const existingRoles = _.pluck(getRoles(), '_id');
@@ -169,6 +161,7 @@ export const saveUser = function(userId, userData) {
 			createUser.email = userData.email;
 		}
 
+		console.log('createUser', createUser);
 		const _id = Accounts.createUser(createUser);
 
 		const updateUser = {
@@ -190,31 +183,6 @@ export const saveUser = function(userId, userData) {
 		}
 
 		Meteor.users.update({ _id }, updateUser);
-
-		if (userData.sendWelcomeEmail) {
-			const subject = settings.get('Accounts_UserAddedEmail_Subject');
-
-			const email = {
-				to: userData.email,
-				from: settings.get('From_Email'),
-				subject,
-				html,
-				data: {
-					name: s.escapeHTML(userData.name),
-					email: s.escapeHTML(userData.email),
-					password: s.escapeHTML(userData.password),
-				},
-			};
-
-			try {
-				Mailer.send(email);
-			} catch (error) {
-				throw new Meteor.Error('error-email-send-failed', `Error trying to send email: ${ error.message }`, {
-					function: 'RocketChat.saveUser',
-					message: error.message,
-				});
-			}
-		}
 
 		const { joinDefaultChannels } = userData;
 		if (joinDefaultChannels !== false) {
