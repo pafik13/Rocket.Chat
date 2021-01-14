@@ -56,7 +56,7 @@ Meteor.methods({
 		}
 
 		if (!doc) {
-			const user = Users.findOne({ _id: this.userId, 'tokens.value': value, 'tokens.appName': options.appName }, { fields: { 'tokens.$': 1 } });
+			const user = Users.findOne({ _id: this.userId, tokens: { $elemMatch: { value, appName: options.appName } } }, { fields: { 'tokens.$': 1 } });
 			if (user) { doc = user.tokens[0]; }
 		}
 
