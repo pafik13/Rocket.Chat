@@ -281,6 +281,7 @@ describe('[Users]', function() {
 					expect(res.body).to.have.nested.property('user.active', true);
 					expect(res.body).to.have.nested.property('user.name', apiUsername);
 					expect(res.body).to.not.have.nested.property('user.e2e');
+					expect(res.body).to.not.have.nested.property('services');
 				})
 				.end(done);
 		});
@@ -296,6 +297,7 @@ describe('[Users]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.nested.property('user.rooms').and.to.be.an('array');
+					expect(res.body).to.not.have.nested.property('services');
 				})
 				.end(done);
 		});
@@ -310,6 +312,7 @@ describe('[Users]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.not.have.nested.property('user.rooms');
+					expect(res.body).to.not.have.nested.property('services');
 				})
 				.end(done);
 		});

@@ -14,6 +14,7 @@ const defaultFields = {
 	type: 1,
 	active: 1,
 	reason: 1,
+	disabled: 1,
 };
 
 const fullFields = {
@@ -22,7 +23,7 @@ const fullFields = {
 	statusConnection: 1,
 	createdAt: 1,
 	lastLogin: 1,
-	services: 1,
+	// services: 1,
 	requirePasswordChange: 1,
 	requirePasswordChangeReason: 1,
 	roles: 1,
