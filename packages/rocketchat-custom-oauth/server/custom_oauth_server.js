@@ -318,6 +318,8 @@ export class CustomOAuth {
 		});
 
 		Accounts.validateNewUser((user) => {
+			console.log('validateNewUser', user);
+
 			if (!user.services || !user.services[this.name] || !user.services[this.name].id) {
 				return true;
 			}
