@@ -1110,7 +1110,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/channels.files - before video upload', (done) => {
-			request.get(api(`rooms.files?roomId=${ testChannel._id }`))
+			request.get(api(`channels.files?roomId=${ testChannel._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
