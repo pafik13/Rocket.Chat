@@ -1146,8 +1146,10 @@ describe('[Rooms]', function() {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
 					const [file] = res.body.files;
-					expect(file).to.have.property('identify.preview');
-					expect(file).to.have.property('video_preview.url');
+					expect(file).to.have.property('identify');
+					expect(file.identify).to.have.property('preview');
+					expect(file).to.have.property('video_preview');
+					expect(file.video_preview).to.have.property('url');
 				})
 				.end(done);
 		});
@@ -1189,8 +1191,10 @@ describe('[Rooms]', function() {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
 					const [file] = res.body.files;
-					expect(file).to.have.property('identity.preview');
-					expect(file).to.have.property('video_preview.url');
+					expect(file).to.have.property('identify');
+					expect(file.identify).to.have.property('preview');
+					expect(file).to.have.property('video_preview');
+					expect(file.video_preview).to.have.property('url');
 				})
 				.end(done);
 		});
