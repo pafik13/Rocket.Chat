@@ -258,6 +258,8 @@ Accounts.validateLoginAttempt(function(login) {
 });
 
 Accounts.validateNewUser(function(user) {
+	console.log('validateNewUser', user);
+
 	if (user.type === 'visitor') {
 		return true;
 	}
@@ -265,12 +267,12 @@ Accounts.validateNewUser(function(user) {
 	if (settings.get('Accounts_Registration_AuthenticationServices_Enabled') === false && settings.get('LDAP_Enable') === false && !(user.services && user.services.password)) {
 		throw new Meteor.Error('registration-disabled-authentication-services', 'User registration is disabled for authentication services');
 	}
-
-	console.log('validateNewUser', user);
 	return true;
 });
 
 Accounts.validateNewUser(function(user) {
+	console.log('validateNewUser', user);
+
 	if (user.type === 'visitor') {
 		return true;
 	}
@@ -290,8 +292,6 @@ Accounts.validateNewUser(function(user) {
 			throw new Meteor.Error('error-invalid-domain');
 		}
 	}
-
-	console.log('validateNewUser', user);
 	return true;
 });
 

@@ -454,6 +454,7 @@ API.v1.addRoute('channels.files', { authRequired: true }, {
 			if (file.userId) {
 				file = this.insertUserObject({ object: file, userId: file.userId });
 			}
+			file = this.addPreviewToFile(file);
 			return file;
 		};
 

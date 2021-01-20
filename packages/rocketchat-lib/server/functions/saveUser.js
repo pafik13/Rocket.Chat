@@ -161,8 +161,12 @@ export const saveUser = function(userId, userData) {
 			createUser.email = userData.email;
 		}
 
-		console.log('createUser', createUser);
-		const _id = Accounts.createUser(createUser);
+		let _id;
+		try {
+			_id = Accounts.createUser(createUser);
+		} catch (error) {
+			throw error;
+		}
 
 		const updateUser = {
 			$set: {

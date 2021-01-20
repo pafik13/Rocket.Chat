@@ -152,8 +152,8 @@ export const FileUpload = Object.assign(_FileUpload, {
 		return this.generatePreview(image);
 	},
 
-	uploadVideoPreview(preview) {
-		const { folder, filename } = preview;
+	uploadVideoPreview(preview, userId) {
+		const { _id, folder, filename } = preview;
 		const filenameWithExt = `${ filename }.png`;
 		const filePath = path.join(folder, filenameWithExt);
 		const store = FileUpload.getStore('Uploads').getStore();
@@ -161,6 +161,8 @@ export const FileUpload = Object.assign(_FileUpload, {
 
 		// Insert the file in database
 		const fileId = store.create({
+			_id,
+			userId,
 			size: fileStat.size,
 			type: 'image/png',
 			name: filenameWithExt,
@@ -242,7 +244,7 @@ export const FileUpload = Object.assign(_FileUpload, {
 							const folder = path.dirname(tmpFile);
 							const filename = `${ path.basename(tmpFile) }-preview`;
 							identify.preview = {
-								randomOffset, timeFormatted, folder, filename,
+								_id: `${ file._id }-preview`, randomOffset, timeFormatted, folder, filename,
 							};
 						}
 						this.getCollection().direct.update({ _id: file._id }, {

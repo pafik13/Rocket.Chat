@@ -29,6 +29,7 @@ export class Users extends Base {
 		this.tryEnsureIndex({ 'subscriptions.rid': 1 });
 		this.tryEnsureIndex({ 'subscriptions.rid': 1, isSubscribedOnNotifications: 1 });
 		this.tryEnsureIndex({ 'tokens._id': 1 }, { unique: true, partialFilterExpression: { 'tokens._id': { $exists: true } } });
+		this.tryEnsureIndex({ 'tokens.value': 1 });
 		this.loadSettings();
 	}
 
