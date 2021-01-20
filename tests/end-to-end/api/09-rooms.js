@@ -1000,7 +1000,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/channels.files - before image upload', (done) => {
-			request.post(api(`channels.files/${ testChannel._id }`))
+			request.post(api(`channels.files?roomId=${ testChannel._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1027,9 +1027,8 @@ describe('[Rooms]', function() {
 				.end(done);
 		});
 
-
 		it('/channels.files - after image upload', (done) => {
-			request.post(api(`channels.files/${ testChannel._id }`))
+			request.post(api(`channels.files?roomId=${ testChannel._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1041,7 +1040,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/groups.files - before image upload', (done) => {
-			request.post(api(`groups.files/${ testGroup._id }`))
+			request.post(api(`groups.files?roomId=${ testGroup._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1069,7 +1068,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/groups.files - after image upload', (done) => {
-			request.post(api(`groups.files/${ testGroup._id }`))
+			request.post(api(`groups.files?roomId=${ testGroup._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1111,7 +1110,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/channels.files - before video upload', (done) => {
-			request.post(api(`rooms.files/${ testChannel._id }`))
+			request.post(api(`rooms.files?roomId=${ testChannel._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1139,7 +1138,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/channels.files - after video upload', (done) => {
-			request.post(api(`channels.files/${ testChannel._id }`))
+			request.post(api(`channels.files?roomId=${ testChannel._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1154,7 +1153,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/groups.files - before video upload', (done) => {
-			request.post(api(`groups.files/${ testGroup._id }`))
+			request.post(api(`groups.files?roomId=${ testGroup._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
@@ -1182,7 +1181,7 @@ describe('[Rooms]', function() {
 		});
 
 		it('/groups.files - after video upload', (done) => {
-			request.post(api(`groups.files/${ testGroup._id }`))
+			request.post(api(`groups.files?roomId=${ testGroup._id }`))
 				.set(credentials)
 				.expect('Content-Type', 'application/json')
 				.expect(200)
