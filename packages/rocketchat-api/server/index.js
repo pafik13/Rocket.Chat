@@ -1,5 +1,6 @@
 import './settings';
 export { API } from './api';
+import './helpers/addPreviewToFile';
 import './helpers/composeRoomWithLastMessage';
 import './helpers/deprecationWarning';
 import './helpers/getLoggedInUser';
