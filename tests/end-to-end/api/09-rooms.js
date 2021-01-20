@@ -4,7 +4,7 @@ import { getCredentials, api, request, credentials } from '../../data/api-data.j
 import { password } from '../../data/user';
 import { closeRoom, createRoom } from '../../data/rooms.helper';
 import { updatePermission } from '../../data/permissions.helper';
-import { imgURL } from '../../data/interactions';
+import { imgURL, vidURL } from '../../data/interactions';
 
 
 function getMessages(roomId, roomType) {
@@ -998,6 +998,19 @@ describe('[Rooms]', function() {
 					done();
 				});
 		});
+
+		it('/channels.files - before image upload', (done) => {
+			request.post(api(`channels.files/${ testChannel._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(0);
+				})
+				.end(done);
+		});
+
 		it('/rooms.upload - channel', (done) => {
 			request.post(api(`rooms.upload/${ testChannel._id }`))
 				.set(credentials)
@@ -1014,6 +1027,31 @@ describe('[Rooms]', function() {
 				.end(done);
 		});
 
+
+		it('/channels.files - after image upload', (done) => {
+			request.post(api(`channels.files/${ testChannel._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
+				})
+				.end(done);
+		});
+
+		it('/groups.files - before image upload', (done) => {
+			request.post(api(`groups.files/${ testGroup._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(0);
+				})
+				.end(done);
+		});
+
 		it('/rooms.upload - group', (done) => {
 			request.post(api(`rooms.upload/${ testGroup._id }`))
 				.set(credentials)
@@ -1026,6 +1064,18 @@ describe('[Rooms]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/groups.files - after image upload', (done) => {
+			request.post(api(`groups.files/${ testGroup._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
 				})
 				.end(done);
 		});
@@ -1058,6 +1108,92 @@ describe('[Rooms]', function() {
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 				});
+		});
+
+		it('/channels.files - before video upload', (done) => {
+			request.post(api(`rooms.files/${ testChannel._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(0);
+				})
+				.end(done);
+		});
+
+		it('/rooms.upload - channel', (done) => {
+			request.post(api(`rooms.upload/${ testChannel._id }`))
+				.set(credentials)
+				.attach('file', vidURL)
+				.field({
+					msg: 'Sent video',
+					description: 'Simple video file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/channels.files - after video upload', (done) => {
+			request.post(api(`channels.files/${ testChannel._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
+					const [file] = res.body.files;
+					expect(file).to.have.property('identify.preview');
+					expect(file).to.have.property('video_preview.url');
+				})
+				.end(done);
+		});
+
+		it('/groups.files - before video upload', (done) => {
+			request.post(api(`groups.files/${ testGroup._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(0);
+				})
+				.end(done);
+		});
+
+		it('/rooms.upload - group', (done) => {
+			request.post(api(`rooms.upload/${ testGroup._id }`))
+				.set(credentials)
+				.attach('file', vidURL)
+				.field({
+					msg: 'Sent video',
+					description: 'Simple video file',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
+
+		it('/groups.files - after video upload', (done) => {
+			request.post(api(`groups.files/${ testGroup._id }`))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('files').that.is.an('array').that.has.lengthOf(1);
+					const [file] = res.body.files;
+					expect(file).to.have.property('identity.preview');
+					expect(file).to.have.property('video_preview.url');
+				})
+				.end(done);
 		});
 	});
 
