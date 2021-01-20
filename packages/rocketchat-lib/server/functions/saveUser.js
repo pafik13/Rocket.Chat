@@ -161,13 +161,10 @@ export const saveUser = function(userId, userData) {
 			createUser.email = userData.email;
 		}
 
-		console.log('createUser', createUser);
-		Accounts._skipCaseInsensitiveChecksForTest[userData.username] = true;
 		let _id;
 		try {
 			_id = Accounts.createUser(createUser);
 		} catch (error) {
-			delete Accounts._skipCaseInsensitiveChecksForTest[userData.username];
 			throw error;
 		}
 
