@@ -827,4 +827,77 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 	});
+
+	describe('[/admin.getUserByUsername]', () => {
+		it('should error if username is not passed', (done) => {
+			request.get(api('admin.getUserByUsername'))
+				.set(credentials)
+				.query({})
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+
+		it('should error if username is invalid', (done) => {
+			request.get(api('admin.getUserByUsername'))
+				.set(credentials)
+				.query({
+					username: `${ apiUsername }-invalid`,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(404)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', false);
+				})
+				.end(done);
+		});
+
+		it('should query information about a user by username', (done) => {
+			request.get(api('admin.getUserByUsername'))
+				.set(credentials)
+				.query({
+					username: apiUsername,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.nested.property('user.username', apiUsername);
+					expect(res.body).to.have.nested.property('user.emails[0].address', apiEmail);
+					expect(res.body).to.have.nested.property('user.active', true);
+					expect(res.body).to.have.nested.property('user.name', apiUsername);
+					expect(res.body).to.not.have.nested.property('user.e2e');
+					expect(res.body).to.not.have.nested.property('services');
+				})
+				.end(done);
+		});
+
+		it('should query information about a user by username with case permutations', (done) => {
+			function capitalizeFirstLetter(string) {
+				return string.charAt(0).toUpperCase() + string.slice(1);
+			}
+			const capitalizedUsername = capitalizeFirstLetter(apiUsername);
+			request.get(api('admin.getUserByUsername'))
+				.set(credentials)
+				.query({
+					username: capitalizedUsername,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.nested.property('user.username', apiUsername);
+					expect(res.body).to.have.nested.property('user.emails[0].address', apiEmail);
+					expect(res.body).to.have.nested.property('user.active', true);
+					expect(res.body).to.have.nested.property('user.name', apiUsername);
+					expect(res.body).to.not.have.nested.property('user.e2e');
+					expect(res.body).to.not.have.nested.property('services');
+					expect(capitalizedUsername).to.not.equal(apiUsername);
+				})
+				.end(done);
+		});
+	});
 });
