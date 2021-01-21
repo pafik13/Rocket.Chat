@@ -829,6 +829,23 @@ describe('[Admin]', function() {
 	});
 
 	describe('[/admin.getUserByUsername]', () => {
+		const username = `${ apiUsername }_${ Date.now() }`;
+		const email = `${ Date.now() }_${ apiEmail }`;
+
+		before(() => request.post(api('users.create'))
+			.set(credentials)
+			.send({
+				email,
+				name: username,
+				username,
+				password,
+				active: true,
+				roles: ['user'],
+				joinDefaultChannels: true,
+				verified: true,
+			})
+			.expect(200));
+
 		it('should error if username is not passed', (done) => {
 			request.get(api('admin.getUserByUsername'))
 				.set(credentials)
@@ -845,7 +862,7 @@ describe('[Admin]', function() {
 			request.get(api('admin.getUserByUsername'))
 				.set(credentials)
 				.query({
-					username: `${ apiUsername }-invalid`,
+					username: `${ username }-invalid`,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -859,16 +876,16 @@ describe('[Admin]', function() {
 			request.get(api('admin.getUserByUsername'))
 				.set(credentials)
 				.query({
-					username: apiUsername,
+					username,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('user.username', apiUsername);
-					expect(res.body).to.have.nested.property('user.emails[0].address', apiEmail);
+					expect(res.body).to.have.nested.property('user.username', username);
+					expect(res.body).to.have.nested.property('user.emails[0].address', email);
 					expect(res.body).to.have.nested.property('user.active', true);
-					expect(res.body).to.have.nested.property('user.name', apiUsername);
+					expect(res.body).to.have.nested.property('user.name', username);
 					expect(res.body).to.not.have.nested.property('user.e2e');
 					expect(res.body).to.not.have.nested.property('services');
 				})
@@ -879,7 +896,7 @@ describe('[Admin]', function() {
 			function capitalizeFirstLetter(string) {
 				return string.charAt(0).toUpperCase() + string.slice(1);
 			}
-			const capitalizedUsername = capitalizeFirstLetter(apiUsername);
+			const capitalizedUsername = capitalizeFirstLetter(username);
 			request.get(api('admin.getUserByUsername'))
 				.set(credentials)
 				.query({
@@ -889,13 +906,13 @@ describe('[Admin]', function() {
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
-					expect(res.body).to.have.nested.property('user.username', apiUsername);
+					expect(res.body).to.have.nested.property('user.username', username);
 					expect(res.body).to.have.nested.property('user.emails[0].address', apiEmail);
 					expect(res.body).to.have.nested.property('user.active', true);
-					expect(res.body).to.have.nested.property('user.name', apiUsername);
+					expect(res.body).to.have.nested.property('user.name', username);
 					expect(res.body).to.not.have.nested.property('user.e2e');
 					expect(res.body).to.not.have.nested.property('services');
-					expect(capitalizedUsername).to.not.equal(apiUsername);
+					expect(capitalizedUsername).to.not.equal(username);
 				})
 				.end(done);
 		});
