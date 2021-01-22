@@ -519,3 +519,78 @@ API.v1.addRoute('admin.notifyUser', { authRequired: true }, {
 		return API.v1.success();
 	},
 });
+
+// Copied from https://github.com/meteor/meteor/blob/2f2db14f8348e916a733a50cbbf9628ab4e36a25/packages/accounts-password/password_server.js#L201
+// Generates permutations of all case variations of a given string.
+const generateCasePermutationsForString = (string) => {
+	let permutations = [''];
+	for (let i = 0; i < string.length; i++) {
+		const ch = string.charAt(i);
+		permutations = [].concat(...(permutations.map((prefix) => {
+			const lowerCaseChar = ch.toLowerCase();
+			const upperCaseChar = ch.toUpperCase();
+			// Don't add unneccesary permutations when ch is not a letter
+			if (lowerCaseChar === upperCaseChar) {
+				return [prefix + ch];
+			} else {
+				return [prefix + lowerCaseChar, prefix + upperCaseChar];
+			}
+		})));
+	}
+	return permutations;
+};
+
+// Generates a MongoDB selector that can be used to perform a fast case
+// insensitive lookup for the given fieldName and string. Since MongoDB does
+// not support case insensitive indexes, and case insensitive regex queries
+// are slow, we construct a set of prefix selectors for all permutations of
+// the first 4 characters ourselves. We first attempt to matching against
+// these, and because 'prefix expression' regex queries do use indexes (see
+// http://docs.mongodb.org/v2.6/reference/operator/query/regex/#index-use),
+// this has been found to greatly improve performance (from 1200ms to 5ms in a
+// test with 1.000.000 users).
+const selectorForFastCaseInsensitiveLookup = (field, value) => {
+	// Performance seems to improve up to 4 prefix characters
+	const prefix = value.substring(0, Math.min(value.length, 4));
+	const orClause = generateCasePermutationsForString(prefix).map(
+		(prefixPermutation) => {
+			const selector = {};
+			selector[field] = new RegExp(`^${ Meteor._escapeRegExp(prefixPermutation) }`);
+			return selector;
+		});
+	const caseInsensitiveClause = {};
+	caseInsensitiveClause[field] = new RegExp(`^${ Meteor._escapeRegExp(value) }$`, 'i');
+	return { $and: [{ $or: orClause }, caseInsensitiveClause] };
+};
+
+API.v1.addRoute('admin.getUserByUsername', { authRequired: true }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const params = this.requestParams();
+		if (!params.username || !params.username.trim()) {
+			throw new Meteor.Error('error-user-param-not-provided', 'The required "username" param was not provided');
+		}
+
+		const query = selectorForFastCaseInsensitiveLookup('username', params.username);
+		const matchedUsers = Meteor.users.find(query, { fields: { _id: 1, username: 1 }, limit: 2 }).fetch();
+		if (matchedUsers.length > 1) {
+			return API.v1.failure(`Found too many users. Usernames = [${ matchedUsers.map((u) => u.username) }]`);
+		}
+		if (!matchedUsers.length) { return API.v1.notFound(); }
+
+		const { username } = matchedUsers[0];
+		let user = {};
+		let result;
+		Meteor.runAsUser(this.userId, () => {
+			result = Meteor.call('getFullUserData', { username, limit: 1 });
+		});
+
+		user = result[0];
+		return API.v1.success({
+			user,
+		});
+	},
+});

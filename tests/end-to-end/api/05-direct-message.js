@@ -146,10 +146,11 @@ describe('[Direct Messages]', function() {
 			request.post(api('users.create'))
 				.set(credentials)
 				.send({ email, name: username, username, password })
-				.end((err, res) => {
+				.expect((res) => {
 					user = res.body.user;
 					done();
-				});
+				})
+				.end(done);
 		});
 
 		let userCredentials;
