@@ -149,7 +149,8 @@ describe('[Direct Messages]', function() {
 				.expect((res) => {
 					user = res.body.user;
 					done();
-				});
+				})
+				.end(done);
 		});
 
 		let userCredentials;
