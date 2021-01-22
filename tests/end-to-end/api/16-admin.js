@@ -829,21 +829,12 @@ describe('[Admin]', function() {
 	});
 
 	describe('[/admin.getUserByUsername]', () => {
-		const username = `${ apiUsername }_${ Date.now() }`;
-		const email = `${ Date.now() }_${ apiEmail }`;
+		const username = `user.test.get.by.username.${ Date.now() }`;
+		const email = `${ username }@rocket.chat`;
 
 		before(() => request.post(api('users.create'))
 			.set(credentials)
-			.send({
-				email,
-				name: username,
-				username,
-				password,
-				active: true,
-				roles: ['user'],
-				joinDefaultChannels: true,
-				verified: true,
-			})
+			.send({ email, name: username, username, password })
 			.expect(200));
 
 		it('should error if username is not passed', (done) => {
