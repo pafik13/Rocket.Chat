@@ -148,7 +148,6 @@ describe('[Direct Messages]', function() {
 				.send({ email, name: username, username, password })
 				.expect((res) => {
 					user = res.body.user;
-					done();
 				})
 				.end(done);
 		});
