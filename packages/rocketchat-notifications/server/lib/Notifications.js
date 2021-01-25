@@ -71,7 +71,6 @@ class RoomStreamer extends Meteor.Streamer {
 }
 
 const printStreamRoomSubsStat = (streamRoom) => {
-	console.log('publication.onStop is called');
 	console.log('Subscriptions stats:');
 	console.log(`  subs len: "${ streamRoom.subscriptions.length }"`);
 	const keys = Object.keys(streamRoom.subscriptionsByEventName);
@@ -113,6 +112,7 @@ class Notifications {
 						publication.onStop(() => {
 							this.streamRoom.$sessionsMap.delete(session);
 							cursorHandle.stop();
+							console.log('publication.onStop is called');
 							printStreamRoomSubsStat(this.streamRoom);
 						});
 						this.streamRoom.$sessionsMap.set(session, true);

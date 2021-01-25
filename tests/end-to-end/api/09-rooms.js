@@ -2,7 +2,7 @@ import { expect } from 'chai';
 
 import { getCredentials, api, request, credentials } from '../../data/api-data.js';
 import { password } from '../../data/user';
-import { closeRoom, createRoom } from '../../data/rooms.helper';
+import { /* closeRoom, */ createRoom } from '../../data/rooms.helper';
 import { updatePermission } from '../../data/permissions.helper';
 import { imgURL, vidURL } from '../../data/interactions';
 
@@ -415,10 +415,10 @@ describe('[Rooms]', function() {
 		groupExpectedKeys.push('membersHidden');
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
-		after((done) => {
-			closeRoom({ type: 'd', roomId: testDM._id })
-				.then(done);
-		});
+		// after((done) => {
+		// 	closeRoom({ type: 'd', roomId: testDM._id })
+		// 		.then(done);
+		// });
 		it('create an channel', (done) => {
 			createRoom({ type: 'c', name: testChannelName })
 				.end((err, res) => {
@@ -533,10 +533,10 @@ describe('[Rooms]', function() {
 		let testDM;
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
-		after((done) => {
-			closeRoom({ type: 'd', roomId: testDM._id })
-				.then(done);
-		});
+		// after((done) => {
+		// 	closeRoom({ type: 'd', roomId: testDM._id })
+		// 		.then(done);
+		// });
 		it('create an channel', (done) => {
 			createRoom({ type: 'c', name: testChannelName })
 				.end((err, res) => {

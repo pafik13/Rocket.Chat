@@ -591,6 +591,32 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 
+		it('/admin.unblockChannel', async() => request.post(api('admin.unblockChannel'))
+			.set(credentials)
+			.send({
+				channelId: testChannel._id,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200));
+
+		it('should send message into channel', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						rid: testChannel._id,
+						text: 'Sample message',
+						alias: 'Gruggy',
+						emoji: ':smirk:',
+						avatar: 'http://res.guggy.com/logo_128.png',
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+
 		it('/admin.blockGroup', async() => {
 			testGroup = await getGroupInfo(apiPrivateChannelName);
 
@@ -621,6 +647,31 @@ describe('[Admin]', function() {
 					expect(res.body).to.have.property('success', false);
 					expect(res.body).to.have.property('errorType', 'error-room-blocked');
 				})
+				.end(done);
+		});
+
+		it('/admin.unblockGroup', async() => request.post(api('admin.blockGroup'))
+			.set(credentials)
+			.send({
+				groupId: testGroup._id,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200));
+
+		it('should send message into group', (done) => {
+			request.post(api('chat.sendMessage'))
+				.set(credentials)
+				.send({
+					message: {
+						rid: testGroup._id,
+						text: 'Sample message',
+						alias: 'Gruggy',
+						emoji: ':smirk:',
+						avatar: 'http://res.guggy.com/logo_128.png',
+					},
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
 				.end(done);
 		});
 	});
