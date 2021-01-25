@@ -650,7 +650,7 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 
-		it('/admin.unblockGroup', async() => request.post(api('admin.blockGroup'))
+		it('/admin.unblockGroup', async() => request.post(api('admin.unblockGroup'))
 			.set(credentials)
 			.send({
 				groupId: testGroup._id,
