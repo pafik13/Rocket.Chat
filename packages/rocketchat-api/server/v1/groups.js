@@ -136,22 +136,6 @@ API.v1.addRoute('groups.archive', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('groups.close', { authRequired: true }, {
-	post() {
-		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId, checkedArchived: false });
-
-		if (!findResult.open) {
-			return API.v1.failure(`The private group, ${ findResult.name }, is already closed to the sender`);
-		}
-
-		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('hideRoom', findResult.rid);
-		});
-
-		return API.v1.success();
-	},
-});
-
 API.v1.addRoute('groups.counters', { authRequired: true }, {
 	get() {
 		const access = hasPermission(this.userId, 'view-room-administration');
@@ -807,22 +791,6 @@ API.v1.addRoute('groups.online', { authRequired: true }, {
 		return API.v1.success({
 			online: onlineInRoom,
 		});
-	},
-});
-
-API.v1.addRoute('groups.open', { authRequired: true }, {
-	post() {
-		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId, checkedArchived: false });
-
-		if (findResult.open) {
-			return API.v1.failure(`The private group, ${ findResult.name }, is already open for the sender`);
-		}
-
-		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('openRoom', findResult.rid);
-		});
-
-		return API.v1.success();
 	},
 });
 
