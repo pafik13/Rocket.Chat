@@ -996,6 +996,30 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	blockById(_id) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				blocked: true,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	unblockById(_id) {
+		const query = { _id };
+
+		const update = {
+			$unset: {
+				blocked: 1,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
 	setNameById(_id, name, fname) {
 		const query = { _id };
 

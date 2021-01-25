@@ -404,7 +404,7 @@ API.v1.addRoute('admin.unblockChannel', { authRequired: true }, {
 		if (!room || room.t !== 'c') { return API.v1.notFound(); }
 
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('saveRoomSettings', room._id, 'blocked', false);
+			Rooms.unblockById(room._id);
 		});
 
 		return API.v1.success();
@@ -452,7 +452,7 @@ API.v1.addRoute('admin.unblockGroup', { authRequired: true }, {
 		if (!room || room.t !== 'p') { return API.v1.notFound(); }
 
 		Meteor.runAsUser(this.userId, () => {
-			Meteor.call('saveRoomSettings', room._id, 'blocked', false);
+			Rooms.unblockById(room._id);
 		});
 
 		return API.v1.success();
