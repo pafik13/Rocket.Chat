@@ -565,21 +565,6 @@ describe('[Direct Messages]', function() {
 			.end(done);
 	});
 
-	it('/im.close', (done) => {
-		request.post(api('im.close'))
-			.set(credentials)
-			.send({
-				roomId: directMessage._id,
-				userId: 'rocket.cat',
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', true);
-			})
-			.end(done);
-	});
-
 	describe('fname property', () => {
 		const username = `fname_${ apiUsername }`;
 		const name = `Name fname_${ apiUsername }`;
