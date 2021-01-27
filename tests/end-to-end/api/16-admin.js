@@ -746,8 +746,8 @@ describe('[Admin]', function() {
 
 		it('should logout', (done) => {
 			request.post(api('logout'))
-				.send({
-				})
+				.set(userCredentials)
+				.send({})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
