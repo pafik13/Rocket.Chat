@@ -744,6 +744,31 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 
+		it('should logout', (done) => {
+			request.post(api('logout'))
+				.send({
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.end(done);
+		});
+
+		it('should login', (done) => {
+			request.post(api('login'))
+				.send({
+					user: user.username,
+					password,
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					userCredentials = {};
+					userCredentials['X-Auth-Token'] = res.body.data.authToken;
+					userCredentials['X-User-Id'] = res.body.data.userId;
+				})
+				.end(done);
+		});
+
 		it('should enable user', (done) => {
 			request.post(api('admin.enableUser'))
 				.set(credentials)

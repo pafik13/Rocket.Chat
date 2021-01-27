@@ -16,6 +16,9 @@ const defaultRateLimiterOptions = {
 	numRequestsAllowed: settings.get('API_Enable_Rate_Limiter_Limit_Calls_Default'),
 	intervalTimeInMS: settings.get('API_Enable_Rate_Limiter_Limit_Time_Default'),
 };
+const accessibleRoutesForDisabledUser = [
+	'login', 'logout', 'push.token',
+];
 
 export let API = {};
 
@@ -278,7 +281,7 @@ class APIClass extends Restivus {
 						// 						console.log('this.userId', this.userId);
 						// 						console.log('this.user', this.user);
 
-						if (this.user && this.user.disabled) {
+						if (this.user && this.user.disabled && !accessibleRoutesForDisabledUser.includes(route)) {
 							this.response.setHeader('X-Restricted-Access', true);
 							throw new Meteor.Error('error-user-disabled', 'User is disabled', {});
 						}
