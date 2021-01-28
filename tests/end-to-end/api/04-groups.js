@@ -566,6 +566,7 @@ describe('[Groups]', function() {
 					expect(res.body).to.have.nested.property('group.msgs', 1);
 					expect(res.body).to.have.nested.property('group.membersHidden', false);
 					expect(res.body).to.have.nested.property('group.filesHidden', false);
+					expect(res.body).to.have.nested.property('group.canMembersAddUser', false);
 				})
 				.end(done);
 		});
@@ -1102,6 +1103,25 @@ describe('[Groups]', function() {
 				expect(res.body).to.have.property('success', true);
 				const { group } = res.body;
 				expect(group).to.have.property('filesHidden', true);
+			})
+			.end(done);
+	});
+
+
+
+	it('/groups.setCanMembersAddUser', (done) => {
+		request.post(api('groups.setCanMembersAddUser'))
+			.set(credentials)
+			.send({
+				roomId: group._id,
+				canMembersAddUser: true,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				const { group } = res.body;
+				expect(group).to.have.property('filcanMembersAddUseresHidden', true);
 			})
 			.end(done);
 	});

@@ -52,6 +52,8 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.msgs', 1);
 				expect(res.body).to.have.nested.property('channel.filesHidden', false);
 				expect(res.body).to.have.nested.property('channel.country', 'AU');
+				expect(res.body).to.have.nested.property('channel.canMembersAddUser', true);
+				expect(res.body).to.have.nested.property('channel.linkVisible', false);
 				channel._id = res.body.channel._id;
 			})
 			.end(done);
@@ -1354,6 +1356,48 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.t', 'c');
 				expect(res.body).to.have.nested.property('channel.msgs', roomInfo.channel.msgs);
 				expect(res.body).to.have.nested.property('channel.filesHidden', !roomInfo.channel.filesHidden);
+			});
+	});
+
+	it('/channels.setCanMembersAddUser', async() => {
+		const roomInfo = await getRoomInfo(channel._id);
+
+		return request.post(api('channels.setCanMembersAddUser'))
+			.set(credentials)
+			.send({
+				roomId: channel._id,
+				canMembersAddUser: !roomInfo.channel.canMembersAddUser,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.nested.property('channel._id');
+				expect(res.body).to.have.nested.property('channel.name', `EDITED${ apiPublicChannelName }`);
+				expect(res.body).to.have.nested.property('channel.t', 'c');
+				expect(res.body).to.have.nested.property('channel.msgs', roomInfo.channel.msgs);
+				expect(res.body).to.have.nested.property('channel.canMembersAddUser', !roomInfo.channel.canMembersAddUser);
+			});
+	});
+
+	it('/channels.setLinkVisible', async() => {
+		const roomInfo = await getRoomInfo(channel._id);
+
+		return request.post(api('channels.setLinkVisible'))
+			.set(credentials)
+			.send({
+				roomId: channel._id,
+				linkVisible: !roomInfo.channel.linkVisible,
+			})
+			.expect('Content-Type', 'application/json')
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).to.have.property('success', true);
+				expect(res.body).to.have.nested.property('channel._id');
+				expect(res.body).to.have.nested.property('channel.name', `EDITED${ apiPublicChannelName }`);
+				expect(res.body).to.have.nested.property('channel.t', 'c');
+				expect(res.body).to.have.nested.property('channel.msgs', roomInfo.channel.msgs);
+				expect(res.body).to.have.nested.property('channel.linkVisible', !roomInfo.channel.linkVisible);
 			});
 	});
 

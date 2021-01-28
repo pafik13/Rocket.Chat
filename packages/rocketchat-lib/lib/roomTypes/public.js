@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { openRoom } from 'meteor/rocketchat:ui-utils';
 import { ChatRoom } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
-import { hasAtLeastOnePermission } from 'meteor/rocketchat:authorization';
+import { hasAtLeastOnePermission, hasPermission } from 'meteor/rocketchat:authorization';
 import { getUserPreference, RoomTypeConfig, RoomTypeRouteConfig, RoomSettingsEnum, UiTextContext } from 'meteor/rocketchat:utils';
 
 export class PublicRoomRoute extends RoomTypeRouteConfig {
@@ -62,7 +62,7 @@ export class PublicRoomType extends RoomTypeConfig {
 	}
 
 	canAddUser(room) {
-		return hasAtLeastOnePermission(['add-user-to-any-c-room', 'add-user-to-joined-room'], room._id);
+		return room.canMembersAddUser || hasPermission('add-user-to-joined-room', room._id);
 	}
 
 	enableMembersListProfile() {

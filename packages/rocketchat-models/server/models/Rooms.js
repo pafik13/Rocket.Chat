@@ -1412,6 +1412,31 @@ export class Rooms extends Base {
 		return this.update(query, update);
 	}
 
+	setCanMembersAddUserById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				canMembersAddUser: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	setLinkVisibleById(_id, val) {
+		const query = { _id };
+
+		const update = {
+			$set: {
+				linkVisible: val,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+
 	saveRetentionEnabledById(_id, value) {
 		const query = { _id };
 

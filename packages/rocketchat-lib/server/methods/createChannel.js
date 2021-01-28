@@ -28,6 +28,6 @@ Meteor.methods({
 			throw new Meteor.Error('error-invalid-value', 'Invalid value: "photoUrl" must be a URL', { method: 'createChannel' });
 		}
 
-		return createRoom('c', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, filesHidden: false, ...extraData });
+		return createRoom('c', name, Meteor.user() && Meteor.user().username, members, readOnly, { customFields, filesHidden: false, canMembersAddUser: true, linkVisible: true, ...extraData });
 	},
 });

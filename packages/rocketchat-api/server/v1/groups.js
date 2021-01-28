@@ -246,9 +246,9 @@ API.v1.addRoute('groups.create', { authRequired: true }, {
 		const countryFromHeader = this.getCountry();
 		const { country = countryFromHeader } = this.bodyParams;
 
-		const { description, topic, location, filesHidden = false, membersHidden = false } = this.bodyParams;
+		const { description, topic, location, filesHidden = false, membersHidden = false, canMembersAddUser = false } = this.bodyParams;
 		const extraData = {
-			membersHidden, filesHidden, country,
+			membersHidden, filesHidden, country, canMembersAddUser,
 		};
 		if (topic) {
 			extraData.topic = topic;
@@ -315,14 +315,16 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		let filesHidden = false;
 		let membersHidden = false;
 		let country;
+		let canMembersAddUser = false;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
-			membersHidden = stringToBoolean(fields.membersHidden);
-			filesHidden = stringToBoolean(fields.filesHidden);
+			membersHidden = stringToBoolean(fields.membersHidden, membersHidden);
+			filesHidden = stringToBoolean(fields.filesHidden, filesHidden);
 			country = fields.country || countryFromHeader;
+			canMembersAddUser = stringToBoolean(fields.canMembersAddUser, canMembersAddUser);
 
 			validateGroup(fields);
 			if (fields.customFields) {
@@ -338,7 +340,7 @@ API.v1.addRoute('groups.createWithAvatar', { authRequired: true }, {
 		}
 
 		const extraData = {
-			filesHidden, membersHidden, country,
+			filesHidden, membersHidden, country, canMembersAddUser,
 		};
 		if (fields.topic) {
 			extraData.topic = fields.topic;
@@ -1001,6 +1003,33 @@ API.v1.addRoute('groups.setFilesHidden', { authRequired: true }, {
 
 		Meteor.runAsUser(this.userId, () => {
 			Meteor.call('saveRoomSettings', findResult.rid, 'filesHidden', filesHidden);
+		});
+
+		return API.v1.success({
+			group: this.composeRoomWithLastMessage(Rooms.findOneById(findResult.rid, { fields: API.v1.defaultFieldsToExclude }), this.userId),
+		});
+	},
+});
+
+API.v1.addRoute('groups.setCanMembersAddUser', { authRequired: true }, {
+	post() {
+		const { canMembersAddUser } = this.bodyParams;
+		if (typeof canMembersAddUser === 'undefined') {
+			return API.v1.failure('The bodyParam "filesHcanMembersAddUseridden" is required');
+		}
+
+		if (typeof canMembersAddUser !== 'boolean') {
+			return API.v1.failure('The bodyParam "canMembersAddUser" must be a boolean');
+		}
+
+		const findResult = findPrivateGroupByIdOrName({ params: this.requestParams(), userId: this.userId });
+
+		if (findResult.canMembersAddUser === canMembersAddUser) {
+			return API.v1.failure('The private group can members add user setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult.rid, 'canMembersAddUser', canMembersAddUser);
 		});
 
 		return API.v1.success({

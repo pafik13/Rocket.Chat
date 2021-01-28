@@ -479,6 +479,8 @@
   "by": "by",
   "cache_cleared": "Cache cleared",
   "call-management": "Call Management",
+  "Can_members_add_user": "Can members add user",
+  "Can_members_add_user_setting_changed_successfully": "Can members add user setting changed successfully",
   "Cancel": "Cancel",
   "Canceled": "Canceled",
   "Cancel_message_input": "Cancel",
@@ -2525,7 +2527,6 @@
   "Script_Enabled": "Script Enabled",
   "Search": "Search",
   "Search_by_file_name": "Search by file name",
-  "Search_by_username": "Search by username",
   "Search_Channels": "Search Channels",
   "Search_current_provider_not_active": "Current Search Provider is not active",
   "Search_message_search_failed": "Search request failed",
@@ -2862,7 +2863,6 @@
   "Tokens_Required_Input_Error": "Invalid typed tokens.",
   "Tokens_Required_Input_Placeholder": "Tokens asset names",
   "Topic": "Topic",
-  "Total": "Total",
   "Total_conversations": "Total Conversations",
   "Total_messages": "Total Messages",
   "Total_visitors": "Total Visitors",
@@ -3253,5 +3253,7 @@
   "Total": "Total",
   "Search_by_username": "Search by username",
   "LongTasks": "Long Tasks",
-  "Search_by_method": "Search by method"
+  "Search_by_method": "Search by method",
+  "Is_link_visible": "Is link visible for all",
+  "Link_visible_setting_changed_successfully": "Link visible setting changed successfully"
 }

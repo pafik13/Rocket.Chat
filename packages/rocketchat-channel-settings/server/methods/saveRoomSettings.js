@@ -45,6 +45,8 @@ const fields = [
 	'filesHidden',
 	'blocked',
 	'country',
+	'canMembersAddUser',
+	'linkVisible',
 ];
 Meteor.methods({
 	saveRoomSettings(rid, settings, value) {
@@ -209,6 +211,20 @@ Meteor.methods({
 					});
 				}
 			}
+
+			if (setting === 'canMembersAddUser' && !hasPermission(userId, 'edit-room', rid)) {
+				throw new Meteor.Error('error-action-not-allowed', 'Editing room canMembersAddUser is not allowed', {
+					method: 'saveRoomSettings',
+					action: 'Editing_room',
+				});
+			}
+
+			if (setting === 'linkVisible' && (room.t === 'p' || !hasPermission(userId, 'edit-room', rid))) {
+				throw new Meteor.Error('error-action-not-allowed', 'Editing room link visibility is not allowed', {
+					method: 'saveRoomSettings',
+					action: 'Editing_room',
+				});
+			}
 		});
 
 		Object.keys(settings).forEach((setting) => {
@@ -312,6 +328,12 @@ Meteor.methods({
 					break;
 				case 'country':
 					Rooms.setCountryById(rid, value);
+					break;
+				case 'canMembersAddUser':
+					Rooms.setCanMembersAddUserById(rid, value);
+					break;
+				case 'linkVisible':
+					Rooms.setLinkVisibleById(rid, value);
 					break;
 			}
 		});

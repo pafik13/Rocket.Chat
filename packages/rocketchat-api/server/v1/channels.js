@@ -244,10 +244,10 @@ API.v1.addRoute('channels.create', { authRequired: true }, {
 
 		const countryFromHeader = this.getCountry();
 
-		const { description, topic, location, filesHidden = false, country = countryFromHeader } = bodyParams;
+		const { description, topic, location, filesHidden = false, country = countryFromHeader, canMembersAddUser = true, linkVisible = true } = bodyParams;
 
 		const extraData = {
-			filesHidden, country,
+			filesHidden, country, canMembersAddUser, linkVisible,
 		};
 		if (topic) {
 			extraData.topic = topic;
@@ -312,13 +312,17 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 		let errorResponse;
 		let filesHidden = false;
 		let country;
+		let canMembersAddUser = true;
+		let linkVisible = true;
 		try {
 			if (fields.members) {
 				fields.members = JSON.parse(fields.members);
 			}
 			fields.readOnly = stringToBoolean(fields.readOnly);
-			filesHidden = stringToBoolean(fields.filesHidden);
+			filesHidden = stringToBoolean(fields.filesHidden, filesHidden);
 			country = fields.country || countryFromHeader;
+			canMembersAddUser = stringToBoolean(fields.canMembersAddUser, canMembersAddUser);
+			linkVisible = stringToBoolean(fields.linkVisible, linkVisible);
 
 			API.channels.create.validate({
 				user: {
@@ -355,7 +359,7 @@ API.v1.addRoute('channels.createWithAvatar', { authRequired: true }, {
 		}
 
 		const extraData = {
-			filesHidden, country,
+			filesHidden, country, canMembersAddUser, linkVisible,
 		};
 		if (fields.topic) {
 			extraData.topic = fields.topic;
@@ -1127,6 +1131,10 @@ API.v1.addRoute('channels.setFilesHidden', { authRequired: true }, {
 			return API.v1.failure('The bodyParam "filesHidden" is required');
 		}
 
+		if (typeof filesHidden !== 'boolean') {
+			return API.v1.failure('The bodyParam "filesHidden" must be a boolean');
+		}
+
 		const findResult = findChannelByIdOrName({ params: this.requestParams() });
 
 		if (findResult.filesHidden === filesHidden) {
@@ -1143,6 +1151,63 @@ API.v1.addRoute('channels.setFilesHidden', { authRequired: true }, {
 	},
 });
 
+
+API.v1.addRoute('channels.setCanMembersAddUser', { authRequired: true }, {
+	post() {
+		const { canMembersAddUser } = this.bodyParams;
+
+		if (typeof canMembersAddUser === 'undefined') {
+			return API.v1.failure('The bodyParam "canMembersAddUser" is required');
+		}
+
+		if (typeof canMembersAddUser !== 'boolean') {
+			return API.v1.failure('The bodyParam "canMembersAddUser" must be a boolean');
+		}
+
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		if (findResult.canMembersAddUser === canMembersAddUser) {
+			return API.v1.failure('The channel can members add user setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult._id, 'canMembersAddUser', canMembersAddUser);
+		});
+
+		return API.v1.success({
+			channel: findChannelByIdOrName({ params: this.requestParams(), userId: this.userId }),
+		});
+	},
+});
+
+
+API.v1.addRoute('channels.setLinkVisible', { authRequired: true }, {
+	post() {
+		const { linkVisible } = this.bodyParams;
+
+		if (typeof linkVisible === 'undefined') {
+			return API.v1.failure('The bodyParam "linkVisible" is required');
+		}
+
+		if (typeof linkVisible !== 'boolean') {
+			return API.v1.failure('The bodyParam "linkVisible" must be a boolean');
+		}
+
+		const findResult = findChannelByIdOrName({ params: this.requestParams() });
+
+		if (findResult.linkVisible === linkVisible) {
+			return API.v1.failure('The channel link visible setting is the same as what it would be changed to.');
+		}
+
+		Meteor.runAsUser(this.userId, () => {
+			Meteor.call('saveRoomSettings', findResult._id, 'linkVisible', linkVisible);
+		});
+
+		return API.v1.success({
+			channel: findChannelByIdOrName({ params: this.requestParams(), userId: this.userId }),
+		});
+	},
+});
 
 API.v1.addRoute('channels.setTopic', { authRequired: true }, {
 	post() {

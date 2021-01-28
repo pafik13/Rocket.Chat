@@ -42,11 +42,9 @@ Meteor.methods({
 
 		// Can add to any room you're in, with permission, otherwise need specific room type permission
 		let canAddUser = false;
-		if (userInRoom && hasPermission(userId, 'add-user-to-joined-room', room._id)) {
+		if (room.canMembersAddUser) {
 			canAddUser = true;
-		} else if (room.t === 'c' && hasPermission(userId, 'add-user-to-any-c-room')) {
-			canAddUser = true;
-		} else if (room.t === 'p' && hasPermission(userId, 'add-user-to-any-p-room')) {
+		} else if (userInRoom && hasPermission(userId, 'add-user-to-joined-room', room._id)) {
 			canAddUser = true;
 		}
 

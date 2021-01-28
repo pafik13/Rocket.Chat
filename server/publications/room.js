@@ -55,6 +55,8 @@ const fields = {
 	filesHidden: 1,
 	blocked: 1,
 	messageEventsCount: 1,
+	canMembersAddUser: 1,
+	linkVisible: 1,
 };
 
 const roomMap = (record) => {

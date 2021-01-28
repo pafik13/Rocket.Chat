@@ -479,6 +479,54 @@ Template.channelSettingsEditing.onCreated(function() {
 				);
 			},
 		},
+		canMembersAddUser: {
+			type: 'boolean',
+			label: 'Can_members_add_user',
+			isToggle: true,
+			processing: new ReactiveVar(false),
+			canView() {
+				return room.t !== 'd';
+			},
+			getValue() {
+				return room.canMembersAddUser;
+			},
+			canEdit() {
+				return hasAllPermission('edit-room', room._id);
+			},
+			save(value) {
+				return call('saveRoomSettings', room._id, 'canMembersAddUser', value).then(
+					() => {
+						toastr.success(
+							t('Can_members_add_user_setting_changed_successfully')
+						);
+					}
+				);
+			},
+		},
+		linkVisible: {
+			type: 'boolean',
+			label: 'Is_link_visible',
+			isToggle: true,
+			processing: new ReactiveVar(false),
+			canView() {
+				return room.t === 'c';
+			},
+			getValue() {
+				return room.linkVisible;
+			},
+			canEdit() {
+				return hasAllPermission('edit-room', room._id);
+			},
+			save(value) {
+				return call('saveRoomSettings', room._id, 'linkVisible', value).then(
+					() => {
+						toastr.success(
+							t('Link_visible_setting_changed_successfully')
+						);
+					}
+				);
+			},
+		},
 		blocked: {
 			type: 'boolean',
 			label: 'Block_room',

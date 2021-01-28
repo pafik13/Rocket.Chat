@@ -463,6 +463,8 @@
   "by": "по",
   "cache_cleared": "Кэш очищен",
   "call-management": "Управление вызовами",
+  "Can_members_add_user": "Могут ли участники добавлять других?",
+  "Can_members_add_user_setting_changed_successfully": "Разрешение участникам на добавление других изменено успешно",
   "Cancel": "Отмена",
   "Cancel_message_input": "Отменить",
   "Cannot_invite_users_to_direct_rooms": "Нельзя приглашать пользователей в личную переписку",
@@ -2458,7 +2460,6 @@
   "Script_Enabled": "Использовать скрипт",
   "Search": "Поиск",
   "Search_by_file_name": "Поиск по имени файла",
-  "Search_by_username": "Поиск по логину",
   "Search_Channels": "Поиск каналов",
   "Search_current_provider_not_active": "Текущий поисковый провайдер неактивен",
   "Search_message_search_failed": "Не удалось выполнить запрос поиска",
@@ -3172,5 +3173,7 @@
   "Total": "Всего",
   "Search_by_username": "Поиск по username",
   "LongTasks": "Длинные задачи",
-  "Search_by_method": "Поиск по method"
+  "Search_by_method": "Поиск по method",
+  "Is_link_visible": "Показывать ссылку всем",
+  "Link_visible_setting_changed_successfully": "Настройка видимости ссылки успешно изменена"
 }
