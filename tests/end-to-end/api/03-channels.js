@@ -53,7 +53,7 @@ describe('[Channels]', function() {
 				expect(res.body).to.have.nested.property('channel.filesHidden', false);
 				expect(res.body).to.have.nested.property('channel.country', 'AU');
 				expect(res.body).to.have.nested.property('channel.canMembersAddUser', true);
-				expect(res.body).to.have.nested.property('channel.linkVisible', false);
+				expect(res.body).to.have.nested.property('channel.linkVisible', true);
 				channel._id = res.body.channel._id;
 			})
 			.end(done);
