@@ -1121,7 +1121,7 @@ describe('[Groups]', function() {
 			.expect((res) => {
 				expect(res.body).to.have.property('success', true);
 				const { group } = res.body;
-				expect(group).to.have.property('filcanMembersAddUseresHidden', true);
+				expect(group).to.have.property('canMembersAddUser', true);
 			})
 			.end(done);
 	});
