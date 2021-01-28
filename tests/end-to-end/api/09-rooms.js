@@ -407,11 +407,13 @@ describe('[Rooms]', function() {
 		let testChannel;
 		let testGroup;
 		let testDM;
-		const channelExpectedKeys = [
-			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'ts', 'sysMes', 'filesHidden', 'country', 'messageEventsCount',
-			'lastMessage', '_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed', 'default', 'ro', 'lm',
+		const generalExpectedKeys = [
+			'_id', 'name', 'fname', 't', 'msgs', 'usersCount', 'u', 'customFields', 'sysMes', 'filesHidden', 'country', 'messageEventsCount', 'canMembersAddUser',
+			'lastMessage', '_updatedAt', 'isImageFilesAllowed', 'isAudioFilesAllowed', 'isVideoFilesAllowed', 'isOtherFilesAllowed', 'default', 'ro', 'lm', 'ts',
 		];
-		const groupExpectedKeys = Array.from(channelExpectedKeys);
+		const channelExpectedKeys = Array.from(generalExpectedKeys);
+		channelExpectedKeys.push('linkVisible');
+		const groupExpectedKeys = Array.from(generalExpectedKeys);
 		groupExpectedKeys.push('membersHidden');
 		const testChannelName = `channel.test.${ Date.now() }-${ Math.random() }`;
 		const testGroupName = `group.test.${ Date.now() }-${ Math.random() }`;
