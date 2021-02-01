@@ -11,8 +11,6 @@ Meteor.startup(function() {
 		{ _id: 'access-permissions',            roles : ['admin'] },
 		{ _id: 'add-oauth-service',             roles : ['admin'] },
 		{ _id: 'add-user-to-joined-room',       roles : ['admin', 'owner', 'moderator'] },
-		{ _id: 'add-user-to-any-c-room',        roles : ['admin', 'user'] },
-		{ _id: 'add-user-to-any-p-room',        roles : [] },
 		{ _id: 'api-bypass-rate-limit',         roles : ['admin', 'bot'] },
 		{ _id: 'archive-room',                  roles : ['admin', 'owner'] },
 		{ _id: 'assign-admin-role',             roles : ['admin'] },
