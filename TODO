@@ -1,10 +1,20 @@
 Tasks:
     [] Delete code related to LiveChat
-    [] Clear permissions (LiveChat, Anonymous)
     [] Change Logo and Avatar to ANONYM (Test, Prod). Copy from CORP.
+    [] Remove message deletion when room deleting
+    [] Remove i18n for LiveChat
+    [] Remove unnecessary packages (CAS, OAUTH, Slashcommands and etc.)
+    [] Clean permissions (Invite User)
     Tests:
         [+] Fix messaging
         [+] Fix emojis
         [] Fix admin (Accounts)
         [] Split messaging tests by room types
         [] Repair file uploads (messaging)
+
+General task list:
+    [] Make server logic
+    [] Add logic to WEB UI, if needed 
+    [] Add tests, if applicable
+    [] Add docs, if needed
+    [] Add migrations, if needed

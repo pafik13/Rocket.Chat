@@ -34,18 +34,7 @@ accounts-meteor-developer@1.4.2
   meteor-developer-config-ui@1.0.1 (weak dependency)
   meteor-developer-oauth@1.2.1
 
-accounts-password@1.6.2
-  accounts-base@1.7.0
-  check@1.3.1
-  ddp@1.4.0
-  ecmascript@0.14.3
-  ejson@1.1.1
-  email@2.0.0
-  isobuild:isopack-2@1.0.0
-  npm-bcrypt@0.9.3
-  random@1.2.0
-  sha@1.0.9
-  srp@1.1.0
+accounts-password@1.6.2*
 
 accounts-twitter@1.4.2
   accounts-base@1.4.3
@@ -88,23 +77,9 @@ dispatch:run-as-user@1.1.1
   mongo@1.1.0
   underscore@1.0.3
 
-dynamic-import@0.5.2
-  fetch@0.1.1
-  inter-process-messaging@0.1.1
-  isobuild:dynamic-import@1.5.0
-  modern-browsers@0.1.5
-  modules@0.15.0
-  promise@0.11.2
+dynamic-import@0.5.2*
 
-ecmascript@0.14.3
-  babel-compiler@7.5.0
-  babel-runtime@1.5.0
-  dynamic-import@0.5.1
-  ecmascript-runtime@0.7.0
-  isobuild:compiler-plugin@1.0.0
-  isobuild:isopack-2@1.0.0
-  modules@0.15.0
-  promise@0.11.2
+ecmascript@0.14.3*
 
 ejson@1.1.1
   base64@1.0.11
@@ -131,20 +106,9 @@ http@1.4.2
   modules@0.12.0
   url@1.2.0
 
-jalik:ufs@1.0.2
-  check@1.3.1
-  ecmascript@0.14.0
-  isobuild:isopack-2@1.0.0
-  matb33:collection-hooks@1.0.1
-  mongo@1.8.0
-  underscore@1.0.10
-  webapp@1.8.0
+jalik:ufs@1.0.2*
 
-jalik:ufs-gridfs@1.0.2
-  ecmascript@0.14.0
-  isobuild:isopack-2@1.0.0
-  jalik:ufs@1.0.2
-  mongo@1.8.0
+jalik:ufs-gridfs@1.0.2*
 
 jquery@1.11.11*
 
@@ -224,29 +188,7 @@ mobile-experience@1.1.0
   launch-screen@1.2.0
   mobile-status-bar@1.1.0
 
-mongo@1.10.0
-  allow-deny@1.1.0
-  autopublish@1.0.7 (weak dependency)
-  binary-heap@1.0.11
-  callback-hook@1.3.0
-  check@1.3.1
-  ddp@1.4.0
-  diff-sequence@1.1.1
-  disable-oplog@1.0.7 (weak dependency)
-  ecmascript@0.14.3
-  ejson@1.1.1
-  facts-base@1.0.1 (weak dependency)
-  insecure@1.0.7 (weak dependency)
-  isobuild:isopack-2@1.0.0
-  minimongo@1.6.0
-  mongo-decimal@0.1.1
-  mongo-dev-server@1.1.0
-  mongo-id@1.0.7
-  npm-mongo@3.7.0
-  random@1.2.0
-  tracker@1.2.0
-  underscore@1.0.10
-  webapp@1.9.1 (weak dependency)
+mongo@1.10.0*
 
 mrt:reactive-store@0.0.1
   deps@1.0.0
@@ -268,11 +210,7 @@ nimble:restivus@0.8.12
 
 nooitaf:colors@1.1.2_1
 
-ostrio:cookies@2.6.0
-  ecmascript@0.5.7
-  http@1.2.8
-  isobuild:isopack-2@1.0.0
-  webapp@1.3.10
+ostrio:cookies@2.6.0*
 
 pauli:accounts-linkedin@5.0.0
   accounts-base@1.4.2
@@ -314,9 +252,7 @@ reactive-dict@1.3.0
 reactive-var@1.0.11
   tracker@1.1.1
 
-reload@1.3.0
-  ecmascript@0.12.4
-  isobuild:isopack-2@1.0.0
+reload@1.3.0*
 
 rocketchat:action-links@0.0.1+
 
@@ -359,6 +295,8 @@ rocketchat:emoji-custom@1.0.0+
 rocketchat:emoji-emojione@0.0.1+
 
 rocketchat:error-handler@1.0.0+
+
+rocketchat:extasciifolder@0.0.1+
 
 rocketchat:favico@0.0.1+
 
@@ -431,8 +369,6 @@ rocketchat:otr@0.0.1+
 rocketchat:p2p-calls@0.0.1+
 
 rocketchat:promises@0.0.1+
-
-rocketchat:push@4.0.0+
 
 rocketchat:push-notifications@0.0.1+
 
