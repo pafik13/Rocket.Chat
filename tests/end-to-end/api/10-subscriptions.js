@@ -200,4 +200,17 @@ describe('[Subscriptions]', function() {
 				.end(done);
 		});
 	});
+	describe('[/subscriptions.getAll]', () => {
+		it('return all subscriptions for user', (done) => {
+			request.get(api('subscriptions.getAll'))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('result').that.is.an('array');
+				})
+				.end(done);
+		});
+	});
 });

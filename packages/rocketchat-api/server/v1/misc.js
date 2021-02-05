@@ -6,6 +6,7 @@ import { Info } from 'meteor/rocketchat:utils';
 import { Users } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { API } from '../api';
+import _ from 'underscore';
 
 API.v1.addRoute('info', { authRequired: false }, {
 	get() {
@@ -184,5 +185,28 @@ API.v1.addRoute('directory', { authRequired: true }, {
 			offset,
 			total: result.total,
 		});
+	},
+});
+
+API.v1.addRoute('subscriptions.getAll', { authRequired: false }, {
+	get() {
+		const result = [];
+		const { userId } = this;
+		const sockets = Meteor.server.stream_server.open_sockets;
+		_.each(sockets, function(socket) {
+			// socket._meteorSession._namedSubs is Map
+			for (const value of socket._meteorSession._namedSubs) {
+				if (value[1].userId === userId) {
+					result.push({
+						userId: value[1].userId,
+						subscriptionId: value[1]._subscriptionId,
+						name: value[1]._name,
+						params: value[1]._params,
+					});
+				}
+			}
+		});
+
+		return API.v1.success({ result });
 	},
 });
