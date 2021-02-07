@@ -191,7 +191,9 @@ API.v1.addRoute('directory', { authRequired: true }, {
 API.v1.addRoute('subscriptions.getAll', { authRequired: false }, {
 	get() {
 		const result = [];
-		const { userId } = this;
+		const { userId } = this.queryParams;
+		//const { userId } = this;
+		console.log('userId', userId);
 		const sockets = Meteor.server.stream_server.open_sockets;
 		_.each(sockets, function(socket) {
 			// socket._meteorSession._namedSubs is Map
