@@ -986,6 +986,19 @@ describe('[Admin]', function() {
 	});
 
 	describe('get passwords', () => {
+		let user;
+		before((done) => {
+			const username = `user.test.${ Date.now() }`;
+			const email = `${ username }@rocket.chat`;
+			request.post(api('users.create'))
+				.set(credentials)
+				.send({ email, name: username, username, password })
+				.end((err, res) => {
+					user = res.body.user;
+					done();
+				});
+		});
+
 		it('should error', (done) => {
 			request.get(api('admin.getPasswords'))
 				.set(credentials)
@@ -998,14 +1011,15 @@ describe('[Admin]', function() {
 			request.get(api('admin.getPasswords'))
 				.set(credentials)
 				.query({
-					ids: 'rocket.cat',
+					ids: `rocket.cat,${ user._id }`,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.expect((res) => {
 					expect(res.body).to.have.property('success', true);
 					expect(res.body).to.have.property('result');
-					expect(res.body.result).to.have.property('rocket.cat');
+					expect(res.body.result).to.not.have.property('rocket.cat');
+					expect(res.body.result).to.have.property(user._id);
 				})
 				.end(done);
 		});
