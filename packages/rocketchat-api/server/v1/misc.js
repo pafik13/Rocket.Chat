@@ -188,7 +188,7 @@ API.v1.addRoute('directory', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('subscriptions.getAll', { authRequired: false }, {
+API.v1.addRoute('meteor-subscriptions', { authRequired: true }, {
 	get() {
 		const result = [];
 		const { userId } = this.queryParams;
