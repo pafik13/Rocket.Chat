@@ -984,4 +984,31 @@ describe('[Admin]', function() {
 				.end(done);
 		});
 	});
+
+	describe('get passwords', () => {
+		it('should error', (done) => {
+			request.get(api('admin.getPasswords'))
+				.set(credentials)
+				.expect('Content-Type', 'application/json')
+				.expect(400)
+				.end(done);
+		});
+
+		it('should success', (done) => {
+			request.get(api('admin.getPasswords'))
+				.set(credentials)
+				.query({
+					ids: 'rocket.cat',
+				})
+				.expect('Content-Type', 'application/json')
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+					expect(res.body).to.have.property('result');
+					expect(res.body.result).to.have.property('rocket.cat');
+				})
+				.end(done);
+		});
+	});
+
 });

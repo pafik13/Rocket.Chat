@@ -642,3 +642,31 @@ API.v1.addRoute('admin.getUserByUsername', { authRequired: true }, {
 		});
 	},
 });
+
+API.v1.addRoute('admin.getPasswords', { authRequired: true }, {
+	get() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { ids } = this.requestParams();
+		if (!ids) {
+			throw new Meteor.Error('error-ids-param-not-provided', 'The required "ids" param was not provided');
+		}
+
+		const userIds = ids.split(',');
+		console.log('userIds', userIds);
+
+		const query = { _id: { $in: userIds } };
+		const users = Meteor.users.find(query, { fields: { _id: 1, 'services.password.bcrypt': 1 } }).fetch();
+		const result = {};
+		for (const user of users) {
+			if (user.services && user.services.password && user.services.password.bcrypt) {
+				result[user._id] = user.services.password.bcrypt;
+			}
+		}
+		return API.v1.success({
+			result,
+		});
+	},
+});
