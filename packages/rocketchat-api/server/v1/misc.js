@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 import { TAPi18n } from 'meteor/tap:i18n';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { Info } from 'meteor/rocketchat:utils';
-import { Users } from 'meteor/rocketchat:models';
+import { Users, Subscriptions } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { API } from '../api';
 import _ from 'underscore';
@@ -191,17 +191,38 @@ API.v1.addRoute('directory', { authRequired: true }, {
 API.v1.addRoute('meteor-subscriptions', { authRequired: true }, {
 	get() {
 		const result = [];
-		const { userId } = this.queryParams;
+		const { userId } = this;
+		const rooms = Subscriptions.findByUserId(userId, {
+			fields : {
+				rid: 1,
+			},
+		}).fetch();
+		const roomList = _.map(rooms, function(room) {
+			return `${ room.rid }/typing`;
+		});
 		const sockets = Meteor.server.stream_server.open_sockets;
+
 		_.each(sockets, function(socket) {
-			// socket._meteorSession._namedSubs is Map
-			for (const value of socket._meteorSession._namedSubs) {
-				if (value[1].userId === userId) {
+			for (const [id, sub] of socket._meteorSession._namedSubs) {
+				const { _name: name, _params: params } = sub;
+				if (name === 'stream-notify-room'
+					&& sub.userId !== userId
+					&& roomList.includes(params[0])) {
 					result.push({
-						userId: value[1].userId,
-						subscriptionId: value[1]._subscriptionId,
-						name: value[1]._name,
-						params: value[1]._params,
+						userId,
+						id,
+						name,
+						params,
+						notSubscribed: true,
+					});
+				}
+
+				if (sub.userId === userId) {
+					result.push({
+						userId,
+						id,
+						name,
+						params,
 					});
 				}
 			}
