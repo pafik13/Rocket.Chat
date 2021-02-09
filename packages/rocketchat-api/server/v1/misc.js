@@ -3,9 +3,10 @@ import { check } from 'meteor/check';
 import { TAPi18n } from 'meteor/tap:i18n';
 import { hasRole } from 'meteor/rocketchat:authorization';
 import { Info } from 'meteor/rocketchat:utils';
-import { Users } from 'meteor/rocketchat:models';
+import { Users, Subscriptions } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { API } from '../api';
+import _ from 'underscore';
 
 API.v1.addRoute('info', { authRequired: false }, {
 	get() {
@@ -184,5 +185,49 @@ API.v1.addRoute('directory', { authRequired: true }, {
 			offset,
 			total: result.total,
 		});
+	},
+});
+
+API.v1.addRoute('meteor-subscriptions', { authRequired: true }, {
+	get() {
+		const result = [];
+		const { userId } = this;
+		const rooms = Subscriptions.findByUserId(userId, {
+			fields : {
+				rid: 1,
+			},
+		}).fetch();
+		const roomList = _.map(rooms, function(room) {
+			return `${ room.rid }/typing`;
+		});
+		const sockets = Meteor.server.stream_server.open_sockets;
+
+		_.each(sockets, function(socket) {
+			for (const [id, sub] of socket._meteorSession._namedSubs) {
+				const { _name: name, _params: params } = sub;
+				if (name === 'stream-notify-room'
+					&& sub.userId !== userId
+					&& roomList.includes(params[0])) {
+					result.push({
+						userId,
+						id,
+						name,
+						params,
+						directSubscribe: true,
+					});
+				}
+
+				if (sub.userId === userId) {
+					result.push({
+						userId,
+						id,
+						name,
+						params,
+					});
+				}
+			}
+		});
+
+		return API.v1.success({ result });
 	},
 });
