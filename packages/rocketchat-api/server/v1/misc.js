@@ -213,7 +213,7 @@ API.v1.addRoute('meteor-subscriptions', { authRequired: true }, {
 						id,
 						name,
 						params,
-						notSubscribed: true,
+						directSubscribe: true,
 					});
 				}
 
