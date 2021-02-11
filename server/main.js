@@ -50,6 +50,7 @@ import './methods/logoutCleanUp';
 import './methods/messageSearch';
 import './methods/migrate';
 import './methods/muteUserInRoom';
+import './methods/notifyAboutSpammers';
 import './methods/openRoom';
 import './methods/processHeavyQuery';
 import './methods/readMessages';

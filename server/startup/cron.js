@@ -1,10 +1,10 @@
 import { Meteor } from 'meteor/meteor';
-import { Logger } from 'meteor/rocketchat:logger';
 import { SyncedCron } from 'meteor/littledata:synced-cron';
 import { statistics } from 'meteor/rocketchat:statistics';
 import { randomInteger } from 'meteor/rocketchat:utils';
 import { LongTasks } from 'meteor/rocketchat:models';
 
+import { Logger } from 'meteor/rocketchat:logger';
 const logger = new Logger('SyncedCron');
 
 SyncedCron.config({
@@ -21,6 +21,14 @@ function generateStatistics() {
 // function cleanupOEmbedCache() {
 // 	return Meteor.call('OEmbedCacheCleanup');
 // }
+
+const MS_PER_MINUTE = 60000;
+function notifyAboutSpammers() {
+	const till = new Date();
+	const from = new Date(till.valueOf() - MS_PER_MINUTE * 1.1);
+	logger.debug('notifyAboutSpammers', from, till);
+	return Meteor.call('notifyAboutSpammers', from, till);
+}
 
 function cleanupDeactivations() {
 	return Meteor.call('cleanupDeactivations');
@@ -67,6 +75,14 @@ Meteor.startup(function() {
 				return parser.cron('*/1 * * * *');
 			},
 			job: resumeLongTask,
+		});
+
+		SyncedCron.add({
+			name: 'Notify About Spammers',
+			schedule(parser) {
+				return parser.cron('*/1 * * * *');
+			},
+			job: notifyAboutSpammers,
 		});
 
 		// SyncedCron.add({

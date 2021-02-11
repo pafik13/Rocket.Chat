@@ -1,9 +1,11 @@
 import { Meteor } from 'meteor/meteor';
+import { Random } from 'meteor/random';
 import { Match, check } from 'meteor/check';
-import { Messages } from 'meteor/rocketchat:models';
+import { Messages, Rooms } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
-import { processWebhookMessage } from 'meteor/rocketchat:lib';
+import { processWebhookMessage, redis } from 'meteor/rocketchat:lib';
+import { settings } from 'meteor/rocketchat:settings';
 import { API } from '../api';
 
 API.v1.addRoute('chat.delete', { authRequired: true }, {
@@ -161,8 +163,55 @@ API.v1.addRoute('chat.sendMessage', { authRequired: true }, {
 			throw new Meteor.Error('error-invalid-params', 'The "message" parameter must be provided.');
 		}
 
+		let spammer = false;
+		let user = {};
+		if (settings.get('API_Enable_Spam_Detection') === true) {
+			const threshold = settings.get('API_Spam_Detection_Threshold_SendMessage') || 6;
+			user = Meteor.users.findOne(this.userId, { fields: { spammer: 1, username: 1, name: 1 } });
+			spammer = user.spammer;
+			if (!spammer) {
+				const checkKey = `${ user._id }::chat.sendMessage`;
+				spammer = Promise.await(redis.limitPerSecond(checkKey, threshold));
+				if (spammer) {
+					Meteor.users.update(user._id, { $set: { spammer, _updatedAt: new Date() } });
+				}
+			}
+		}
+
 		let message;
-		Meteor.runAsUser(this.userId, () => message = Meteor.call('sendMessage', this.bodyParams.message));
+		if (!spammer) {
+			Meteor.runAsUser(this.userId, () => message = Meteor.call('sendMessage', this.bodyParams.message));
+		} else {
+			const { rid, msg } = this.bodyParams.message;
+			const { _id, username, name } = user;
+			if (rid) {
+				message = {
+					rid,
+					msg,
+					ts: new Date(),
+					u: { _id, username, name },
+					mentions: [],
+					channels: [],
+					serverId: 1,
+					// fake: true
+				};
+
+				const room = Rooms.findOneById(rid);
+				if (room) {
+					message.serverId = room.msgs + 1;
+				} else {
+					message.serverId = Promise.await(redis.incr(`fake::${ rid }`));
+				}
+				message._id = Random.id();
+				// Random delay
+				Meteor._sleepForMs(100 * Math.random());
+				message._updatedAt = new Date();
+				const cacheTTL = settings.get('API_Spam_Detection_Cache_TTL_In_Seconds') || 120;
+				Promise.await(redis.set(`fake::${ rid }::lm`, JSON.stringify(message), 'EX', cacheTTL));
+			} else {
+				throw new Meteor.Error('error-invalid-params', 'The "message.rid" parameter must be provided.');
+			}
+		}
 
 		return API.v1.success({
 			message: composeMessageObjectWithUser(message, this.userId),

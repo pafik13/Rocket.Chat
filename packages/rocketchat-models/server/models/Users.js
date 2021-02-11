@@ -429,6 +429,18 @@ export class Users extends Base {
 		return this.findOne(query, options);
 	}
 
+	findSpammersBetweenDates(from, till) {
+		const query = {
+			_updatedAt: {
+				$gte: from,
+				$lte: till,
+			},
+			spammer: true,
+		};
+
+		return this.find(query, { fields: { customFields: 1 } });
+	}
+
 	// FIND
 	findById(userId) {
 		const query = { _id: userId };

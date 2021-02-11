@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
+import { getRoomByNameOrIdWithOptionToJoin, redis } from 'meteor/rocketchat:lib';
 import { Subscriptions, Uploads, Users, Messages, Rooms } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
@@ -94,10 +94,77 @@ API.v1.addRoute(['dm.setUploadsState', 'im.setUploadsState'], { authRequired: tr
 
 API.v1.addRoute(['dm.create', 'im.create'], { authRequired: true }, {
 	post() {
-		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+		let spammer = false;
+		let user = {};
+		if (settings.get('API_Enable_Spam_Detection') === true) {
+			const threshold = settings.get('API_Spam_Detection_Threshold_IMCreate') || 3;
+			user = Users.findOneById(this.userId, { fields: { spammer: 1, username: 1 } });
+			spammer = user.spammer;
+			if (!spammer) {
+				const checkKey = `${ user._id }::{dm,im}.create`;
+				spammer = Promise.await(redis.limitPerSecond(checkKey, threshold));
+				if (spammer) {
+					Meteor.users.update(user._id, { $set: { spammer, _updatedAt: new Date() } });
+				}
+			}
+		}
+
+		let room;
+		if (!spammer) {
+			const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+			room = findResult.room;
+		} else {
+			const { username: interlocutor } = this.requestParams();
+			const { _id, username } = user;
+			if (interlocutor) {
+				const i = Users.findOneByUsername(interlocutor, { _id: 1 });
+				if (i) {
+					const rid = [_id, i._id].sort().join('');
+					const key = `fake::${ rid }`;
+					const msgs = Promise.await(redis.get(key)) || 0;
+					room = {
+						_id: rid,
+						t: 'd',
+						msgs,
+						ts: new Date(),
+						usersCount: 2,
+						usernames: [
+							username,
+							interlocutor,
+						],
+						// fake: true,
+					};
+
+					if (!msgs) {
+						const cacheTTL = settings.get('API_Spam_Detection_Cache_TTL_In_Seconds') || 120;
+						Promise.await(redis.set(key, 0, 'EX', cacheTTL));
+					}
+
+					// Random delay
+					Meteor._sleepForMs(100 * Math.random());
+					room._updatedAt = new Date();
+					const lmFromRedis = Promise.await(redis.get(`fake::${ rid }::lm`));
+					if (lmFromRedis) {
+						try {
+							const lm = JSON.parse(lmFromRedis);
+							room.lastMessage = lm;
+							room.lm = lm.ts;
+						} catch (err) {
+							console.error(err);
+						}
+					}
+				} else {
+					throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+						method: 'createDirectMessage',
+					});
+				}
+			} else {
+				throw new Meteor.Error('error-invalid-params', 'The "username" parameter must be provided.');
+			}
+		}
 
 		return API.v1.success({
-			room: findResult.room,
+			room,
 		});
 	},
 });

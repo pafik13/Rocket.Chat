@@ -79,12 +79,27 @@ const get = async(key) => {
 	return result;
 };
 
-const set = async(key, value) => {
+const set = async(key, value, ttlType, ttlTime) => {
 	if (!isUseRedis) { return 'OK'; }
-	logger.debug('set', key, value);
-	const result = await client.set(key, value);
-	logger.debug('set', key, value, result);
+	logger.debug('set', key, value, ttlType, ttlTime);
+	const result = ttlType ? await client.set(key, value, ttlType, ttlTime) : await client.set(key, value);
+	logger.debug('set', key, result);
 	return result;
+};
+
+const limitPerSecond = async(key, threshold) => {
+	if (!isUseRedis) { return null; }
+	logger.debug('limit', key, threshold);
+	const limitKey = `${ key }::${ Math.floor(Date.now() / 1000) }`;
+	const result = await client.get(limitKey);
+	logger.debug('limit', limitKey, result);
+	if (result && result > threshold) { return true; }
+	await client.multi()
+		.incr(limitKey)
+		.expire(limitKey, 2)
+		.exec();
+	logger.debug('limit updated');
+	return false;
 };
 
 export const redis = {
@@ -93,4 +108,5 @@ export const redis = {
 	incr,
 	get,
 	set,
+	limitPerSecond,
 };
