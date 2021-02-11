@@ -6,6 +6,8 @@ import { Messages } from 'meteor/rocketchat:models';
 import { Markdown } from 'meteor/rocketchat:markdown';
 import { redis } from '../lib';
 
+const reHTML = /([A-Za-z]{3,9}):\/\/([-;:&=\+\$,\w]+@{1})?([-A-Za-z0-9\.]+)+:?(\d+)?((\/[-\+=!:~%\/\.@\,\(\)\w]*)?\??([-\+=&!:;%@\/\.\,\w]+)?(?:#([^\s\)]+))?)?/g;
+
 const objectMaybeIncluding = (types) => Match.Where((value) => {
 	Object.keys(types).forEach((field) => {
 		if (value[field] != null) {
@@ -134,7 +136,7 @@ export const sendMessage = function(user, message, room, upsert = false) {
 		message.html = message.msg;
 		message = Markdown.code(message);
 
-		const urls = message.html.match(/([A-Za-z]{3,9}):\/\/([-;:&=\+\$,\w]+@{1})?([-A-Za-z0-9\.]+)+:?(\d+)?((\/[-\+=!:~%\/\.@\,\(\)\w]*)?\??([-\+=&!:;%@\/\.\,\w]+)?(?:#([^\s\)]+))?)?/g);
+		const urls = message.html.match(reHTML);
 		if (urls) {
 			message.urls = urls.map((url) => ({ url }));
 		}
@@ -154,13 +156,6 @@ export const sendMessage = function(user, message, room, upsert = false) {
 		}
 		message.serverId = msgsInRedis;
 
-		// Avoid saving sandstormSessionId to the database
-		let sandstormSessionId = null;
-		if (message.sandstormSessionId) {
-			sandstormSessionId = message.sandstormSessionId;
-			delete message.sandstormSessionId;
-		}
-
 		if (message._id && upsert) {
 			const { _id } = message;
 			delete message._id;
@@ -176,11 +171,10 @@ export const sendMessage = function(user, message, room, upsert = false) {
 		/*
 		Defer other updates as their return is not interesting to the user
 		*/
-		Meteor.defer(() => {
+		Meteor.defer(() =>
 			// Execute all callbacks
-			message.sandstormSessionId = sandstormSessionId;
-			return callbacks.run('afterSaveMessage', message, room, user._id);
-		});
+			callbacks.run('afterSaveMessage', message, room, user._id)
+		);
 		return message;
 	}
 };
