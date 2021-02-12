@@ -8,6 +8,17 @@ import path from 'path';
 import semver from 'semver';
 
 Meteor.startup(function() {
+// 	Meteor._printSentDDP = true;
+
+	Meteor.server.stream_server.register((socket) => {
+		Meteor._debug('socket.id', socket.id);
+		const originalSend = socket.send;
+		socket.send = (data) => {
+			if (settings.get('Log_Socket') === true) { Meteor._debug('socket data', data); }
+			originalSend(data);
+		};
+	});
+
 	let oplogState = 'Disabled';
 	if (MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle && MongoInternals.defaultRemoteCollectionDriver().mongo._oplogHandle.onOplogEntry) {
 		oplogState = 'Enabled';

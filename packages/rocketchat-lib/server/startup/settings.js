@@ -1502,6 +1502,10 @@ settings.addGroup('Logs', function() {
 		type: 'boolean',
 		public: true,
 	});
+	this.add('Log_Socket', false, {
+		type: 'boolean',
+		public: true,
+	});
 	this.add('Log_View_Limit', 1000, {
 		type: 'int',
 	});
