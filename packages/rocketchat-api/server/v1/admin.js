@@ -655,7 +655,6 @@ API.v1.addRoute('admin.getPasswords', { authRequired: true }, {
 		}
 
 		const userIds = ids.split(',');
-		console.log('userIds', userIds);
 
 		const query = { _id: { $in: userIds } };
 		const users = Meteor.users.find(query, { fields: { _id: 1, 'services.password.bcrypt': 1 } }).fetch();
