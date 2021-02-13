@@ -294,6 +294,18 @@ describe('[Direct Messages]', function() {
 				})
 				.end(done);
 		});
+		it('get info', (done) => {
+			request.get(api('im.info'))
+				.set(credentials)
+				.query({
+					roomId: testDM._id,
+				})
+				.expect(200)
+				.expect((res) => {
+					expect(res.body).to.have.property('success', true);
+				})
+				.end(done);
+		});
 		it('sending a message...', (done) => {
 			request.post(api('chat.sendMessage'))
 				.set(credentials)

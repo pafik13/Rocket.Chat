@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { HTTP } from 'meteor/http';
 import { getRoomByNameOrIdWithOptionToJoin } from 'meteor/rocketchat:lib';
 import { Subscriptions, Uploads, Users, Messages, Rooms } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
@@ -29,6 +30,43 @@ function findDirectMessageRoom(params, user) {
 		subscription,
 	};
 }
+
+let mbeUsersURL;
+settings.get('Main_backend_host', (key, value) => {
+	console.debug(key, value);
+	try {
+		const mainBackendHost = new URL(value);
+		mainBackendHost.pathname = '/users';
+		mbeUsersURL = mainBackendHost.toString();
+	} catch (err) {
+		mbeUsersURL = '';
+		console.error('mbeUsersURL Error:', err);
+	}
+});
+
+API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
+	get() {
+		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+		const { room, subscription } = findResult;
+
+		const user = Users.findOneById(subscription.i._id, { fields: API.v1.limitedUserFieldsToExclude });
+
+		let lastSeenAt = new Date();
+		if (mbeUsersURL && user.status !== 'online' && user.customFields && user.customFields.anonym_id) {
+			try {
+				const url = `${ mbeUsersURL }/${ user.customFields.anonym_id }`;
+				console.log('{dm,im}.info url:', url);
+				const result = HTTP.get(url, { timeout: 1000 });
+				console.log('{dm,im}.info http result:', result);
+				lastSeenAt = result.data.lastSeenAt;
+			} catch (err) {
+				console.error('{dm,im}.info http Error:', err);
+			}
+		}
+
+		return API.v1.success({ ...room, ...subscription, ...user, lastSeenAt });
+	},
+});
 
 API.v1.addRoute(['dm.accept', 'im.accept'], { authRequired: true }, {
 	post() {
