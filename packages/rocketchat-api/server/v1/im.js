@@ -5,7 +5,6 @@ import { Subscriptions, Uploads, Users, Messages, Rooms } from 'meteor/rocketcha
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { settings } from 'meteor/rocketchat:settings';
-import _ from 'underscore';
 import { API } from '../api';
 
 function findDirectMessageRoom(params, user) {
@@ -64,7 +63,9 @@ API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 				console.log('{dm,im}.info url:', url);
 				const result = HTTP.get(url, { timeout: 1000 });
 				console.log('{dm,im}.info http result:', result);
-				lastSeenAt = _.get(result, 'data.data.auth.lastSeenAt', -1);
+				if (result.data && result.data.data && result.data.data.auth) {
+					lastSeenAt = result.data.data.auth.lastSeenAt;
+				}
 			} catch (err) {
 				console.error('{dm,im}.info http Error:', err);
 			}
