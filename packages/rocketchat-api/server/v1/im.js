@@ -5,6 +5,7 @@ import { Subscriptions, Uploads, Users, Messages, Rooms } from 'meteor/rocketcha
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser } from 'meteor/rocketchat:utils';
 import { settings } from 'meteor/rocketchat:settings';
+import _ from 'underscore';
 import { API } from '../api';
 
 function findDirectMessageRoom(params, user) {
@@ -56,14 +57,14 @@ API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 		const user = Users.findOneById(subscription.i._id, { fields: userFieldsForIMInfo });
 
 		console.log('user', user);
-		let lastSeenAt = new Date();
+		let lastSeenAt = 0;
 		if (mbeUsersURL && user.status !== 'online' && user.customFields && user.customFields.anonym_id) {
 			try {
 				const url = `${ mbeUsersURL }/${ user.customFields.anonym_id }`;
 				console.log('{dm,im}.info url:', url);
 				const result = HTTP.get(url, { timeout: 1000 });
 				console.log('{dm,im}.info http result:', result);
-				lastSeenAt = result.data.lastSeenAt;
+				lastSeenAt = _.get(result, 'data.data.auth.lastSeenAt', -1);
 			} catch (err) {
 				console.error('{dm,im}.info http Error:', err);
 			}
