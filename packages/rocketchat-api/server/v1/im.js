@@ -49,11 +49,13 @@ const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, customFields
 API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 	get() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
+		console.log(findResult);
 		const { room, subscription } = findResult;
 
-		console.log(userFieldsForIMInfo);
+		console.log('userFieldsForIMInfo', userFieldsForIMInfo);
 		const user = Users.findOneById(subscription.i._id, { fields: userFieldsForIMInfo });
 
+		console.log('user', user);
 		let lastSeenAt = new Date();
 		if (mbeUsersURL && user.status !== 'online' && user.customFields && user.customFields.anonym_id) {
 			try {
