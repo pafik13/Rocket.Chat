@@ -44,7 +44,7 @@ settings.get('Main_backend_host', (key, value) => {
 	}
 });
 
-const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, customFields: 1 };
+const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, username: 1, name: 1, status: 1, active: 1, customFields: 1 };
 
 API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 	get() {
@@ -55,7 +55,6 @@ API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 		console.log('userFieldsForIMInfo', userFieldsForIMInfo);
 		const user = Users.findOneById(subscription.i._id, { fields: userFieldsForIMInfo });
 
-		console.log('user', user);
 		let lastSeenAt = 0;
 		if (mbeUsersURL && user.status !== 'online' && user.customFields && user.customFields.anonym_id) {
 			try {
@@ -71,7 +70,7 @@ API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 			}
 		}
 
-		return API.v1.success({ ...room, ...subscription, ...user, lastSeenAt });
+		return API.v1.success({ ...user, ...room, ...subscription, lastSeenAt });
 	},
 });
 
