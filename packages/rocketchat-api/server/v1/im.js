@@ -44,12 +44,15 @@ settings.get('Main_backend_host', (key, value) => {
 	}
 });
 
+const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, customFields: 1 };
+
 API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 	get() {
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
 		const { room, subscription } = findResult;
 
-		const user = Users.findOneById(subscription.i._id, { fields: API.v1.limitedUserFieldsToExclude });
+		console.log(userFieldsForIMInfo);
+		const user = Users.findOneById(subscription.i._id, { fields: userFieldsForIMInfo });
 
 		let lastSeenAt = new Date();
 		if (mbeUsersURL && user.status !== 'online' && user.customFields && user.customFields.anonym_id) {
