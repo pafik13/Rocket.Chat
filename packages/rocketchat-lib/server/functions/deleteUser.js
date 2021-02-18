@@ -60,7 +60,8 @@ export const deleteUser = function(userId) {
 				Messages.findFilesByUserId(userId).forEach(function({ file }) {
 					store.deleteById(file._id);
 				});
-				Messages.removeByUserId(userId);
+				// Messages.removeByUserId(userId);
+				Messages.remove({ 'u._id': userId });
 				break;
 			case 'Unlink':
 				const rocketCat = Users.findOneById('rocket.cat');
@@ -77,8 +78,9 @@ export const deleteUser = function(userId) {
 			// Remove DMs and non-channel rooms with only 1 user (the one being deleted)
 			if (roomData.t === 'd' || (roomData.t !== 'c' && roomData.subscribers === 1)) {
 				Subscriptions.removeByRoomId(roomData.rid);
-				Messages.removeFilesByRoomId(roomData.rid);
-				Messages.removeByRoomId(roomData.rid);
+				Messages.remove({ rid: roomData.rid });
+				// 				Messages.removeFilesByRoomId(roomData.rid);
+				// 				Messages.removeByRoomId(roomData.rid);
 				Rooms.removeById(roomData.rid);
 			}
 		});
