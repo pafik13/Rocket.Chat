@@ -2,6 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { Messages } from 'meteor/rocketchat:models';
 import { deleteMessage } from '../functions';
 
+const maxMessagesRemovedImmediately = 100;
+
 Meteor.methods({
 	deleteMessagesAfterBan(userId, roomId) {
 		if (!userId) {
@@ -15,8 +17,8 @@ Meteor.methods({
 			});
 		}
 
-		const callUser = !Meteor.userId();
-		if (callUser) {
+		const caller = !Meteor.userId();
+		if (caller) {
 			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
 				method: 'deleteMessagesAfterBan',
 			});
@@ -28,10 +30,12 @@ Meteor.methods({
 				file: 1,
 				ts: 1,
 			},
+			limit: maxMessagesRemovedImmediately,
+			sort: { ts: -1 },
 		}).fetch();
 
 		for (let i = 0, len = originalMessages.length; i < len; i++) {
-			deleteMessage(originalMessages[i], callUser);
+			deleteMessage(originalMessages[i], caller);
 		}
 
 		return true;

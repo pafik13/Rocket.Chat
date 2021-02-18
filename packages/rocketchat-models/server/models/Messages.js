@@ -893,12 +893,6 @@ export class Messages extends Base {
 		return this.remove(query);
 	}
 
-	removeByRoomId(roomId) {
-		const query =	{ rid: roomId };
-
-		return this.remove(query);
-	}
-
 	removeByIdPinnedTimestampAndUsers(rid, pinned, ts, users = []) {
 		const query = {
 			rid,
@@ -944,58 +938,49 @@ export class Messages extends Base {
 		});
 	}
 
-	removeByUserId(userId) {
-		const query =	{ 'u._id': userId };
+	// 	removeByUserId(userId) {
+	// 		const query =	{ 'u._id': userId };
 
-		return this.remove(query);
-	}
+	// 		return this.remove(query);
+	// 	}
 
-	removeByRoomIdAndUserId(roomId, userId) {
-		const query =	{
-			rid: roomId,
-			'u._id': userId,
-		};
+	// 	async removeFilesByRoomId(roomId) {
+	// 		if (!this.FileUpload) {
+	// 			const { FileUpload } = await import('meteor/rocketchat:file-upload');
+	// 			this.FileUpload = FileUpload;
+	// 		}
+	// 		this.find({
+	// 			rid: roomId,
+	// 			'file._id': {
+	// 				$exists: true,
+	// 			},
+	// 		}, {
+	// 			fields: {
+	// 				'file._id': 1,
+	// 			},
+	// 		}).fetch().forEach((document) => this.FileUpload.getStore('Uploads').deleteById(document.file._id));
+	// 	}
 
-		return this.remove(query);
-	}
-
-	async removeFilesByRoomId(roomId) {
-		if (!this.FileUpload) {
-			const { FileUpload } = await import('meteor/rocketchat:file-upload');
-			this.FileUpload = FileUpload;
-		}
-		this.find({
-			rid: roomId,
-			'file._id': {
-				$exists: true,
-			},
-		}, {
-			fields: {
-				'file._id': 1,
-			},
-		}).fetch().forEach((document) => this.FileUpload.getStore('Uploads').deleteById(document.file._id));
-	}
-
-	async removeFilesByRoomIdAndUserId(roomId, userId) {
-		if (!this.FileUpload) {
-			const { FileUpload } = await import('meteor/rocketchat:file-upload');
-			this.FileUpload = FileUpload;
-		}
-		this.find({
-			rid: roomId,
-			'file._id': {
-				$exists: true,
-			},
-			'u._id': userId,
-		}, {
-			fields: {
-				'file._id': 1,
-			},
-		}).fetch().forEach((document) => {
-			this.FileUpload.getStore('Uploads').deleteById(document.file._id);
-			this.removeById(document._id);
-		});
-	}
+	// 	async removeFilesByRoomIdAndUserId(roomId, userId) {
+	// 		if (!this.FileUpload) {
+	// 			const { FileUpload } = await import('meteor/rocketchat:file-upload');
+	// 			this.FileUpload = FileUpload;
+	// 		}
+	// 		this.find({
+	// 			rid: roomId,
+	// 			'file._id': {
+	// 				$exists: true,
+	// 			},
+	// 			'u._id': userId,
+	// 		}, {
+	// 			fields: {
+	// 				'file._id': 1,
+	// 			},
+	// 		}).fetch().forEach((document) => {
+	// 			this.FileUpload.getStore('Uploads').deleteById(document.file._id);
+	// 			this.removeById(document._id);
+	// 		});
+	// 	}
 
 	getMessageByFileId(fileID) {
 		return this.findOne({ 'file._id': fileID });
