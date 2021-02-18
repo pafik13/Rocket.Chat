@@ -1201,20 +1201,12 @@ settings.addGroup('Message', function() {
 		type: 'boolean',
 		public: true,
 	});
-	this.add('Message_ShowDeletedStatus', false, {
-		type: 'boolean',
-		public: true,
-	});
 	this.add('Message_AllowBadWordsFilter', false, {
 		type: 'boolean',
 		public: true,
 	});
 	this.add('Message_BadWordsFilterList', '', {
 		type: 'string',
-		public: true,
-	});
-	this.add('Message_KeepHistory', false, {
-		type: 'boolean',
 		public: true,
 	});
 	this.add('Message_MaxAll', 0, {

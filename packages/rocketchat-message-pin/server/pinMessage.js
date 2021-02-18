@@ -59,9 +59,8 @@ Meteor.methods({
 		}
 
 		// If we keep history of edits, insert a new message to store history information
-		if (settings.get('Message_KeepHistory')) {
-			Messages.cloneAndSaveAsHistoryById(message._id);
-		}
+		Messages.cloneAndSaveAsHistoryById(message._id);
+
 		const room = Meteor.call('canAccessRoom', message.rid, Meteor.userId());
 		const me = Users.findOneById(userId);
 
@@ -142,9 +141,8 @@ Meteor.methods({
 		}
 
 		// If we keep history of edits, insert a new message to store history information
-		if (settings.get('Message_KeepHistory')) {
-			Messages.cloneAndSaveAsHistoryById(originalMessage._id);
-		}
+		Messages.cloneAndSaveAsHistoryById(originalMessage._id);
+
 
 		const me = Users.findOneById(Meteor.userId());
 		originalMessage.pinned = false;

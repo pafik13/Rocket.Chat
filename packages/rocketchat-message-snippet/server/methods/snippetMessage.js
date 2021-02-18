@@ -1,6 +1,5 @@
 import { Meteor } from 'meteor/meteor';
 import { Subscriptions, Messages, Users, Rooms } from 'meteor/rocketchat:models';
-import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
 import { isTheLastMessage } from 'meteor/rocketchat:lib';
 
@@ -23,10 +22,7 @@ Meteor.methods({
 			return false;
 		}
 
-		// If we keep history of edits, insert a new message to store history information
-		if (settings.get('Message_KeepHistory')) {
-			Messages.cloneAndSaveAsHistoryById(message._id);
-		}
+		Messages.cloneAndSaveAsHistoryById(message._id);
 
 		const me = Users.findOneById(Meteor.userId());
 
