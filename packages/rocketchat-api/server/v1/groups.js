@@ -16,8 +16,6 @@ function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) 
 		throw new Meteor.Error('error-room-param-not-provided', 'The parameter "roomId" or "roomName" is required');
 	}
 
-	console.log('findPrivateGroupByIdOrName', params, userId);
-
 	let roomSub;
 	if (params.roomId) {
 		roomSub = Subscriptions.findOneByRoomIdAndUserId(params.roomId, userId);
@@ -25,7 +23,6 @@ function findPrivateGroupByIdOrName({ params, userId, checkedArchived = true }) 
 		roomSub = Subscriptions.findOneByRoomNameAndUserId(params.roomName, userId);
 	}
 
-	console.log('findPrivateGroupByIdOrName', roomSub);
 	if (!roomSub || roomSub.t !== 'p') {
 		throw new Meteor.Error('error-room-not-found', 'The required "roomId" or "roomName" param provided does not match any group');
 	}
@@ -430,7 +427,11 @@ API.v1.addRoute('groups.files', { authRequired: true }, {
 		const { offset, count } = this.getPaginationItems();
 		const { sort, fields, query } = this.parseJsonQuery();
 
-		const ourQuery = Object.assign({}, query, { rid: findResult.rid });
+		const ourQuery = Object.assign({			complete: true,
+			uploading: false,
+			_hidden: {
+				$ne: true,
+			} }, query, { rid: findResult.rid });
 
 		const files = Uploads.find(ourQuery, {
 			sort: sort ? sort : { name: 1 },
