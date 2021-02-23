@@ -95,7 +95,7 @@ class Notifications {
 		const originalPublish = this.streamRoom._publish.bind(this.streamRoom);
 		this.streamRoom._publish = (publication, eventName, options) => {
 			const e = eventName.split('/')[1];
-			if (e === 'typing') {
+			if (e === 'typing' || eventName === 'typing') {
 				if (publication._session && publication._session.userId) {
 					const session = publication._session;
 					if (!this.streamRoom.$sessionsMap.has(session)) {
@@ -178,6 +178,8 @@ class Notifications {
 			const [userId] = eventName.split('/');
 			return (this.userId != null) && this.userId === userId;
 		});
+		// 		this.streamUserRooms = new Meteor.Streamer('notify-user-rooms');
+		// 		this.streamUserRooms.allowRead('logged');
 	}
 
 	notifyAll(eventName, ...args) {
