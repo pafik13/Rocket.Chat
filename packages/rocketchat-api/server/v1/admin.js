@@ -710,7 +710,8 @@ API.v1.addRoute('admin.blockUser', { authRequired: true }, {
 
 		const { blockerId, blockedId } = this.requestParams();
 
-		blockUnblockUser(blockerId, blockedId, 'blockUser');
+		const result = blockUnblockUser(blockerId, blockedId, 'blockUser');
+		if (result) { return result; }
 
 		return API.v1.success();
 	},
