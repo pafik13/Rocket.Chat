@@ -669,3 +669,80 @@ API.v1.addRoute('admin.getPasswords', { authRequired: true }, {
 		});
 	},
 });
+
+API.v1.addRoute('admin.blockUser', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { blockerId, blockedId } = this.requestParams();
+
+		if (!blockerId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `blockerId`!');
+		}
+
+		if (!blockedId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `blockedId`!');
+		}
+
+		const blocker = Users.findOneById(blockerId, { _id: 1 });
+
+		if (!blocker) { return API.v1.notFound(); }
+
+		const blocked = Users.findOneById(blockedId, { _id: 1 });
+
+		if (!blocked) { return API.v1.notFound(); }
+
+		const rid = [blocker, blocked].sort().join('');
+
+		const room = Rooms.findOneById(rid, { _id: 1 });
+
+		if (!room) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(blocker._id, () => {
+			Meteor.call('blockUser', { rid: room._id, blocked: blocked._id, reason: '' });
+		});
+
+		return API.v1.success();
+	},
+});
+
+
+API.v1.addRoute('admin.unblockUser', { authRequired: true }, {
+	post() {
+		if (!hasRole(this.userId, 'admin')) {
+			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		}
+
+		const { blockerId, blockedId } = this.requestParams();
+
+		if (!blockerId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `blockerId`!');
+		}
+
+		if (!blockedId) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `blockedId`!');
+		}
+
+		const blocker = Users.findOneById(blockerId, { _id: 1 });
+
+		if (!blocker) { return API.v1.notFound(); }
+
+		const blocked = Users.findOneById(blockedId, { _id: 1 });
+
+		if (!blocked) { return API.v1.notFound(); }
+
+		const rid = [blocker, blocked].sort().join('');
+
+		const room = Rooms.findOneById(rid, { _id: 1 });
+
+		if (!room) { return API.v1.notFound(); }
+
+		Meteor.runAsUser(blocker._id, () => {
+			Meteor.call('unblockUser', { rid, blocked: blocked._id });
+		});
+
+		return API.v1.success();
+	},
+});
