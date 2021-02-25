@@ -717,6 +717,8 @@ API.v1.addRoute('admin.unblockUser', { authRequired: true }, {
 
 		const { blockerId, blockedId } = this.requestParams();
 
+		console.log(blockerId, blockedId);
+
 		if (!blockerId) {
 			throw new Meteor.Error('error-invalid-params', 'Body must contains `blockerId`!');
 		}
@@ -726,21 +728,25 @@ API.v1.addRoute('admin.unblockUser', { authRequired: true }, {
 		}
 
 		const blocker = Users.findOneById(blockerId, { _id: 1 });
+		console.log('blocker', blocker);
 
 		if (!blocker) { return API.v1.notFound(); }
 
 		const blocked = Users.findOneById(blockedId, { _id: 1 });
+		console.log('blocked', blocked);
 
 		if (!blocked) { return API.v1.notFound(); }
 
 		const rid = [blocker, blocked].sort().join('');
+		console.log('rid', rid);
 
 		const room = Rooms.findOneById(rid, { _id: 1 });
+		console.log('room', room);
 
 		if (!room) { return API.v1.notFound(); }
 
 		Meteor.runAsUser(blocker._id, () => {
-			Meteor.call('unblockUser', { rid, blocked: blocked._id });
+			Meteor.call('unblockUser', { rid: room._id, blocked: blocked._id });
 		});
 
 		return API.v1.success();

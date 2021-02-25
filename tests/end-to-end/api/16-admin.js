@@ -245,7 +245,7 @@ describe('[Admin]', function() {
 			request.post(api('admin.blockUser'))
 				.set(credentials)
 				.send({
-					blockerId: userId1,
+					blockerId: userId2,
 					blockedId: 'rocket.cat',
 				})
 				.expect('Content-Type', 'application/json')
