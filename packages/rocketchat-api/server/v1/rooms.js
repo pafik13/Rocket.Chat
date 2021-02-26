@@ -531,6 +531,7 @@ API.v1.addRoute('rooms.info', { authRequired: true }, {
 				blocker: 1,
 				blocked: 1,
 				mobilePushNotifications: 1,
+				roles: 1,
 				...filesPrefsFields,
 			},
 		};
