@@ -218,11 +218,12 @@ describe('[Admin]', function() {
 		});
 
 		it('blockUser: should not found blocker', (done) => {
-			request.post(api('admin.blockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: 'userId1',
-					blockedId: userId2,
+					principal: 'userId1',
+					subject: userId2,
+					enabled: true,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -230,11 +231,12 @@ describe('[Admin]', function() {
 		});
 
 		it('blockUser: should not found blocked user', (done) => {
-			request.post(api('admin.blockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId1,
-					blockedId: 'userId2',
+					principal: userId1,
+					subject: 'userId2',
+					enabled: true,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -242,11 +244,12 @@ describe('[Admin]', function() {
 		});
 
 		it('blockUser: should not found direct message', (done) => {
-			request.post(api('admin.blockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId2,
-					blockedId: 'rocket.cat',
+					principal: userId2,
+					subject: 'rocket.cat',
+					enabled: true,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -254,24 +257,25 @@ describe('[Admin]', function() {
 		});
 
 		it('blockUser: should block user', (done) => {
-			request.post(api('admin.blockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId1,
-					blockedId: userId2,
+					principal: userId1,
+					subject: userId2,
+					enabled: true,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)
 				.end(done);
 		});
 
-
 		it('unblockUser: should not found blocker', (done) => {
-			request.post(api('admin.unblockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: 'userId1',
-					blockedId: userId2,
+					principal: 'userId1',
+					subject: userId2,
+					enabled: false,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -279,11 +283,12 @@ describe('[Admin]', function() {
 		});
 
 		it('unblockUser: should not found blocked user', (done) => {
-			request.post(api('admin.unblockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId1,
-					blockedId: 'userId2',
+					principal: userId1,
+					subject: 'userId2',
+					enabled: false,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -291,11 +296,12 @@ describe('[Admin]', function() {
 		});
 
 		it('unblockUser: should not found direct message', (done) => {
-			request.post(api('admin.unblockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId2,
-					blockedId: 'rocket.cat',
+					principal: userId2,
+					subject: 'rocket.cat',
+					enabled: false,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(404)
@@ -303,11 +309,12 @@ describe('[Admin]', function() {
 		});
 
 		it('should unblock user', (done) => {
-			request.post(api('admin.unblockUser'))
+			request.post(api('admin.setBlocking'))
 				.set(credentials)
 				.send({
-					blockerId: userId1,
-					blockedId: userId2,
+					principal: userId1,
+					subject: userId2,
+					enabled: false,
 				})
 				.expect('Content-Type', 'application/json')
 				.expect(200)

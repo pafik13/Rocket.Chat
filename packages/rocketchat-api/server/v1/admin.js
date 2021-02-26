@@ -670,65 +670,47 @@ API.v1.addRoute('admin.getPasswords', { authRequired: true }, {
 	},
 });
 
-const blockUnblockUser = (blockerId, blockedId, methodName) => {
-	if (!blockerId) {
-		throw new Meteor.Error('error-invalid-params', 'Body must contains `blockerId`!');
-	}
-
-	if (!blockedId) {
-		throw new Meteor.Error('error-invalid-params', 'Body must contains `blockedId`!');
-	}
-
-	const blocker = Users.findOneById(blockerId, { _id: 1 });
-	console.log('blocker', blocker);
-
-	if (!blocker) { return API.v1.notFound(); }
-
-	const blocked = Users.findOneById(blockedId, { _id: 1 });
-	console.log('blocked', blocked);
-
-	if (!blocked) { return API.v1.notFound(); }
-
-	const rid = [blocker._id, blocked._id].sort().join('');
-	console.log('rid', rid);
-
-	const room = Rooms.findOneByIdOrName(rid, { _id: 1 });
-
-	if (!room) { return API.v1.notFound(); }
-	console.log('room', room);
-
-	Meteor.runAsUser(blocker._id, () => {
-		Meteor.call(methodName, { rid: room._id, blocked: blocked._id, reason: 'unknown' });
-	});
-};
-
-API.v1.addRoute('admin.blockUser', { authRequired: true }, {
+API.v1.addRoute('admin.setBlocking', { authRequired: true }, {
 	post() {
 		if (!hasRole(this.userId, 'admin')) {
 			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
 		}
 
-		const { blockerId, blockedId } = this.requestParams();
+		const { principal, subject, enabled } = this.requestParams();
 
-		const result = blockUnblockUser(blockerId, blockedId, 'blockUser');
-		if (result) { return result; }
-
-		return API.v1.success();
-	},
-});
-
-
-API.v1.addRoute('admin.unblockUser', { authRequired: true }, {
-	post() {
-		if (!hasRole(this.userId, 'admin')) {
-			throw new Meteor.Error('error-access-denied', 'You must be a admin!');
+		if (!principal) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `principal`!');
 		}
 
-		const { blockerId, blockedId } = this.requestParams();
+		if (!subject) {
+			throw new Meteor.Error('error-invalid-params', 'Body must contains `subject`!');
+		}
 
-		const result = blockUnblockUser(blockerId, blockedId, 'unblockUser');
-		if (result) { return result; }
+		const blocker = Users.findOneById(principal, { _id: 1 });
+		console.log('blocker', blocker);
+
+		if (!blocker) { return API.v1.notFound(); }
+
+		const blocked = Users.findOneById(subject, { _id: 1 });
+		console.log('blocked', blocked);
+
+		if (!blocked) { return API.v1.notFound(); }
+
+		const rid = [blocker._id, blocked._id].sort().join('');
+		console.log('rid', rid);
+
+		const room = Rooms.findOneByIdOrName(rid, { _id: 1 });
+
+		if (!room) { return API.v1.notFound(); }
+		console.log('room', room);
+
+		const methodName = enabled ? 'blockUser' : 'unblockUser';
+
+		Meteor.runAsUser(blocker._id, () => {
+			Meteor.call(methodName, { rid: room._id, blocked: blocked._id, reason: 'unknown' });
+		});
 
 		return API.v1.success();
 	},
 });
+
