@@ -5,7 +5,7 @@ import { RateLimiter, validateEmailDomain } from '../lib';
 import { checkEmailAvailability } from '.';
 import s from 'underscore.string';
 
-const _setEmail = function(userId, email, shouldSendVerificationEmail = true) {
+const _setEmail = function(userId, email) {
 	email = s.trim(email);
 	if (!userId) {
 		throw new Meteor.Error('error-invalid-user', 'Invalid user', { function: '_setEmail' });
@@ -32,9 +32,6 @@ const _setEmail = function(userId, email, shouldSendVerificationEmail = true) {
 	// Set new email
 	Users.setEmail(user._id, email);
 	user.email = email;
-	if (shouldSendVerificationEmail === true) {
-		Meteor.call('sendConfirmationEmail', user.email);
-	}
 	return user;
 };
 
