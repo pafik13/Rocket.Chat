@@ -538,21 +538,6 @@ API.v1.addRoute('users.setPreferences', { authRequired: true }, {
 	},
 });
 
-API.v1.addRoute('users.forgotPassword', { authRequired: false }, {
-	post() {
-		const { email } = this.bodyParams;
-		if (!email) {
-			return API.v1.failure('The \'email\' param is required');
-		}
-
-		const emailSent = Meteor.call('sendForgotPasswordEmail', email);
-		if (emailSent) {
-			return API.v1.success();
-		}
-		return API.v1.failure('User not found');
-	},
-});
-
 API.v1.addRoute('users.getUsernameSuggestion', { authRequired: true }, {
 	get() {
 		const result = Meteor.runAsUser(this.userId, () => Meteor.call('getUsernameSuggestion'));
