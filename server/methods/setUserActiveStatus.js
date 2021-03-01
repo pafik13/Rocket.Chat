@@ -1,10 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { Accounts } from 'meteor/accounts-base';
-import * as Mailer from 'meteor/rocketchat:mailer';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Users, Subscriptions } from 'meteor/rocketchat:models';
-import { settings } from 'meteor/rocketchat:settings';
 
 Meteor.methods({
 	setUserActiveStatus(userId, active) {
@@ -40,27 +37,6 @@ Meteor.methods({
 		} else {
 			Users.unsetReason(userId);
 		}
-		if (active && !settings.get('Accounts_Send_Email_When_Activating')) {
-			return true;
-		}
-		if (!active && !settings.get('Accounts_Send_Email_When_Deactivating')) {
-			return true;
-		}
-
-		const destinations = Array.isArray(user.emails) && user.emails.map((email) => `${ user.name || user.username }<${ email.address }>`);
-
-
-		const email = {
-			to: destinations,
-			from: settings.get('From_Email'),
-			subject: Accounts.emailTemplates.userActivated.subject({ active }),
-			html: Accounts.emailTemplates.userActivated.html({ active, name: user.name, username: user.username }),
-		};
-
-		Mailer.sendNoWrap(email);
-
-
 		return true;
-
 	},
 });

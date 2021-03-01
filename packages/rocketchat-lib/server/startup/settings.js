@@ -1,6 +1,5 @@
 import { Random } from 'meteor/random';
 import { settings } from 'meteor/rocketchat:settings';
-import './email';
 
 // Insert server unique id if it doesn't exist
 settings.add('uniqueID', process.env.DEPLOYMENT_ID || Random.id(), {
@@ -937,10 +936,6 @@ settings.addGroup('General', function() {
 	this.add('GoogleTagManager_id', '', {
 		type: 'string',
 		public: true,
-	});
-	this.add('Bugsnag_api_key', '', {
-		type: 'string',
-		public: false,
 	});
 	this.add('Force_Disable_OpLog_For_Cache', false, {
 		type: 'boolean',

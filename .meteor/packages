@@ -45,9 +45,7 @@ rocketchat:authorization
 rocketchat:autolinker
 rocketchat:autotranslate
 rocketchat:bot-helpers
-rocketchat:cas
 rocketchat:channel-settings
-rocketchat:channel-settings-mail-messages
 rocketchat:colors
 rocketchat:custom-sounds
 rocketchat:emoji
@@ -66,11 +64,8 @@ rocketchat:issuelinks
 rocketchat:lib
 rocketchat:logger
 rocketchat:login-token
-rocketchat:mailer
 rocketchat:mapview
 rocketchat:markdown
-rocketchat:mentions
-rocketchat:mentions-flextab
 rocketchat:message-action
 rocketchat:message-attachments
 rocketchat:message-mark-as-unread
@@ -148,7 +143,6 @@ rocketchat:search
 rocketchat:lazy-load
 tap:i18n
 underscore@1.0.10
-rocketchat:mailmessages
 littledata:synced-cron
 rocketchat:utils
 rocketchat:settings

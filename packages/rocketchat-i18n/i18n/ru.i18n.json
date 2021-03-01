@@ -442,7 +442,6 @@
   "Broadcasting_client_id": "Идентификатор клиента Broadcasting",
   "Broadcasting_enabled": "Broadcasting включен",
   "Broadcasting_media_server_url": "URL-адрес трансляционного медиа-сервера",
-  "Bugsnag_api_key": "Ключ Bugsnag API",
   "Build_Environment": "Среда сборки",
   "bulk-create-c": "Массовое создание каналов",
   "bulk-create-c_description": "Разрешение на массовое создание каналов",

@@ -458,7 +458,6 @@
   "Broadcasting_client_secret": "Broadcasting Client Secret",
   "Broadcasting_enabled": "Broadcasting Enabled",
   "Broadcasting_media_server_url": "Broadcasting Media Server URL",
-  "Bugsnag_api_key": "Bugsnag API Key",
   "Build_Environment": "Build Environment",
   "bulk-create-c": "Bulk Create Channels",
   "bulk-create-c_description": "Permission to create channels in bulk",

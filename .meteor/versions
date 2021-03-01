@@ -128,9 +128,7 @@ rocketchat:autolinker@0.0.1
 rocketchat:autotranslate@0.0.1
 rocketchat:bot-helpers@0.0.1
 rocketchat:callbacks@0.0.1
-rocketchat:cas@1.0.0
 rocketchat:channel-settings@0.0.1
-rocketchat:channel-settings-mail-messages@0.0.1
 rocketchat:colors@0.0.1
 rocketchat:cors@0.0.1
 rocketchat:custom-sounds@1.0.0
@@ -153,12 +151,8 @@ rocketchat:lazy-load@0.0.1
 rocketchat:lib@0.0.1
 rocketchat:logger@0.0.1
 rocketchat:login-token@1.0.0
-rocketchat:mailer@0.0.1
-rocketchat:mailmessages@0.0.1
 rocketchat:mapview@0.0.1
 rocketchat:markdown@0.0.2
-rocketchat:mentions@0.0.1
-rocketchat:mentions-flextab@0.0.1
 rocketchat:message-action@0.0.1
 rocketchat:message-attachments@0.0.1
 rocketchat:message-mark-as-unread@0.0.1

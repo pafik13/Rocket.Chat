@@ -2,17 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { Match, check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import s from 'underscore.string';
-import * as Mailer from 'meteor/rocketchat:mailer';
 import { Users } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { saveCustomFields, validateEmailDomain, passwordPolicy } from 'meteor/rocketchat:lib';
 
-let verifyEmailTemplate = '';
-Meteor.startup(() => {
-	Mailer.getTemplateWrapped('Verification_Email', (value) => {
-		verifyEmailTemplate = value;
-	});
-});
 Meteor.methods({
 	registerUser(formData) {
 		const AllowAnonymousRead = settings.get('Accounts_AllowAnonymousRead');
@@ -74,18 +67,6 @@ Meteor.methods({
 		}
 
 		saveCustomFields(userId, formData);
-
-		try {
-
-			const subject = Mailer.replace(settings.get('Verification_Email_Subject'));
-
-			Accounts.emailTemplates.verifyEmail.subject = () => subject;
-			Accounts.emailTemplates.verifyEmail.html = (userModel, url) => Mailer.replace(Mailer.replacekey(verifyEmailTemplate, 'Verification_Url', url), userModel);
-
-			Accounts.sendVerificationEmail(userId, userData.email);
-		} catch (error) {
-			// throw new Meteor.Error 'error-email-send-failed', 'Error trying to send email: ' + error.message, { method: 'registerUser', message: error.message }
-		}
 
 		return userId;
 	},

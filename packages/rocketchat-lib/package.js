@@ -39,7 +39,6 @@ Package.onUse(function(api) {
 		'rocketchat:tooltip',
 		'rocketchat:ui',
 		'rocketchat:i18n',
-		'rocketchat:mailer',
 		'rocketchat:settings',
 		'rocketchat:authorization',
 		'rocketchat:file',

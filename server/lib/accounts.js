@@ -4,10 +4,9 @@ import { Accounts } from 'meteor/accounts-base';
 import { TAPi18n } from 'meteor/tap:i18n';
 import _ from 'underscore';
 import s from 'underscore.string';
-import * as Mailer from 'meteor/rocketchat:mailer';
 import { settings } from 'meteor/rocketchat:settings';
 import { callbacks } from 'meteor/rocketchat:callbacks';
-import { Roles, Users, Settings } from 'meteor/rocketchat:models';
+import { Users, Settings } from 'meteor/rocketchat:models';
 import { addUserRoles } from 'meteor/rocketchat:authorization';
 
 const accountsConfig = {
@@ -33,14 +32,8 @@ Accounts.emailTemplates.userToActivate = {
 		return `[${ siteName }] ${ subject }`;
 	},
 
-	html(options = {}) {
-		const email = options.reason ? 'Accounts_Admin_Email_Approval_Needed_With_Reason_Default' : 'Accounts_Admin_Email_Approval_Needed_Default';
-
-		return Mailer.replace(TAPi18n.__(email), {
-			name: s.escapeHTML(options.name),
-			email: s.escapeHTML(options.email),
-			reason: s.escapeHTML(options.reason),
-		});
+	html() {
+		return '';
 	},
 };
 
@@ -54,31 +47,15 @@ Accounts.emailTemplates.userActivated = {
 		return `[${ siteName }] ${ TAPi18n.__(subject) }`;
 	},
 
-	html({ active, name, username }) {
-		const activated = username ? 'Activated' : 'Approved';
-		const action = active ? activated : 'Deactivated';
-
-		return Mailer.replace(TAPi18n.__(`Accounts_Email_${ action }`), {
-			name: s.escapeHTML(name),
-		});
+	html() {
+		return '';
 	},
 };
 
 
-// const verifyEmailHtml = Accounts.emailTemplates.verifyEmail.html;
-let verifyEmailTemplate = '';
-let enrollAccountTemplate = '';
-Meteor.startup(() => {
-	Mailer.getTemplateWrapped('Verification_Email', (value) => {
-		verifyEmailTemplate = value;
-	});
-	Mailer.getTemplateWrapped('Accounts_Enrollment_Email', (value) => {
-		enrollAccountTemplate = value;
-	});
-});
-Accounts.emailTemplates.verifyEmail.html = function(user, url) {
-	url = url.replace(Meteor.absoluteUrl(), `${ Meteor.absoluteUrl() }login/`);
-	return Mailer.replace(verifyEmailTemplate, { Verification_Url: url });
+
+Accounts.emailTemplates.verifyEmail.html = function() {
+	return '';
 };
 
 Accounts.urls.resetPassword = function(token) {
@@ -87,16 +64,12 @@ Accounts.urls.resetPassword = function(token) {
 
 Accounts.emailTemplates.resetPassword.html = Accounts.emailTemplates.resetPassword.text;
 
-Accounts.emailTemplates.enrollAccount.subject = function(user) {
-	const subject = settings.get('Accounts_Enrollment_Email_Subject');
-	return Mailer.replace(subject, user);
+Accounts.emailTemplates.enrollAccount.subject = function() {
+	return '';
 };
 
-Accounts.emailTemplates.enrollAccount.html = function(user = {}/* , url*/) {
-	return Mailer.replace(enrollAccountTemplate, {
-		name: s.escapeHTML(user.name),
-		email: user.emails && user.emails[0] && s.escapeHTML(user.emails[0].address),
-	});
+Accounts.emailTemplates.enrollAccount.html = function() {
+	return '';
 };
 
 Accounts.onCreateUser(function(options, user = {}) {
@@ -133,28 +106,6 @@ Accounts.onCreateUser(function(options, user = {}) {
 			}
 		}
 	}
-
-	if (!user.active) {
-		const destinations = [];
-
-		Roles.findUsersInRole('admin').forEach((adminUser) => {
-			if (Array.isArray(adminUser.emails)) {
-				adminUser.emails.forEach((email) => {
-					destinations.push(`${ adminUser.name }<${ email.address }>`);
-				});
-			}
-		});
-
-		const email = {
-			to: destinations,
-			from: settings.get('From_Email'),
-			subject: Accounts.emailTemplates.userToActivate.subject(),
-			html: Accounts.emailTemplates.userToActivate.html(options),
-		};
-
-		Mailer.send(email);
-	}
-
 	return user;
 });
 

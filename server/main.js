@@ -68,8 +68,6 @@ import './methods/returnRoomToSearch';
 import './methods/roomNameExists';
 import './methods/saveUserPreferences';
 import './methods/saveUserProfile';
-import './methods/sendConfirmationEmail';
-import './methods/sendForgotPasswordEmail';
 import './methods/setAvatarFromService';
 import './methods/setDirectUploadsState';
 import './methods/setUserActiveStatus';
