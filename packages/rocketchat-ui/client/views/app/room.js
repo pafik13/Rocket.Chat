@@ -7,7 +7,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { t, roomTypes, getUserPreference, handleError } from 'meteor/rocketchat:utils';
-import { WebRTC } from 'meteor/rocketchat:webrtc';
 
 import { ChatSubscription, ChatMessage, RoomRoles, Users, Subscriptions, Rooms } from 'meteor/rocketchat:models';
 import {
@@ -1109,22 +1108,6 @@ Template.room.onRendered(function() {
 	wrapper.addEventListener('scroll', () => updateUnreadCount());
 	// salva a data da renderização para exibir alertas de novas mensagens
 	$.data(this.firstNode, 'renderedAt', new Date);
-
-	const webrtc = WebRTC.getInstanceByRoomId(template.data._id);
-	if (webrtc != null) {
-		Tracker.autorun(() => {
-			const remoteItems = webrtc.remoteItems.get();
-			if (remoteItems && remoteItems.length > 0) {
-				this.tabBar.setTemplate('membersList');
-				this.tabBar.open();
-			}
-
-			if (webrtc.localUrl.get() != null) {
-				this.tabBar.setTemplate('membersList');
-				this.tabBar.open();
-			}
-		});
-	}
 	callbacks.add('streamMessage', (msg) => {
 		if (rid !== msg.rid || msg.editedAt) {
 			return;

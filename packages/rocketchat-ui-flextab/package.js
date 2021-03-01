@@ -22,7 +22,6 @@ Package.onUse(function(api) {
 		'rocketchat:settings',
 		'rocketchat:authorization',
 		'mizzao:autocomplete',
-		'rocketchat:webrtc',
 	]);
 	api.mainModule('client/index.js', 'client');
 });

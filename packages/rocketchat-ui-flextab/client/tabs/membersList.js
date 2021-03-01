@@ -7,7 +7,6 @@ import { RoomManager, popover } from 'meteor/rocketchat:ui-utils';
 import { ChatRoom, Subscriptions } from 'meteor/rocketchat:models';
 import { settings } from 'meteor/rocketchat:settings';
 import { t, isRtl, handleError, roomTypes } from 'meteor/rocketchat:utils';
-import { WebRTC } from 'meteor/rocketchat:webrtc';
 import _ from 'underscore';
 import { getActions } from './userActions';
 
@@ -143,14 +142,7 @@ Template.membersList.helpers({
 	},
 
 	showUserInfo() {
-		const webrtc = WebRTC.getInstanceByRoomId(this.rid);
-		let videoActive = undefined;
-		if (webrtc && webrtc.localUrl && webrtc.localUrl.get()) {
-			videoActive = webrtc.localUrl.get();
-		} else if (webrtc && webrtc.remoteItems && webrtc.remoteItems.get() && webrtc.remoteItems.get().length > 0) {
-			videoActive = webrtc.remoteItems.get();
-		}
-		return Template.instance().showDetail.get() && !videoActive;
+		return Template.instance().showDetail.get();
 	},
 
 	userInfoDetail() {

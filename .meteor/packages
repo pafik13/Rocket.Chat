@@ -49,7 +49,6 @@ rocketchat:cas
 rocketchat:channel-settings
 rocketchat:channel-settings-mail-messages
 rocketchat:colors
-rocketchat:custom-oauth
 rocketchat:custom-sounds
 rocketchat:emoji
 rocketchat:emoji-custom
@@ -61,7 +60,6 @@ rocketchat:file
 rocketchat:file-upload
 #rocketchat:google-natural-language
 rocketchat:highlight-words
-rocketchat:iframe-login
 rocketchat:importer
 rocketchat:importer-csv
 rocketchat:issuelinks
@@ -80,7 +78,6 @@ rocketchat:message-pin
 rocketchat:message-snippet
 rocketchat:message-star
 rocketchat:migrations
-rocketchat:oauth2-server-config
 rocketchat:oembed
 rocketchat:otr
 rocketchat:push-notifications
@@ -107,7 +104,6 @@ rocketchat:slider
 rocketchat:statistics
 rocketchat:streamer
 rocketchat:theme
-rocketchat:tokenpass
 rocketchat:tooltip
 rocketchat:ui
 rocketchat:ui-account
@@ -120,8 +116,6 @@ rocketchat:ui-message
 rocketchat:ui-sidenav
 rocketchat:ui-vrecord
 rocketchat:version
-rocketchat:videobridge
-rocketchat:webrtc
 rocketchat:nrr
 
 konecty:change-case
@@ -154,7 +148,6 @@ rocketchat:search
 rocketchat:lazy-load
 tap:i18n
 underscore@1.0.10
-rocketchat:bigbluebutton
 rocketchat:mailmessages
 littledata:synced-cron
 rocketchat:utils

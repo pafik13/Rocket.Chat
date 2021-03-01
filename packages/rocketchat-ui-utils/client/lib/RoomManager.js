@@ -122,6 +122,7 @@ export const RoomManager = new function() {
 					msgStream.removeAllListeners(openedRooms[typeName].rid);
 					Notifications.unRoom(openedRooms[typeName].rid, 'deleteMessage', onDeleteMessageStream); // eslint-disable-line no-use-before-define
 					Notifications.unRoom(openedRooms[typeName].rid, 'deleteMessageBulk', onDeleteMessageBulkStream); // eslint-disable-line no-use-before-define
+					Notifications.unRoom(openedRooms[typeName].rid, 'typing', () => {}); // eslint-disable-line no-use-before-define
 				}
 
 				openedRooms[typeName].ready = false;

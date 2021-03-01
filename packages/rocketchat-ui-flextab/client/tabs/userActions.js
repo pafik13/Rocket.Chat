@@ -2,7 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Session } from 'meteor/session';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { WebRTC } from 'meteor/rocketchat:webrtc';
 import { ChatRoom, ChatSubscription, RoomRoles, Subscriptions } from 'meteor/rocketchat:models';
 import { modal } from 'meteor/rocketchat:ui-utils';
 import { t, handleError, complaintReasonsList } from 'meteor/rocketchat:utils';
@@ -102,84 +101,7 @@ export const getActions = function({ user, directActions, hideAdminControls }) {
 				return canDirectMessage(this.username);
 			},
 		},
-
 		function() {
-			if (isSelf(this.username) || !directActions) {
-				return;
-			}
-			// videoAvaliable
-			if (!WebRTC.getInstanceByRoomId(Session.get('openedRoom'))) {
-				return;
-			}
-			// videoActive
-			const { localUrl, remoteItems } = WebRTC.getInstanceByRoomId(Session.get('openedRoom'));
-			const r = remoteItems.get() || [];
-			if (localUrl.get() === null && r.length === 0) {
-				return;
-			}
-
-			if (WebRTC.getInstanceByRoomId(Session.get('openedRoom')).callInProgress.get()) {
-				return {
-					icon : 'video',
-					name: t('Join_video_call'),
-					action() {
-						WebRTC.getInstanceByRoomId(Session.get('openedRoom')).joinCall({
-							audio: true,
-							video: true,
-						});
-					},
-				};
-			}
-			return {
-				icon : 'video',
-				name: t('Start_video_call'),
-				action() {
-					WebRTC.getInstanceByRoomId(Session.get('openedRoom')).startCall({
-						audio: true,
-						video: true,
-					});
-				},
-			};
-		},
-
-		function() {
-			if (isSelf(this.username) || !directActions) {
-				return;
-			}
-			// videoAvaliable
-			if (!WebRTC.getInstanceByRoomId(Session.get('openedRoom'))) {
-				return;
-			}
-			// videoActive
-			const { localUrl, remoteItems } = WebRTC.getInstanceByRoomId(Session.get('openedRoom'));
-			const r = remoteItems.get() || [];
-			if (localUrl.get() === null && r.length === 0) {
-				return;
-			}
-
-			if (WebRTC.getInstanceByRoomId(Session.get('openedRoom')).callInProgress.get()) {
-				return {
-					icon : 'mic',
-					name: t('Join_audio_call'),
-					action() {
-						WebRTC.getInstanceByRoomId(Session.get('openedRoom')).joinCall({
-							audio: true,
-							video: false,
-						});
-					},
-				};
-			}
-			return {
-				icon : 'mic',
-				name: t('Start_audio_call'),
-				action() {
-					WebRTC.getInstanceByRoomId(Session.get('openedRoom')).startCall({
-						audio: true,
-						video: false,
-					});
-				},
-			};
-		}, function() {
 			if (!isDirect() || isSelf(this.username)) {
 				return;
 			}

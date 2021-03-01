@@ -32,5 +32,4 @@ import './v1/settings';
 import './v1/stats';
 import './v1/subscriptions';
 import './v1/users';
-import './v1/video-conference';
 import './v1/admin';

@@ -2,7 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { hasPermission, canAccessRoom } from 'meteor/rocketchat:authorization';
 import { Rooms } from 'meteor/rocketchat:models';
-import { Tokenpass, updateUserTokenpassBalances } from 'meteor/rocketchat:tokenpass';
 import { addUserToRoom, isUserBanned } from '../functions';
 
 Meteor.methods({
@@ -31,19 +30,11 @@ Meteor.methods({
 
 		// TODO we should have a 'beforeJoinRoom' call back so external services can do their own validations
 		const user = Meteor.user();
-		if (room.tokenpass && user && user.services && user.services.tokenpass) {
-			const balances = updateUserTokenpassBalances(user);
-
-			if (!Tokenpass.validateAccess(room.tokenpass, balances)) {
-				throw new Meteor.Error('error-not-allowed', 'Token required', { method: 'joinRoom' });
-			}
-		} else {
-			if (!canAccessRoom(room, Meteor.user())) {
-				throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'joinRoom' });
-			}
-			if ((room.joinCodeRequired === true) && (code !== room.joinCode) && !hasPermission(Meteor.userId(), 'join-without-join-code')) {
-				throw new Meteor.Error('error-code-invalid', 'Invalid Room Password', { method: 'joinRoom' });
-			}
+		if (!canAccessRoom(room, Meteor.user())) {
+			throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'joinRoom' });
+		}
+		if ((room.joinCodeRequired === true) && (code !== room.joinCode) && !hasPermission(Meteor.userId(), 'join-without-join-code')) {
+			throw new Meteor.Error('error-code-invalid', 'Invalid Room Password', { method: 'joinRoom' });
 		}
 
 		return addUserToRoom(rid, user);

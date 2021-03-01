@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# https://dba.stackexchange.com/questions/194659/change-analyzer-for-an-elasticsearch-index
 # awk '/;;/' ./queries.sh | awk '{$1=$1};1' |sed -e 's/[[:space:]]*$//' | sed 's/[^a-zA-Z0-9_.-]*$//' | sort -u
 RED='\033[0;31m'
 NC='\033[0m' # No Color
@@ -133,7 +134,7 @@ create2() {
 }
 
 create_room() {
-  curl -X PUT "$HOST/room" \
+  curl -X PUT "$HOST/room.20200219" \
     -H 'Content-Type: application/json' -d '
   {
      "settings":{
@@ -167,8 +168,7 @@ create_room() {
            "name"   	: { "type" : "keyword" },
            "fnameAndName" : {
               "type" : "text",
-              "analyzer":"nGram_analyzer",
-              "search_analyzer": "standard"
+              "analyzer":"nGram_analyzer"
            },
 					 "_updatedAt": { "type": "date" },
 					 "customFields": {
