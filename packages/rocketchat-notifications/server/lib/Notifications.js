@@ -94,8 +94,8 @@ class Notifications {
 		this.streamRoom.$sessionsMap = new WeakMap();
 		const originalPublish = this.streamRoom._publish.bind(this.streamRoom);
 		this.streamRoom._publish = (publication, eventName, options) => {
-			const e = eventName.split('/')[1];
-			if (e === 'typing' || eventName === 'typing') {
+			const e = eventName === 'typing' ? eventName : eventName.split('/')[1];
+			if (e === 'typing') {
 				if (publication._session && publication._session.userId) {
 					const session = publication._session;
 					if (!this.streamRoom.$sessionsMap.has(session)) {
