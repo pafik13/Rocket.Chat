@@ -44,7 +44,7 @@ settings.get('Main_backend_host', (key, value) => {
 	}
 });
 
-const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, username: 1, name: 1, status: 1, active: 1, customFields: 1 };
+const userFieldsForIMInfo = { ...API.v1.limitedUserFieldsToExclude, username: 1, name: 1, status: 1, active: 1, customFields: 1, disabled: 1 };
 
 API.v1.addRoute(['dm.info', 'im.info'], { authRequired: true }, {
 	get() {
