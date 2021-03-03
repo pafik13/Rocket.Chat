@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Rooms, Subscriptions, Messages, Uploads, Integrations, Users } from 'meteor/rocketchat:models';
+import { Rooms, Subscriptions, Messages, Uploads, Users } from 'meteor/rocketchat:models';
 import { hasPermission } from 'meteor/rocketchat:authorization';
 import { composeMessageObjectWithUser, stringToBoolean } from 'meteor/rocketchat:utils';
 import { API } from '../api';
@@ -471,50 +471,6 @@ API.v1.addRoute('channels.files', { authRequired: true }, {
 			count: files.length,
 			offset,
 			total: Uploads.find(ourQuery).count(),
-		});
-	},
-});
-
-API.v1.addRoute('channels.getIntegrations', { authRequired: true }, {
-	get() {
-		if (!hasPermission(this.userId, 'manage-integrations')) {
-			return API.v1.unauthorized();
-		}
-
-		const findResult = findChannelByIdOrName({ params: this.requestParams(), checkedArchived: false });
-
-		let includeAllPublicChannels = true;
-		if (typeof this.queryParams.includeAllPublicChannels !== 'undefined') {
-			includeAllPublicChannels = this.queryParams.includeAllPublicChannels === 'true';
-		}
-
-		let ourQuery = {
-			channel: `#${ findResult.name }`,
-		};
-
-		if (includeAllPublicChannels) {
-			ourQuery.channel = {
-				$in: [ourQuery.channel, 'all_public_channels'],
-			};
-		}
-
-		const { offset, count } = this.getPaginationItems();
-		const { sort, fields, query } = this.parseJsonQuery();
-
-		ourQuery = Object.assign({}, query, ourQuery);
-
-		const integrations = Integrations.find(ourQuery, {
-			sort: sort ? sort : { _createdAt: 1 },
-			skip: offset,
-			limit: count,
-			fields,
-		}).fetch();
-
-		return API.v1.success({
-			integrations,
-			count: integrations.length,
-			offset,
-			total: Integrations.find(ourQuery).count(),
 		});
 	},
 });

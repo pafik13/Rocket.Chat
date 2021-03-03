@@ -174,10 +174,10 @@ const toolbarButtons = (user) => [{
 {
 	name: t('Options'),
 	icon: 'menu',
-	condition: () => AccountBox.getItems().length || hasAtLeastOnePermission(['manage-emoji', 'manage-integrations', 'manage-own-integrations', 'manage-sounds', 'view-logs', 'view-privileged-setting', 'view-room-administration', 'view-statistics', 'view-user-administration']),
+	condition: () => AccountBox.getItems().length || hasAtLeastOnePermission(['manage-emoji', 'manage-sounds', 'view-logs', 'view-privileged-setting', 'view-room-administration', 'view-statistics', 'view-user-administration']),
 	action: (e) => {
 		let adminOption;
-		if (hasAtLeastOnePermission(['manage-emoji', 'manage-integrations', 'manage-own-integrations', 'manage-sounds', 'view-logs', 'view-privileged-setting', 'view-room-administration', 'view-statistics', 'view-user-administration'])) {
+		if (hasAtLeastOnePermission(['manage-emoji', 'manage-sounds', 'view-logs', 'view-privileged-setting', 'view-room-administration', 'view-statistics', 'view-user-administration'])) {
 			adminOption = {
 				icon: 'customize',
 				name: t('Administration'),

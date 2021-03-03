@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { TAPi18n } from 'meteor/tap:i18n';
 import { FileUpload } from 'meteor/rocketchat:file-upload';
-import { Users, Subscriptions, Messages, Rooms, Integrations } from 'meteor/rocketchat:models';
+import { Users, Subscriptions, Messages, Rooms } from 'meteor/rocketchat:models';
 import { hasRole, getUsersInRole } from 'meteor/rocketchat:authorization';
 import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
@@ -93,7 +93,6 @@ export const deleteUser = function(userId) {
 			FileUpload.getStore('Avatars').deleteByName(user.username);
 		}
 
-		Integrations.disableByUserId(userId); // Disables all the integrations which rely on the user being deleted.
 		Notifications.notifyLogged('Users:Deleted', { userId });
 	}
 

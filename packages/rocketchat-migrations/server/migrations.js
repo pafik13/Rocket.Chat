@@ -294,6 +294,7 @@ Migrations._migrateTo = function(version, rerun) {
 				`Branch: ${ Info.commit.branch }`,
 				`Tag: ${ Info.commit.tag }`,
 			]));
+			console.log(e);
 			process.exit(1);
 		}
 	}
