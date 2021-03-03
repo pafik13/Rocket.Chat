@@ -490,6 +490,7 @@ API.v1.addRoute('users.setPreferences', { authRequired: true }, {
 				isAudioFilesAllowed: Match.Optional(Boolean),
 				isVideoFilesAllowed: Match.Optional(Boolean),
 				isOtherFilesAllowed: Match.Optional(Boolean),
+				isLinksAllowed: Match.Optional(Boolean),
 				language: Match.Maybe(String),
 				sidebarShowFavorites: Match.Optional(Boolean),
 				sidebarShowUnread: Match.Optional(Boolean),

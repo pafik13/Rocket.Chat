@@ -37,6 +37,7 @@ Meteor.methods({
 			isAudioFilesAllowed: Match.Optional(Boolean),
 			isVideoFilesAllowed: Match.Optional(Boolean),
 			isOtherFilesAllowed: Match.Optional(Boolean),
+			isLinksAllowed: Match.Optional(Boolean),
 			idleTimeLimit: Match.Optional(Number),
 			sidebarShowFavorites: Match.Optional(Boolean),
 			sidebarShowUnread: Match.Optional(Boolean),

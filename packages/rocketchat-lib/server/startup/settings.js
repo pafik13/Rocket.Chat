@@ -417,6 +417,11 @@ settings.addGroup('Accounts', function() {
 			public: true,
 			i18nLabel: 'Is_Other_Files_Allowed',
 		});
+		this.add('Accounts_Default_User_Preferences_isLinksAllowed', false, {
+			type: 'boolean',
+			public: true,
+			i18nLabel: 'Is_Links_Allowed',
+		});
 		this.add('Accounts_Default_User_Preferences_sidebarGroupByType', true, {
 			type: 'boolean',
 			public: true,

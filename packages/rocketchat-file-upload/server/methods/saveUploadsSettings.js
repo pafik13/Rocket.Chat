@@ -18,6 +18,7 @@ Meteor.methods({
 			isAudioFilesAllowed: Match.Optional(Boolean),
 			isVideoFilesAllowed: Match.Optional(Boolean),
 			isOtherFilesAllowed: Match.Optional(Boolean),
+			isLinksAllowed: Match.Optional(Boolean),
 		};
 		check(settings, Match.ObjectIncluding(keys));
 
@@ -35,6 +36,7 @@ Meteor.methods({
 				throw new Meteor.Error('error-not-allowed', 'Not allowed', { method: 'saveUploadsSettings', action: 'Editing_room' });
 			}
 			delete settings.uploadsState;
+			delete settings.isLinksAllowed;
 			Rooms.updateUploadsSettingsById(roomId, settings);
 		}
 
@@ -54,6 +56,9 @@ Meteor.methods({
 					break;
 				case 'isOtherFilesAllowed':
 					type = settings[k] ? 'others-allowed' : 'others-disallowed';
+					break;
+				case 'isLinksAllowed':
+					type = settings[k] ? 'links-allowed' : 'links-disallowed';
 					break;
 				case 'uploadsState':
 					type = `uploads-${ hyphenate(settings[k]) }`;

@@ -110,6 +110,30 @@
 				</div>
 			</div>
 		</div>
+		<div class="rc-user-info__row rc-user-info__row--separator">
+			<div class="rc-switch-double">
+				<div class="rc-switch-double__label {{#if isLinksAllowed}}disabled{{/if}}">
+					{{_ "Turn_OFF"}}
+					<div class="rc-switch-double__description">
+						{{_ "Disallow_Links"}}
+					</div>
+				</div>
+				<div class="rc-switch rc-switch--blue">
+					<label class="rc-switch__label">
+						<input type="checkbox" class="rc-switch__input js-input-check" id="isLinksAllowed" name="isLinksAllowed" value="1" checked="{{$eq isLinksAllowed true}}">
+						<span class="rc-switch__button">
+							<span class="rc-switch__button-inside"></span>
+						</span>
+					</label>
+				</div>
+				<div class="rc-switch-double__label {{#unless isLinksAllowed}}disabled{{/unless}}">
+					{{_ "Turn_ON"}}
+					<div class="rc-switch-double__description">
+						{{_ "Allow_Links"}}
+					</div>
+				</div>
+			</div>
+		</div>
 	</main>
 	<div class="rc-user-info__flex rc-user-info__row">
 		<button class="rc-button js-cancel rc-button--outline" title="{{_ 'Cancel'}}">{{_ 'Cancel'}}</button>

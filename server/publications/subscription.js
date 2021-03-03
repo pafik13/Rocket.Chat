@@ -45,6 +45,7 @@ const fields = {
 	isAudioFilesAllowed: 1,
 	isVideoFilesAllowed: 1,
 	isOtherFilesAllowed: 1,
+	isLinksAllowed: 1,
 	E2EKey: 1,
 	lmServerId: 1,
 };

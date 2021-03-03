@@ -15,6 +15,7 @@ export const getDefaultSubscriptionPref = (user, roomType) => {
 		isAudioFilesAllowed,
 		isVideoFilesAllowed,
 		isOtherFilesAllowed,
+		isLinksAllowed,
 	} = preferences;
 
 	if (Array.isArray(highlights) && highlights.length) {
@@ -69,6 +70,12 @@ export const getDefaultSubscriptionPref = (user, roomType) => {
 			subscription.uploadsState = uploadsState;
 		} else {
 			subscription.uploadsState = getDefaultValue('uploadsState');
+		}
+
+		if (typeof isLinksAllowed !== 'undefined') {
+			subscription.isLinksAllowed = isLinksAllowed;
+		} else {
+			subscription.isLinksAllowed = getDefaultValue('isLinksAllowed');
 		}
 	}
 

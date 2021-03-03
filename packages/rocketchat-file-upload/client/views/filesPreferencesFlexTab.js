@@ -36,6 +36,9 @@ Template.filesPreferencesFlexTab.helpers({
 	isOtherFilesAllowed() {
 		return Template.instance().form.isOtherFilesAllowed.get();
 	},
+	isLinksAllowed() {
+		return Template.instance().form.isLinksAllowed.get();
+	},
 	disabled() {
 		const { original, form } = Template.instance();
 		return Object.keys(original).every((key) => original[key].get() === form[key].get());
@@ -46,6 +49,7 @@ Template.filesPreferencesFlexTab.onRendered(() => {
 	const rid = Session.get('openedRoom');
 	const room = ChatRoom.findOne({ _id: rid }, { fields: { t: 1 } }) || {};
 	this.$('#uploadsState').prop('disabled', room.t !== 'd');
+	this.$('#isLinksAllowed').prop('disabled', room.t !== 'd');
 });
 
 Template.filesPreferencesFlexTab.onCreated(function() {
@@ -68,12 +72,14 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 			values[`is${ fileTypes[i] }FilesAllowed`] = room[`is${ fileTypes[i] }FilesAllowed`] ;
 		}
 	} else {
+		options.fields.isLinksAllowed = 1;
 		const sub = ChatSubscription.findOne({ rid }, options) || {};
 		console.log('filesPreferencesFlexTab:sub', sub);
 		for (let i = 0, len = fileTypes.length; i < len; i++) {
 			values[`is${ fileTypes[i] }FilesAllowed`] = sub[`is${ fileTypes[i] }FilesAllowed`] ;
 		}
 		values.uploadsState = sub.uploadsState || 'acceptedAll';
+		values.isLinksAllowed = sub.isLinksAllowed;
 	}
 
 	this.original = {
@@ -82,6 +88,7 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
 		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
 		isOtherFilesAllowed: new ReactiveVar(values.isOtherFilesAllowed),
+		isLinksAllowed: new ReactiveVar(values.isLinksAllowed),
 	};
 
 	this.form = {
@@ -90,6 +97,7 @@ Template.filesPreferencesFlexTab.onCreated(function() {
 		isAudioFilesAllowed: new ReactiveVar(values.isAudioFilesAllowed),
 		isVideoFilesAllowed: new ReactiveVar(values.isVideoFilesAllowed),
 		isOtherFilesAllowed: new ReactiveVar(values.isOtherFilesAllowed),
+		isLinksAllowed: new ReactiveVar(values.isLinksAllowed),
 	};
 
 	this.saveSetting = async() => {

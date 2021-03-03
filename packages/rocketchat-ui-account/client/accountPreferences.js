@@ -179,6 +179,7 @@ Template.accountPreferences.onCreated(function() {
 		data.isAudioFilesAllowed = JSON.parse($('#isAudioFilesAllowed').find('input:checked').val());
 		data.isVideoFilesAllowed = JSON.parse($('#isVideoFilesAllowed').find('input:checked').val());
 		data.isOtherFilesAllowed = JSON.parse($('#isOtherFilesAllowed').find('input:checked').val());
+		data.isLinksAllowed = JSON.parse($('#isLinksAllowed').find('input:checked').val());
 		data.sendOnEnter = $('#sendOnEnter').find('select').val();
 		data.autoImageLoad = JSON.parse($('input[name=autoImageLoad]:checked').val());
 		data.emailNotificationMode = $('select[name=emailNotificationMode]').val();
