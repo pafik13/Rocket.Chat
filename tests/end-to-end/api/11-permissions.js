@@ -91,7 +91,7 @@ describe('[Permissions]', function() {
 		it('should change the permissions on the server', (done) => {
 			const permissions = [
 				{
-					_id: 'add-complain-d-service',
+					_id: 'complain-d',
 					roles: ['admin', 'user'],
 				},
 			];
