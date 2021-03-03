@@ -655,22 +655,6 @@ describe('[Channels]', function() {
 			});
 	});
 
-	it('/channels.getIntegrations', (done) => {
-		request.get(api('channels.getIntegrations'))
-			.set(credentials)
-			.query({
-				roomId: channel._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', true);
-				expect(res.body).to.have.property('count', 0);
-				expect(res.body).to.have.property('total', 0);
-			})
-			.end(done);
-	});
-
 	it('/channels.addAll', (done) => {
 		request.post(api('channels.addAll'))
 			.set(credentials)

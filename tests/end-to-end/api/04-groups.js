@@ -1040,22 +1040,6 @@ describe('[Groups]', function() {
 			});
 	});
 
-	it('/groups.getIntegrations', (done) => {
-		request.get(api('groups.getIntegrations'))
-			.set(credentials)
-			.query({
-				roomId: group._id,
-			})
-			.expect('Content-Type', 'application/json')
-			.expect(200)
-			.expect((res) => {
-				expect(res.body).to.have.property('success', true);
-				expect(res.body).to.have.property('count', 0);
-				expect(res.body).to.have.property('total', 0);
-			})
-			.end(done);
-	});
-
 	it('/groups.setReadOnly', (done) => {
 		request.post(api('groups.setReadOnly'))
 			.set(credentials)
