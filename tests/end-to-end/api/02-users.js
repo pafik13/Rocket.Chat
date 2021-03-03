@@ -21,23 +21,6 @@ describe('[Users]', function() {
 
 	before((done) => getCredentials(done));
 
-	it('enabling E2E in server and generating keys to user...', (done) => {
-		updateSetting('E2E_Enable', true).then(() => {
-			request.post(api('e2e.setUserPublicAndPivateKeys'))
-				.set(credentials)
-				.send({
-					private_key: 'test',
-					public_key: 'test',
-				})
-				.expect('Content-Type', 'application/json')
-				.expect(200)
-				.expect((res) => {
-					expect(res.body).to.have.property('success', true);
-				})
-				.end(done);
-		});
-	});
-
 	describe('[/users.create]', () => {
 		before((done) => clearCustomFields(done));
 		after((done) => clearCustomFields(done));
@@ -866,24 +849,6 @@ describe('[Users]', function() {
 		const editedUsername = `basicInfo.name${ +new Date() }`;
 		const editedName = `basic-info-test-name${ +new Date() }`;
 		const editedEmail = `test${ +new Date() }@mail.com`;
-
-		it('enabling E2E in server and generating keys to user...', (done) => {
-			updateSetting('E2E_Enable', true).then(() => {
-				request.post(api('e2e.setUserPublicAndPivateKeys'))
-					.set(userCredentials)
-					.send({
-						private_key: 'test',
-						public_key: 'test',
-					})
-					.expect('Content-Type', 'application/json')
-					.expect(200)
-					.expect((res) => {
-						expect(res.body).to.have.property('success', true);
-					})
-					.end(done);
-			});
-		});
-
 		it('should update the user own basic information', (done) => {
 			request.post(api('users.updateOwnBasicInfo'))
 				.set(userCredentials)
