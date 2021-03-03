@@ -7,7 +7,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Session } from 'meteor/session';
 import _ from 'underscore';
 import s from 'underscore.string';
-import { e2e } from 'meteor/rocketchat:e2e';
 import { Users, ChatSubscription } from 'meteor/rocketchat:models';
 import { getUserPreference } from 'meteor/rocketchat:utils';
 import { getAvatarUrlFromUsername } from 'meteor/rocketchat:utils';
@@ -81,13 +80,6 @@ export const KonchatNotification = {
 
 		if ((Meteor.user().status === 'busy') || (Meteor.settings.public.sandstorm != null)) {
 			return;
-		}
-
-		if (notification.payload.message && notification.payload.message.t === 'e2e') {
-			const e2eRoom = await e2e.getInstanceByRoomId(notification.payload.rid);
-			if (e2eRoom) {
-				notification.text = (await e2eRoom.decrypt(notification.payload.message.msg)).text;
-			}
 		}
 
 		return getAvatarAsPng(notification.payload.sender.username, function(avatarAsPng) {

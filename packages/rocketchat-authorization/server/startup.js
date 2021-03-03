@@ -9,7 +9,6 @@ Meteor.startup(function() {
 	// 2. admin, moderator, and user roles should not be deleted as they are referened in the code.
 	const permissions = [
 		{ _id: 'access-permissions',            roles : ['admin'] },
-		{ _id: 'add-oauth-service',             roles : ['admin'] },
 		{ _id: 'add-user-to-joined-room',       roles : ['admin', 'owner', 'moderator'] },
 		{ _id: 'api-bypass-rate-limit',         roles : ['admin', 'bot'] },
 		{ _id: 'archive-room',                  roles : ['admin', 'owner'] },
@@ -48,7 +47,6 @@ Meteor.startup(function() {
 		{ _id: 'manage-emoji',                  roles : ['admin'] },
 		{ _id: 'manage-integrations',           roles : ['admin'] },
 		{ _id: 'manage-own-integrations',       roles : ['admin'] },
-		{ _id: 'manage-oauth-apps',             roles : ['admin'] },
 		{ _id: 'mention-all',                   roles : ['admin', 'owner', 'moderator', 'user'] },
 		{ _id: 'mention-here',                  roles : ['admin', 'owner', 'moderator', 'user'] },
 		{ _id: 'mute-user',                     roles : ['admin', 'owner', 'moderator'] },

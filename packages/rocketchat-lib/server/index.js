@@ -41,8 +41,6 @@ import './methods/insertOrUpdateUser';
 import './methods/joinDefaultChannels';
 import './methods/joinRoom';
 import './methods/leaveRoom';
-import './methods/refreshOAuthService';
-import './methods/removeOAuthService';
 import './methods/restartServer';
 import './methods/robotMethods';
 import './methods/saveSetting';

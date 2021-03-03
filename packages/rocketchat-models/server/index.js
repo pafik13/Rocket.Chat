@@ -17,10 +17,7 @@ import Roles from './models/Roles';
 import CustomSounds from './models/CustomSounds';
 import CredentialTokens from './models/CredentialTokens';
 import EmojiCustom from './models/EmojiCustom';
-import OAuthApps from './models/OAuthApps';
 import OEmbedCache from './models/OEmbedCache';
-import WebdavAccounts from './models/WebdavAccounts';
-import Integrations from './models/Integrations';
 import ReadReceipts from './models/ReadReceipts';
 import BannedUsers from './models/BannedUsers';
 import Complaints from './models/Complaints';
@@ -29,10 +26,6 @@ import LongTasks from './models/LongTasks';
 
 export { oplogEvents } from './oplogEvents';
 export { nats } from './nats';
-
-export { FederationDNSCache } from './models/FederationDNSCache';
-export { FederationEvents } from './models/FederationEvents';
-export { FederationKeys } from './models/FederationKeys';
 
 export {
 	Base,
@@ -52,12 +45,9 @@ export {
 	Permissions,
 	Roles,
 	CustomSounds,
-	Integrations,
 	CredentialTokens,
 	EmojiCustom,
-	OAuthApps,
 	OEmbedCache,
-	WebdavAccounts,
 	ReadReceipts,
 	BannedUsers,
 	Complaints,

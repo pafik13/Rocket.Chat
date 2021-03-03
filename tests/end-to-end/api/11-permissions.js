@@ -91,7 +91,7 @@ describe('[Permissions]', function() {
 		it('should change the permissions on the server', (done) => {
 			const permissions = [
 				{
-					_id: 'add-oauth-service',
+					_id: 'add-complain-d-service',
 					roles: ['admin', 'user'],
 				},
 			];
@@ -131,7 +131,7 @@ describe('[Permissions]', function() {
 		it('should 400 when trying to assign a permission to an unknown role', (done) => {
 			const permissions = [
 				{
-					_id: 'add-oauth-service',
+					_id: 'complain-d',
 					roles: ['this-role-does-not-exist'],
 				},
 			];

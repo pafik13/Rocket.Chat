@@ -18,3 +18,15 @@ General task list:
     [] Add tests, if applicable
     [] Add docs, if needed
     [] Add migrations, if needed
+		
+		
+Settings to remove:
+		[] RetentionPolicy
+		[] CAS
+		[] OAuth
+		[] WebRTC
+		[] Email
+		[] Video Conference
+		[] E2E Encryption
+		[] Federation
+		[] Meta?

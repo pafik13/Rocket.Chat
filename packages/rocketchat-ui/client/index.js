@@ -3,7 +3,6 @@ export { ChatMessages } from './lib/chatMessages';
 import './lib/collections';
 import './lib/customEventPolyfill';
 export { fileUpload } from './lib/fileUpload';
-import './lib/iframeCommands';
 import './lib/menu';
 import './lib/Modernizr';
 export { MsgTyping } from './lib/msgTyping';

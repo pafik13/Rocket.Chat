@@ -13,7 +13,6 @@ import './startup/cron';
 import './startup/initialData';
 import './startup/presence';
 import './startup/serverRunning';
-import './configuration/accounts_meld';
 import './methods/OEmbedCacheCleanup';
 import './methods/cleanupDeactivations';
 import './methods/acceptChannel';

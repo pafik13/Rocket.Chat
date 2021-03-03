@@ -30,7 +30,6 @@ Package.onUse(function(api) {
 		'rocketchat:models',
 		'raix:ui-dropped-event',
 		'rocketchat:lazy-load',
-		'rocketchat:e2e',
 		'mizzao:autocomplete',
 		'rocketchat:file-upload',
 		'konecty:user-presence',

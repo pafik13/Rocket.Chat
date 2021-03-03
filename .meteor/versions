@@ -132,14 +132,12 @@ rocketchat:channel-settings@0.0.1
 rocketchat:colors@0.0.1
 rocketchat:cors@0.0.1
 rocketchat:custom-sounds@1.0.0
-rocketchat:e2e@0.0.1
 rocketchat:emoji@1.0.0
 rocketchat:emoji-custom@1.0.0
 rocketchat:emoji-emojione@0.0.1
 rocketchat:error-handler@1.0.0
 rocketchat:extasciifolder@0.0.1
 rocketchat:favico@0.0.1
-rocketchat:federation@0.0.1
 rocketchat:file@0.0.1
 rocketchat:file-upload@0.0.1
 rocketchat:highlight-words@0.0.1
@@ -171,7 +169,6 @@ rocketchat:p2p-calls@0.0.1
 rocketchat:promises@0.0.1
 rocketchat:push-notifications@0.0.1
 rocketchat:reactions@0.0.1
-rocketchat:retention-policy@0.0.1
 rocketchat:search@0.0.1
 rocketchat:settings@0.0.1
 rocketchat:setup-wizard@0.0.1

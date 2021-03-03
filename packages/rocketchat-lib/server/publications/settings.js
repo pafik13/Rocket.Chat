@@ -79,7 +79,9 @@ Settings.on('change', ({ clientAction, id, data, diff }) => {
 		}
 
 		case 'removed': {
-			const setting = data || Settings.findOneById(id, { fields: { public: 1 } });
+			console.log(clientAction, id, data, diff);
+			const setting = data || Settings.trashFindOneById(id, { fields: { public: 1 } });
+			console.log('setting', setting);
 
 			if (setting.public === true) {
 				Notifications.notifyAllInThisInstance('public-settings-changed', clientAction, { _id: id });

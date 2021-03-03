@@ -105,12 +105,6 @@ settings.addGroup('Accounts', function() {
 		public: true,
 	});
 	this.section('Registration', function() {
-		this.add('Accounts_Send_Email_When_Activating', true, {
-			type: 'boolean',
-		});
-		this.add('Accounts_Send_Email_When_Deactivating', true, {
-			type: 'boolean',
-		});
 		this.add('Accounts_DefaultUsernamePrefixSuggestion', 'user', {
 			type: 'string',
 		});
@@ -121,17 +115,6 @@ settings.addGroup('Accounts', function() {
 		this.add('Accounts_RequirePasswordConfirmation', true, {
 			type: 'boolean',
 			public: true,
-		});
-		this.add('Accounts_EmailVerification', false, {
-			type: 'boolean',
-			public: true,
-			enableQuery: {
-				_id: 'SMTP_Host',
-				value: {
-					$exists: 1,
-					$ne: '',
-				},
-			},
 		});
 		this.add('Accounts_ManuallyApproveNewUsers', false, {
 			public: true,
@@ -511,7 +494,7 @@ settings.addGroup('Accounts', function() {
 			public: true,
 			i18nLabel: 'MessageBox_view_mode',
 		});
-		this.add('Accounts_Default_User_Preferences_emailNotificationMode', 'mentions', {
+		this.add('Accounts_Default_User_Preferences_emailNotificationMode', 'nothing', {
 			type: 'select',
 			values: [
 				{
@@ -652,163 +635,6 @@ settings.addGroup('Accounts', function() {
 		this.add('Accounts_Password_Policy_AtLeastOneSpecialCharacter', true, {
 			type: 'boolean',
 			enableQuery,
-		});
-	});
-});
-
-settings.addGroup('OAuth', function() {
-	this.section('Facebook', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Facebook',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Facebook', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Facebook_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Facebook_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Facebook_callback_url', '_oauth/facebook', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	this.section('Google', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Google',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Google', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Google_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Google_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Google_callback_url', '_oauth/google', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	this.section('GitHub', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Github',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Github', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Github_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Github_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Github_callback_url', '_oauth/github', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	this.section('Linkedin', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Linkedin',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Linkedin', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Linkedin_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Linkedin_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Linkedin_callback_url', '_oauth/linkedin', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	this.section('Meteor', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Meteor',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Meteor', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Meteor_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Meteor_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Meteor_callback_url', '_oauth/meteor', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	this.section('Twitter', function() {
-		const enableQuery = {
-			_id: 'Accounts_OAuth_Twitter',
-			value: true,
-		};
-		this.add('Accounts_OAuth_Twitter', false, {
-			type: 'boolean',
-			public: true,
-		});
-		this.add('Accounts_OAuth_Twitter_id', '', {
-			type: 'string',
-			enableQuery,
-		});
-		this.add('Accounts_OAuth_Twitter_secret', '', {
-			type: 'string',
-			enableQuery,
-		});
-		return this.add('Accounts_OAuth_Twitter_callback_url', '_oauth/twitter', {
-			type: 'relativeUrl',
-			readonly: true,
-			force: true,
-			enableQuery,
-		});
-	});
-	return this.section('Proxy', function() {
-		this.add('Accounts_OAuth_Proxy_host', 'https://oauth-proxy.rocket.chat', {
-			type: 'string',
-			public: true,
-		});
-		return this.add('Accounts_OAuth_Proxy_services', '', {
-			type: 'string',
-			public: true,
 		});
 	});
 });
@@ -2711,7 +2537,7 @@ settings.addGroup('Setup_Wizard', function() {
 				order: 2,
 			},
 		});
-		this.add('Allow_Marketing_Emails', true, {
+		this.add('Allow_Marketing_Emails', false, {
 			type: 'boolean',
 		});
 		this.add('Register_Server', true, {

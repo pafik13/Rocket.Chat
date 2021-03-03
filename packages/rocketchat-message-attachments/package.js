@@ -11,7 +11,6 @@ Package.onUse(function(api) {
 		'ecmascript',
 		'rocketchat:lib',
 		'rocketchat:lazy-load',
-		'rocketchat:e2e',
 		'rocketchat:ui-message',
 		'rocketchat:ui-utils',
 		'rocketchat:utils',

@@ -191,13 +191,6 @@ Accounts.validateLoginAttempt(function(login) {
 		});
 	}
 
-	if (login.user.roles.includes('admin') === false && login.type === 'password' && settings.get('Accounts_EmailVerification') === true) {
-		const validEmail = login.user.emails.filter((email) => email.verified === true);
-		if (validEmail.length === 0) {
-			throw new Meteor.Error('error-invalid-email', 'Invalid email __email__');
-		}
-	}
-
 	login = callbacks.run('onValidateLogin', login);
 
 	Users.updateLastLoginById(login.user._id);

@@ -4,7 +4,6 @@ import { hasPermission } from 'meteor/rocketchat:authorization';
 import { Rooms, Users } from 'meteor/rocketchat:models';
 import s from 'underscore.string';
 
-import { Federation } from 'meteor/rocketchat:federation';
 
 const sortChannels = function(field, direction) {
 	switch (field) {
@@ -90,28 +89,7 @@ Meteor.methods({
 			return;
 		}
 
-		let exceptions = [user.username];
-
-		// Get exceptions
-		if (type === 'users' && workspace === 'all') {
-			const nonFederatedUsers = Users.find({
-				$or: [
-					{ federation: { $exists: false } },
-					{ 'federation.peer': Federation.localIdentifier },
-				],
-			}, { fields: { username: 1 } }).map((u) => u.username);
-
-			exceptions = exceptions.concat(nonFederatedUsers);
-		} else if (type === 'users' && workspace === 'local') {
-			const federatedUsers = Users.find({
-				$and: [
-					{ federation: { $exists: true } },
-					{ 'federation.peer': { $ne: Federation.localIdentifier } },
-				],
-			}, { fields: { username: 1 } }).map((u) => u.username);
-
-			exceptions = exceptions.concat(federatedUsers);
-		}
+		const exceptions = [user.username];
 
 		const sort = sortUsers(sortBy, sortDirection);
 

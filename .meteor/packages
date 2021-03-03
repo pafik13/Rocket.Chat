@@ -53,7 +53,6 @@ rocketchat:emoji-custom
 rocketchat:emoji-emojione
 rocketchat:error-handler
 rocketchat:favico
-rocketchat:federation
 rocketchat:file
 rocketchat:file-upload
 #rocketchat:google-natural-language
@@ -77,7 +76,6 @@ rocketchat:oembed
 rocketchat:otr
 rocketchat:push-notifications
 rocketchat:reactions
-rocketchat:retention-policy
 rocketchat:setup-wizard
 rocketchat:slashcommands-archive
 rocketchat:slashcommands-asciiarts
@@ -137,7 +135,6 @@ pauli:accounts-linkedin
 raix:handlebar-helpers
 raix:ui-dropped-event
 yasinuslu:blaze-meta
-rocketchat:e2e
 
 rocketchat:search
 rocketchat:lazy-load

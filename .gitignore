@@ -83,3 +83,8 @@ cypress.json
 /tests/cypress/videos
 /tests/cypress/screenshots
 !/tests/cypress.json
+
+# Custom
+file_example_MP4_480_1_5MG.mp4
+ForBiggerBlazes.mp4
+curls2.sh
