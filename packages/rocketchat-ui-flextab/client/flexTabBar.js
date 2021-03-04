@@ -3,7 +3,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { Session } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { TAPi18n } from 'meteor/tap:i18n';
-import { hasPermission } from 'meteor/rocketchat:authorization';
+// import { hasPermission } from 'meteor/rocketchat:authorization';
 import { ChatRoom } from 'meteor/rocketchat:models';
 import { popover, TabBar, Layout } from 'meteor/rocketchat:ui-utils';
 import { t } from 'meteor/rocketchat:utils';
@@ -21,7 +21,8 @@ const commonHelpers = {
 };
 function canShowAddUsersButton(rid) {
 	const room = ChatRoom.findOne(rid, { fields: { canMembersAddUser: 1 } });
-	const canAddUser = room.canMembersAddUser || hasPermission('add-user-to-joined-room', room._id);
+	console.log('canShowAddUsersButton', room, rid);
+	const canAddUser = true; // room.canMembersAddUser || hasPermission('add-user-to-joined-room', room._id);
 	if (
 		!canAddUser &&
 		Template.instance().tabBar.currentGroup() === 'channel'
@@ -37,6 +38,7 @@ function canShowAddUsersButton(rid) {
 	return true;
 }
 const filterButtons = (button, anonymous, rid) => {
+	console.log('filterButtons', button, anonymous, rid);
 	if (!Meteor.userId() && !anonymous) {
 		return false;
 	}

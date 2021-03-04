@@ -1491,7 +1491,8 @@
   "Is_Image_Files_Allowed": "Is image files allowed in direct?",
   "Is_Audio_Files_Allowed": "Is audio files allowed in direct?",
   "Is_Video_Files_Allowed": "Is video files allowed in direct?",
-  "Is_Other_Files_Allowed": "Is other files allowed in direct?",
+  "Is_Other_Files_Allowed": "Is other files allowed in direct
+  "Is_Links_Allowed": "Is links preview allowed in direct?",
   "is_also_typing": "is also typing",
   "is_also_typing_female": "is also typing",
   "is_also_typing_male": "is also typing",
@@ -3066,6 +3067,8 @@
   "Videos_disallowed_by": "User <em>__user_by__</em> disallowed videos.",
   "Others_allowed_by": "User <em>__user_by__</em> allowed other files.",
   "Others_disallowed_by": "User <em>__user_by__</em> disallowed other files.",
+  "Links_allowed_by": "User <em>__user_by__</em> allowed links preview.",
+  "Links_disallowed_by": "User <em>__user_by__</em> disallowed links preview.",
   "Uploads_state_changed_by": "User <em>__user_by__</em> change uploads state to __uploads_state__",
   "Members_hidden_setting_changed_successfully": "Members hidden setting changed successfully",
   "Files_hidden_setting_changed_successfully": "Files hidden setting changed successfully",

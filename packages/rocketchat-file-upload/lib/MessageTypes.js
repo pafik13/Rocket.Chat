@@ -85,6 +85,27 @@ Meteor.startup(function() {
 	});
 
 	MessageTypes.registerType({
+		id: 'links-allowed',
+		system: true,
+		message: 'Links_allowed_by',
+		data(message) {
+			return {
+				user_by: message.msg,
+			};
+		},
+	});
+	MessageTypes.registerType({
+		id: 'links-disallowed',
+		system: true,
+		message: 'Links_disallowed_by',
+		data(message) {
+			return {
+				user_by: message.msg,
+			};
+		},
+	});
+
+	MessageTypes.registerType({
 		id: 'uploads-need-accept',
 		system: true,
 		message: 'Uploads_state_changed_by',
