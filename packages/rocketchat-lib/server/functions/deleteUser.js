@@ -1,9 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { TAPi18n } from 'meteor/tap:i18n';
 import { FileUpload } from 'meteor/rocketchat:file-upload';
 import { Users, Subscriptions, Messages, Rooms } from 'meteor/rocketchat:models';
 import { hasRole, getUsersInRole } from 'meteor/rocketchat:authorization';
-import { settings } from 'meteor/rocketchat:settings';
 import { Notifications } from 'meteor/rocketchat:notifications';
 
 export const deleteUser = function(userId) {
@@ -53,22 +51,22 @@ export const deleteUser = function(userId) {
 			roomCache.push(roomData);
 		});
 
-		const messageErasureType = settings.get('Message_ErasureType');
-		switch (messageErasureType) {
-			case 'Delete':
-				const store = FileUpload.getStore('Uploads');
-				Messages.findFilesByUserId(userId).forEach(function({ file }) {
-					store.deleteById(file._id);
-				});
-				// Messages.removeByUserId(userId);
-				Messages.remove({ 'u._id': userId });
-				break;
-			case 'Unlink':
-				const rocketCat = Users.findOneById('rocket.cat');
-				const nameAlias = TAPi18n.__('Removed_User');
-				Messages.unlinkUserId(userId, rocketCat._id, rocketCat.username, nameAlias);
-				break;
-		}
+		// 		const messageErasureType = settings.get('Message_ErasureType');
+		// 		switch (messageErasureType) {
+		// 			case 'Delete':
+		// 				const store = FileUpload.getStore('Uploads');
+		// 				Messages.findFilesByUserId(userId).forEach(function({ file }) {
+		// 					store.deleteById(file._id);
+		// 				});
+		// 				// Messages.removeByUserId(userId);
+		// 				Messages.remove({ 'u._id': userId });
+		// 				break;
+		// 			case 'Unlink':
+		// 				const rocketCat = Users.findOneById('rocket.cat');
+		// 				const nameAlias = TAPi18n.__('Removed_User');
+		// 				Messages.unlinkUserId(userId, rocketCat._id, rocketCat.username, nameAlias);
+		// 				break;
+		// 		}
 
 		roomCache.forEach((roomData) => {
 			if (roomData.subscribers === null && roomData.t !== 'd' && roomData.t !== 'c') {
