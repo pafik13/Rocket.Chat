@@ -16,11 +16,10 @@ Meteor.methods({
 		const subscription = Subscriptions.findOneByRoomIdAndUserId(rid, callerId);
 		const subscription2 = Subscriptions.findOneByRoomIdAndUserId(rid, blocked);
 
-		if (!subscription || !subscription2) {
-			throw new Meteor.Error('error-invalid-room', 'Invalid room', { method: 'unblockUser' });
+		if (subscription && subscription2) {
+			Subscriptions.unsetBlockedByRoomId(rid, blocked, callerId);
 		}
 
-		Subscriptions.unsetBlockedByRoomId(rid, blocked, callerId);
 		BlockedUsers.deleteRecord(callerId, blocked);
 
 		return true;
