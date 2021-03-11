@@ -689,25 +689,20 @@ API.v1.addRoute('admin.setBlocking', { authRequired: true }, {
 		const blocker = Users.findOneById(principal, { _id: 1 });
 		console.log('blocker', blocker);
 
-		if (!blocker) { return API.v1.notFound(); }
+		if (!blocker) { return API.v1.notFound('Principal not found'); }
 
 		const blocked = Users.findOneById(subject, { _id: 1 });
 		console.log('blocked', blocked);
 
-		if (!blocked) { return API.v1.notFound(); }
+		if (!blocked) { return API.v1.notFound('Subject not found'); }
 
 		const rid = [blocker._id, blocked._id].sort().join('');
 		console.log('rid', rid);
 
-		const room = Rooms.findOneByIdOrName(rid, { _id: 1 });
-
-		if (!room) { return API.v1.notFound(); }
-		console.log('room', room);
-
 		const methodName = enabled ? 'blockUser' : 'unblockUser';
 
 		Meteor.runAsUser(blocker._id, () => {
-			Meteor.call(methodName, { rid: room._id, blocked: blocked._id, reason: 'unknown' });
+			Meteor.call(methodName, { rid, blocked: blocked._id, reason: 'denylist' });
 		});
 
 		return API.v1.success();
